@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="bold">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>M* (M-star): A Modular, Extensible, Serving System for Multimodal Models</title>
+<meta name="google-site-verification" content="Ym7WaMQx-4UrRha-HpIzbS3jEtvssnB0jWCc_DR_ZJc" />
+<meta name="description" content="M* (M-star) is a universal serving system for composite, any-to-any multimodal models. Models are dataflow graphs; requests are Walks. One runtime serves image, audio, video, and robot-action models at or above the performance of specialized engines." />
+<link rel="canonical" href="https://mstar.stanford.edu/" />
+<meta property="og:title" content="M*: One Serving System for Any-to-Any Multimodal Models" />
+<meta property="og:description" content="Composite models broke the single-loop assumption behind LLM serving. The Walk Graph fixes it." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://mstar.stanford.edu/" />
+<meta property="og:image" content="https://mstar.stanford.edu/assets/img/fig_system.png" />
+<meta name="twitter:image" content="https://mstar.stanford.edu/assets/img/fig_system.png" />
+<meta name="twitter:card" content="summary_large_image" />
+<!-- set theme ASAP to avoid flash; enable progressive-enhancement reveal -->
+<script>
+(function(){try{var t=localStorage.getItem('mstar-theme')||'bold';document.documentElement.setAttribute('data-theme',t);}catch(e){}document.documentElement.className+=' js';})();
+</script>
+<link rel="stylesheet" href="assets/css/base.css" />
+<link rel="stylesheet" href="assets/css/theme-minimal.css" />
+<link rel="stylesheet" href="assets/css/theme-bold.css" />
+<style>
+  /* placement-diagram GPU badges (uses theme --gpu* vars) */
+  #placediagram .badge-bg { rx: 11; }
+  .node .badge-bg { fill: var(--muted); }
+  .node.g0 .badge-bg { fill: var(--gpu0); }
+  .node.g1 .badge-bg { fill: var(--gpu1); }
+  .node.g2 .badge-bg { fill: var(--gpu2); }
+  .node.g12 .badge-bg { fill: var(--gpu1); }
+  .node text.gpu-badge { fill: #fff; font: 700 11px var(--font-mono); }
+</style>
+<script defer src="assets/js/theme.js"></script>
+<script defer src="assets/js/animations.js"></script>
+</head>
+<body>
+
+<!-- ===================== top bar ===================== -->
+<header class="topbar">
+  <div class="wrap">
+    <span class="brand">M<span class="star">&#42;</span></span>
+    <nav class="topnav">
+      <a class="nav-hide" href="#idea">The idea</a>
+      <a class="nav-hide" href="#unlocks">What it unlocks</a>
+      <a class="nav-hide" href="#results">Results</a>
+      <a class="nav-hide" href="#start">Get the code</a>
+      <span class="theme-toggle" role="group" aria-label="Color theme">
+        <button data-theme-set="minimal" aria-pressed="false">Minimal</button>
+        <button data-theme-set="bold" aria-pressed="true">Bold</button>
+      </span>
+    </nav>
+  </div>
+</header>
+
+<!-- ===================== hero / hub ===================== -->
+<section class="hero">
+  <div class="wrap">
+    <div class="hero-grid">
+      <div>
+        <h1>M* (M-star): A Modular, Extensible, Serving System for Multimodal Models</h1>
+        <p class="lead">Today's models no longer fit the mold of autoregressive token generation, but the
+          systems supporting LLM inference have not kept up. These models have composite architectures best
+          captured by dataflow <strong>graphs</strong>. Requests are just <strong>walks</strong> on these
+          graphs. M* is designed to fit this paradigm and maximize flexibility and performance for current
+          and future composite models. In our tests, M* achieves nearly <strong>2.7&#215;</strong> higher
+          throughput vs. vLLM-Omni and <strong>4&#215;</strong> higher throughput vs. SGLang-Omni while
+          maintaining a lower RTF than both on the Qwen3-Omni TTS workload.</p>
+        <p class="byline" style="color:var(--hero-heading); font-size:1.02rem; line-height:1.55; margin-bottom:.35em">Atindra Jha, Naomi Sagan, Keisuke Kamahori, Xikai (Noah) Meng, Luke Zettlemoyer, Olivia Hsu, Jure Leskovec, Baris Kasikci, Stephanie Wang</p>
+        <p class="byline" style="margin:0; font-size:.85rem">Stanford&nbsp;University · University&nbsp;of&nbsp;Washington · Carnegie&nbsp;Mellon&nbsp;University</p>
+        <p class="byline" style="margin:.2em 0 0"><a href="mailto:atindra@cs.stanford.edu">atindra@cs.stanford.edu</a></p>
+        <p class="byline" style="margin-top:.15em; color:var(--muted, #777)">June 2026</p>
+        <div class="btnrow">
+          <a class="btn btn-primary" href="https://arxiv.org/abs/2606.12688">Read the paper <span class="tag">arXiv</span></a>
+          <a class="btn btn-ghost" href="https://github.com/mstar-project/mstar">Code <span class="tag">GitHub</span></a>
+          <a class="btn btn-ghost" href="/mstar/">Docs <span class="tag">guide</span></a>
+        </div>
+      </div>
+      <div class="diagram" aria-label="Animated walk-graph diagram">
+        <svg id="heroflow" viewBox="0 0 760 300" role="img" aria-label="A request walking a model's computation graph">
+          <defs>
+            <marker id="arrow" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto" markerUnits="strokeWidth">
+              <path d="M0,0 L7,3 L0,6 Z" fill="var(--edge)"></path>
+            </marker>
+          </defs>
+          <!-- edges -->
+          <path class="edge" id="hfe-text" marker-end="url(#arrow)" d="M144,67 C 215,80 235,140 278,150"></path>
+          <path class="edge" id="hfe-vit"  marker-end="url(#arrow)" d="M144,221 C 215,205 235,168 278,160"></path>
+          <path class="edge" id="hfe-flow" marker-end="url(#arrow)" d="M420,144 C 470,120 482,90 518,72"></path>
+          <path class="edge" id="hfe-vae"  marker-end="url(#arrow)" d="M605,98 L605,194"></path>
+          <path class="edge" id="hfe-dec"  marker-end="url(#arrow)" d="M330,120 C 322,84 384,84 374,118"></path>
+          <text class="sub" x="392" y="104">decode</text>
+          <text class="sub" x="676" y="225" text-anchor="start">&#8594; image</text>
+          <!-- nodes -->
+          <g class="node n-enc" id="hf-text"><rect x="24" y="42" width="120" height="50" rx="10"></rect><text x="84" y="66" text-anchor="middle">Text</text><text x="84" y="82" text-anchor="middle">encoder</text></g>
+          <g class="node n-enc" id="hf-vit"><rect x="24" y="196" width="120" height="50" rx="10"></rect><text x="84" y="220" text-anchor="middle">ViT</text><text x="84" y="236" text-anchor="middle">encoder</text></g>
+          <g class="node n-bb" id="hf-llm"><rect x="280" y="120" width="140" height="60" rx="11"></rect><text x="350" y="147" text-anchor="middle">LLM</text><text x="350" y="165" text-anchor="middle" class="sub">backbone</text></g>
+          <g class="node n-bb" id="hf-flow"><rect x="520" y="44" width="170" height="52" rx="11"></rect><text x="605" y="68" text-anchor="middle">image_gen</text><text x="605" y="84" text-anchor="middle" class="sub">flow loop &#215;50</text></g>
+          <g class="node n-dec" id="hf-vae"><rect x="545" y="196" width="120" height="50" rx="10"></rect><text x="605" y="220" text-anchor="middle">VAE</text><text x="605" y="236" text-anchor="middle">decoder</text></g>
+        </svg>
+        <p class="diagram-cap" id="hero-cap">A request walks the graph.</p>
+        <div class="legend">
+          <span><i style="background:var(--node-encoder);border-color:var(--node-encoder-bd)"></i>Encoder</span>
+          <span><i style="background:var(--node-backbone);border-color:var(--node-backbone-bd)"></i>Backbone</span>
+          <span><i style="background:var(--node-decoder);border-color:var(--node-decoder-bd)"></i>Decoder</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== body ===================== -->
+<main>
+
+<!-- §1 hook -->
+<section class="section-pad" id="idea">
+  <div class="wrap narrow reveal">
+    <h2>Inference is no longer a single loop</h2>
+    <p>LLM serving systems like vLLM and SGLang are built on one assumption: that inference is a single
+      autoregressive loop &mdash; prefill the prompt, then decode one token at a time until the model stops.
+      The newest multimodal models break that assumption. Five families make it concrete:</p>
+    <ul class="chips">
+      <li class="chip"><b>UMMs</b> &mdash; BAGEL</li>
+      <li class="chip"><b>SpeechLMs</b> &mdash; Orpheus</li>
+      <li class="chip"><b>Omni</b> &mdash; Qwen3-Omni</li>
+      <li class="chip"><b>VLAs</b> &mdash; &#960;0.5</li>
+      <li class="chip"><b>World models</b> &mdash; V-JEPA&nbsp;2</li>
+    </ul>
+    <p>They are <em>composite</em>: built from structurally distinct components &mdash; vision encoders,
+      transformer backbones, diffusion and flow heads, audio codecs, action and world-model predictors
+      &mdash; wired together in patterns that change with the input. They add <strong>non-AR loops</strong>
+      (diffusion image generation, variable-horizon world-model rollouts), <strong>internal
+      parallelism</strong> (the branches of classifier-free guidance; the pipelined Thinker&ndash;Talker of
+      an omni model), and <strong>input-dependent paths</strong> (in BAGEL, <em>generating</em> an image and
+      <em>understanding</em> one traverse different components of the <em>same</em> model).</p>
+    <p>M* serves all of them from a single runtime. On the models we have benchmarked, M* matches or beats
+      the specialized system built for each &mdash; by up to <strong>2.7&#215;</strong> on speech and image
+      serving, and <strong>12.5&#215;</strong> on world-model rollouts. The rest of this post shows how M*
+      works, starting with code.</p>
+  </div>
+  <div class="wrap narrow reveal">
+    <figure>
+      <img src="assets/img/fig_model_arch.png" alt="BAGEL and Qwen3-Omni drawn as component graphs" loading="lazy" />
+      <figcaption><strong>Figure 1.</strong> Two composite architectures as graphs of components &mdash;
+        BAGEL (a UMM: <code>vit_encoder</code>, <code>vae_encoder</code>, an <code>LLM</code> backbone,
+        <code>vae_decoder</code>) and Qwen3-Omni (an omni model: <code>Thinker</code>, <code>Talker</code>,
+        <code>Code2Wav</code>). Structurally diverse; each is naturally a graph.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<hr class="divider" />
+
+<!-- §2 why existing systems fall short -->
+<section class="section-pad">
+  <div class="wrap narrow reveal">
+    <h2>Why today's serving stacks fall short</h2>
+    <p>Composite models pose three challenges at once: <strong>architectural diversity</strong> (many
+      paths, non-AR loops), <strong>performant modularity</strong> (HuggingFace Transformers is flexible
+      but slow; vLLM and VoxServe are fast but domain-locked), and <strong>physical topology</strong>
+      (heterogeneous components want different placement, batching, and transport).</p>
+    <p><strong>vLLM and SGLang</strong> are superb at autoregressive text, but they are
+      <strong>modality-locked</strong>: built for text generation, with image (and even text) inputs
+      supported only as prefill-time encoder add-ons, and a single decode loop whose output is always text.
+      There is no first-class way to compose heterogeneous components into loops and parallel branches
+      &mdash; no CFG fan-out &mdash; and no cross-component streaming. <strong>vLLM-Omni and
+      SGLang-Omni</strong> go further, modeling a request as a flat pipeline of stages wired by explicit
+      data-transfer functions &mdash; enough for a Thinker&ndash;Talker&ndash;codec chain. But iteration
+      stays inside a single stage and stages cannot be composed in parallel, so patterns such as diffusion
+      loops or classifier-free guidance (CFG) fan-out must be added per-model as glue code. In vLLM-Omni,
+      for instance, BAGEL's CFG runs through a bespoke plugin built on <code>torch.distributed</code>.</p>
+    <p>We built M* because we wanted to make it easier for current and future composite models to achieve
+      state-of-the-art efficiency. We found that current systems could be generalized into the M*
+      <strong>Walk Graph</strong>.</p>
+    <div class="tablewrap card reveal">
+      <table>
+        <thead><tr><th>&nbsp;</th><th>vLLM-Omni</th><th>SGLang-Omni</th><th>M* (ours)</th></tr></thead>
+        <tbody>
+          <tr><td>Graph node</td><td>Engine-instance stage</td><td>Worker-pool stage</td><td class="ours">Model component</td></tr>
+          <tr><td>Composition</td><td>Flat DAG</td><td>Flat DAG</td><td class="ours">Seq. / Par. / Loop / Stream</td></tr>
+          <tr><td>Paths per model</td><td>Prefill, decode</td><td>Prefill, decode</td><td class="ours">Flexible</td></tr>
+          <tr><td>Loops</td><td>Within a stage</td><td>Within a stage</td><td class="ours">Across any subgraph</td></tr>
+          <tr><td>Placement</td><td>Stage</td><td>Stage</td><td class="ours">Component, w/ optional Walk</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="codecap">Table 1. Each prior abstraction is a restricted subset of the Walk Graph.</p>
+  </div>
+</section>
+
+<hr class="divider" />
+
+<!-- §3 the Walk Graph, by example -->
+<section class="section-pad">
+  <div class="wrap narrow reveal">
+    <h2>The Walk Graph, by example</h2>
+    <p>In M*, a model is declared as a graph of model-component <strong>nodes</strong> connected by tensor
+      <strong>edges</strong>, plus a set of named <strong>Walks</strong>. Each Walk is a labeled subgraph for
+      one phase of behavior. A request is a <em>series of Walks</em>, chosen by a small state machine the
+      model author writes. The author provides only the graph and the Walks. Everything physical &mdash;
+      placement, scheduling, batching, tensor transport, streaming &mdash; is the runtime's job.</p>
+    <figure>
+      <img src="assets/img/fig_bagel_example.png" alt="BAGEL as nodes and Walks" loading="lazy" />
+      <figcaption><strong>Figure 2.</strong> BAGEL in M*: its components as graph nodes (four core, plus
+        <code>combine_cfg</code> and two extra <code>LLM</code> views when CFG runs in parallel), and the
+        Walks a request strings together.</figcaption>
+    </figure>
+    <p>For example, BAGEL has four core components &mdash; <code>vit_encoder</code>, <code>vae_encoder</code>,
+      the <code>LLM</code>, and <code>vae_decoder</code> &mdash; and a handful of Walks. The state machine
+      strings them together differently per request:</p>
+    <ul class="chips">
+      <li class="chip"><b>Generate an image</b> (text&#8594;image): <code>prefill_text &#8594; image_gen</code></li>
+      <li class="chip"><b>Understand an image</b> (image&#8594;text): <code>prefill_text &#8594; prefill_vit &#8594; decode</code></li>
+      <li class="chip"><b>Edit an image</b> (image&#8594;image): <code>prefill_text &#8594; prefill_vae &#8594; prefill_vit &#8594; image_gen</code></li>
+    </ul>
+    <p>Defining requests as Walks means that the runtime executes <em>only the components a request
+      needs</em>. Image understanding never touches the diffusion loop or the <code>vae_decoder</code>;
+      image generation never runs the ViT understanding path.</p>
+    <p>Walks are run based on a state machine the author writes: it builds the prefill steps from the input
+      modalities, then transitions to decode or image generation based on the requested output (<em>note:
+      this is a simplification of the actual M* model code</em>):</p>
+<pre><span class="cmt"># Pick the next Walk based on the current phase</span>
+<span class="kw">def</span> <span class="fn">next_walk</span>(self, state):
+    <span class="kw">if</span> state.prefill_steps:                 <span class="cmt"># still consuming inputs</span>
+        <span class="kw">return</span> state.prefill_steps.pop(<span class="kw">0</span>)   <span class="cmt">#   prefill_text / prefill_vae / prefill_vit</span>
+    <span class="kw">if</span> state.target == <span class="str">"image"</span>:
+        <span class="kw">return</span> <span class="str">"image_gen"</span>                  <span class="cmt">#   image_gen_cfg when CFG is configured</span>
+    <span class="kw">return</span> <span class="str">"decode"</span>                         <span class="cmt"># otherwise, autoregressive text</span></pre>
+    <p>Next we'll see how the model author defines the BAGEL graph. If you would rather run it first, go to
+      the <a href="/mstar/quickstart.html">quickstart</a>.</p>
+
+    <p><strong>Start with one node.</strong> A node names its inputs and declares where each output goes.
+      BAGEL's <code>vae_decoder</code> takes denoised latents and emits an image to the client:</p>
+<pre><span class="kw">from</span> mstar.graph.base <span class="kw">import</span> GraphNode, GraphEdge
+<span class="kw">from</span> mstar.graph.special_destinations <span class="kw">import</span> EMIT_TO_CLIENT
+
+vae_decoder = <span class="fn">GraphNode</span>(
+    name=<span class="str">"vae_decoder"</span>,
+    input_names=[<span class="str">"latents"</span>],
+    outputs=[
+        <span class="fn">GraphEdge</span>(next_node=EMIT_TO_CLIENT, name=<span class="str">"image_output"</span>,
+                  output_modality=<span class="str">"image"</span>),
+    ],
+)</pre>
+    <p>The graph only names inputs, outputs, and wiring. The compute behind a node is a
+      <code>torch.nn.Module</code> &mdash; the model author implements <code>prepare_inputs</code> and a
+      pure-tensor <code>forward</code>, and the runtime handles batching, KV caching, CUDA graphs, and
+      tensor transport. Here is that Submodule for the <code>vae_decoder</code> node:</p>
+<pre><span class="kw">class</span> <span class="fn">VAEDecoderSubmodule</span>(NodeSubmodule):      <span class="cmt"># NodeSubmodule is a torch.nn.Module</span>
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, vae_model):
+        self.vae_model = vae_model
+
+    <span class="kw">def</span> <span class="fn">prepare_inputs</span>(self, graph_walk, fwd_info, inputs):
+        <span class="cmt"># gather the tensors this node consumes from its input edges</span>
+        <span class="kw">return</span> <span class="fn">NodeInputs</span>(tensor_inputs={<span class="str">"latents"</span>: inputs[<span class="str">"latents"</span>][<span class="kw">0</span>]})
+
+    <span class="kw">def</span> <span class="fn">forward</span>(self, graph_walk, engine_inputs, latents):
+        <span class="cmt"># pure tensor compute; outputs are keyed to the node's output edges</span>
+        image = self.vae_model.decode(<span class="fn">unpatchify</span>(latents))
+        <span class="kw">return</span> {<span class="str">"image_output"</span>: [image]}</pre>
+
+    <p><strong>Add a loop.</strong> BAGEL generates an image by running flow-matching steps on its
+      <code>LLM</code> backbone, then decoding the final latents to pixels. This can be expressed in M* with a
+      <code>Loop</code>, which runs its <code>section</code> repeatedly, feeding each step's outputs back as
+      the next step's inputs. When the loop finishes, its <code>outputs</code> route forward &mdash; here, the
+      latents route to the <code>vae_decoder</code> we just built:</p>
+<pre><span class="kw">from</span> mstar.graph.base <span class="kw">import</span> Sequential, Loop
+
+image_gen = <span class="fn">Sequential</span>([
+    <span class="fn">Loop</span>(
+        section=<span class="fn">GraphNode</span>(
+            name=<span class="str">"LLM"</span>,
+            input_names=[<span class="str">"latents"</span>, <span class="str">"time_index"</span>],
+            outputs=[
+                <span class="fn">GraphEdge</span>(next_node=<span class="str">"LLM"</span>, name=<span class="str">"latents"</span>),
+                <span class="fn">GraphEdge</span>(next_node=<span class="str">"LLM"</span>, name=<span class="str">"time_index"</span>),
+            ],
+        ),
+        max_iters=<span class="kw">49</span>,                       <span class="cmt"># num_timesteps - 1</span>
+        outputs=[<span class="fn">GraphEdge</span>(next_node=<span class="str">"vae_decoder"</span>, name=<span class="str">"latents"</span>)],
+    ),
+    vae_decoder,                            <span class="cmt"># the node from above</span>
+])</pre>
+    <p>The same <code>Loop</code> primitive covers autoregressive text decode (it stops on an
+      end-of-sequence signal instead of a fixed count) and world-model rollout (it stops at the horizon).
+      Nothing here is special-cased to images. Furthermore, because Loops are generic, M* applies continuous
+      batching and CUDA-graph replay to flow steps exactly as it does to token decode.</p>
+    <div class="callout">
+      <p class="eyebrow">A node is whatever compute you name</p>
+      <p style="margin:0">BAGEL's diagram splits the model into a backbone, an LM head, a flow head, a time
+        embedder &mdash; yet the code has a single <code>LLM</code> node. That is a design choice for
+        performance: BAGEL's flow projection and time embedder are one or two linear layers each and both run
+        on the same hidden states as the backbone, so M* keeps them inside the one <code>LLM</code> node
+        &mdash; splitting them out would add scheduling and input-preparation overhead on the
+        image-generation critical path, with no performance benefit. The ViT and VAE <em>are</em> separate
+        nodes, because they genuinely differ in compute and placement needs.</p>
+    </div>
+
+    <p><strong>Add parallelism.</strong> Classifier-free guidance (CFG) runs three forward passes per
+      denoising step &mdash; an unconditional pass and two conditioned ones &mdash; and combines them.
+      Running these in parallel is ideal for minimizing latency. Unfortunately, this kind of pattern is hard
+      to capture in the flat stage pipelines used by vLLM-Omni or SGLang-Omni. Because three-way CFG can't be
+      natively supported, it requires a bespoke per-model plugin (e.g., a <code>CFGParallelMixin</code> that
+      <code>all_gather</code>s velocities across ranks in vLLM).</p>
+    <p>Meanwhile, M* handles all parallelism in a generic way, so the user just needs to express the
+      parallelism to the runtime. This is done with a <code>Parallel</code> block of three <code>LLM</code>
+      &ldquo;views&rdquo; that fan into a <code>combine_cfg</code> node and loop. Each branch can sit on its
+      own GPU; the runtime places and merges them with no per-model glue code (listing lightly simplified):</p>
+
+    <div class="diagram" aria-label="CFG fan-out animation">
+      <svg id="cfgflow" viewBox="-36 0 796 240" role="img" aria-label="Three CFG branches running in parallel and merging">
+        <defs>
+          <marker id="arrow2" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto" markerUnits="strokeWidth">
+            <path d="M0,0 L7,3 L0,6 Z" fill="var(--edge)"></path>
+          </marker>
+        </defs>
+        <text class="sub" x="40" y="18">Parallel &mdash; one GPU per branch</text>
+        <path class="edge" marker-end="url(#arrow2)" d="M210,47  C 320,47 330,116 416,116"></path>
+        <path class="edge" marker-end="url(#arrow2)" d="M210,116 L 416,116"></path>
+        <path class="edge" marker-end="url(#arrow2)" d="M210,185 C 320,185 330,116 416,116"></path>
+        <path class="edge" style="stroke-dasharray:5 6" d="M492,139 C 260,250 -3,231 -15,195 C -27,159 8,120 40,116" marker-end="url(#arrow2)"></path>
+        <text class="sub" x="250" y="234">latents loop &#215; 50 steps</text>
+        <g class="node n-bb" id="cf-main"><rect x="40" y="24" width="170" height="46" rx="10"></rect><text x="125" y="52" text-anchor="middle">LLM (cond)</text></g>
+        <g class="node n-bb" id="cf-text"><rect x="40" y="93" width="170" height="46" rx="10"></rect><text x="125" y="121" text-anchor="middle">LLM_cfg_text</text></g>
+        <g class="node n-bb" id="cf-img"><rect x="40" y="162" width="170" height="46" rx="10"></rect><text x="125" y="190" text-anchor="middle">LLM_cfg_img</text></g>
+        <g class="node n-dec" id="cf-combine"><rect x="416" y="93" width="160" height="46" rx="10"></rect><text x="496" y="121" text-anchor="middle">combine_cfg</text></g>
+      </svg>
+      <p class="diagram-cap">Three branches fire in parallel each step, then <code>combine_cfg</code> applies the CFG formula + an Euler step and loops the latents back.</p>
+    </div>
+
+<pre><span class="kw">from</span> mstar.graph.base <span class="kw">import</span> Parallel
+
+image_gen_cfg = <span class="fn">Sequential</span>([
+    <span class="fn">Loop</span>(
+        section=<span class="fn">Sequential</span>([
+            <span class="fn">Parallel</span>([
+                <span class="fn">GraphNode</span>(name=<span class="str">"LLM"</span>,          input_names=[<span class="str">"latents"</span>, <span class="str">"time_index"</span>],
+                          outputs=[<span class="fn">GraphEdge</span>(next_node=<span class="str">"combine_cfg"</span>, name=<span class="str">"v_main"</span>)]),
+                <span class="fn">GraphNode</span>(name=<span class="str">"LLM_cfg_text"</span>, input_names=[<span class="str">"latents"</span>, <span class="str">"time_index"</span>],
+                          outputs=[<span class="fn">GraphEdge</span>(next_node=<span class="str">"combine_cfg"</span>, name=<span class="str">"v_cfg_text"</span>)]),
+                <span class="fn">GraphNode</span>(name=<span class="str">"LLM_cfg_img"</span>,  input_names=[<span class="str">"latents"</span>, <span class="str">"time_index"</span>],
+                          outputs=[<span class="fn">GraphEdge</span>(next_node=<span class="str">"combine_cfg"</span>, name=<span class="str">"v_cfg_img"</span>)]),
+            ]),  <span class="cmt"># latent-init consistency ensured via a fixed per-request seed</span>
+            <span class="fn">GraphNode</span>(
+                name=<span class="str">"combine_cfg"</span>,
+                input_names=[<span class="str">"v_main"</span>, <span class="str">"v_cfg_text"</span>, <span class="str">"v_cfg_img"</span>, <span class="str">"latents"</span>, <span class="str">"time_index"</span>],
+                outputs=[       <span class="cmt"># feed latents + time_index back to every branch</span>
+                    <span class="fn">GraphEdge</span>(next_node=<span class="str">"LLM"</span>,          name=<span class="str">"latents"</span>),
+                    <span class="fn">GraphEdge</span>(next_node=<span class="str">"LLM"</span>,          name=<span class="str">"time_index"</span>),
+                    <span class="fn">GraphEdge</span>(next_node=<span class="str">"LLM_cfg_text"</span>, name=<span class="str">"latents"</span>),
+                    <span class="fn">GraphEdge</span>(next_node=<span class="str">"LLM_cfg_text"</span>, name=<span class="str">"time_index"</span>),
+                    <span class="fn">GraphEdge</span>(next_node=<span class="str">"LLM_cfg_img"</span>,  name=<span class="str">"latents"</span>),
+                    <span class="fn">GraphEdge</span>(next_node=<span class="str">"LLM_cfg_img"</span>,  name=<span class="str">"time_index"</span>),
+                ],
+            ),
+        ]),
+        max_iters=<span class="kw">49</span>,
+        outputs=[<span class="fn">GraphEdge</span>(next_node=<span class="str">"vae_decoder"</span>, name=<span class="str">"latents"</span>)],
+    ),
+    vae_decoder,  <span class="cmt"># as defined in "Start with one node" above</span>
+])</pre>
+    <p>How do the three <code>LLM</code> views connect to the real model? Each node name maps to a Submodule,
+      and the three CFG branches are the same language model wrapped under three names, differing only in
+      which guidance cache they read and write.</p>
+    <figure>
+      <img src="assets/img/fig_cfg_parallel.png" alt="BAGEL in M* with CFG parallelism" loading="lazy" />
+      <figcaption><strong>Figure 3.</strong> BAGEL in M* with CFG parallelism. The three Qwen2.5 MoT models
+        are each placed on a different GPU to enable parallel execution for each KV cache.</figcaption>
+    </figure>
+
+    <p><strong>Placement.</strong> Placement is a small YAML file that maps logical nodes to physical GPU
+      ranks. Nothing in the model code changes when you move components around. Mapping each node to GPU
+      ranks &mdash; disaggregating components, disaggregating prefill from decode, or using tensor-parallel
+      <strong>sharding</strong> &mdash; always uses the same placement API, so you can shard a big Qwen3-Omni
+      backbone while disaggregating its encoders and codec elsewhere.</p>
+    <div class="diagram" id="placediagram" aria-label="Placement and sharding toggle">
+      <div class="controls" role="group" aria-label="Placement mode">
+        <button data-mode="colocated" aria-pressed="false">Colocated</button>
+        <button data-mode="disaggregated" aria-pressed="true">Disaggregated</button>
+        <button data-mode="pd" aria-pressed="false">Prefill/decode split</button>
+        <button data-mode="sharded" aria-pressed="false">Sharding &#215; disaggregation</button>
+      </div>
+      <svg viewBox="0 0 760 170" role="img" aria-label="Encoders, backbone, and decoder placed across GPUs">
+        <defs>
+          <marker id="arrow3" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto" markerUnits="strokeWidth">
+            <path d="M0,0 L7,3 L0,6 Z" fill="var(--edge)"></path>
+          </marker>
+        </defs>
+        <path class="edge" marker-end="url(#arrow3)" d="M184,99 L300,99"></path>
+        <path class="edge" marker-end="url(#arrow3)" d="M460,99 L576,99"></path>
+        <g class="node n-enc g0" id="pl-enc">
+          <rect x="24" y="60" width="160" height="78" rx="11"></rect>
+          <text x="104" y="90" text-anchor="middle">Encoders</text>
+          <rect class="badge-bg" x="44" y="104" width="120" height="22"></rect>
+          <text class="gpu-badge" id="pl-enc-badge" x="104" y="119" text-anchor="middle">GPU 0</text>
+        </g>
+        <g class="node n-bb g1" id="pl-llm">
+          <rect x="300" y="60" width="160" height="78" rx="11"></rect>
+          <text x="380" y="90" text-anchor="middle">LLM backbone</text>
+          <rect class="badge-bg" x="320" y="104" width="120" height="22"></rect>
+          <text class="gpu-badge" id="pl-llm-badge" x="380" y="119" text-anchor="middle">GPU 1</text>
+        </g>
+        <g class="node n-dec g2" id="pl-dec">
+          <rect x="576" y="60" width="160" height="78" rx="11"></rect>
+          <text x="656" y="90" text-anchor="middle">Decoder</text>
+          <rect class="badge-bg" x="596" y="104" width="120" height="22"></rect>
+          <text class="gpu-badge" id="pl-dec-badge" x="656" y="119" text-anchor="middle">GPU 2</text>
+        </g>
+      </svg>
+      <p class="diagram-cap" id="place-cap">Disaggregated: each component on its own GPU(s) and scaled independently.</p>
+    </div>
+    <p>As an example, the <em>same</em> BAGEL graph runs on one GPU:</p>
+<pre><span class="cmt"># Single GPU: everything colocated</span>
+<span class="kw">model</span>: <span class="str">"bagel"</span>
+<span class="kw">node_groups</span>:
+  - { node_names: [vit_encoder, vae_encoder, vae_decoder, LLM], ranks: [0] }</pre>
+    <p>...or fans the three CFG branches across three GPUs &mdash; active only during image generation
+      &mdash; by editing the same file:</p>
+<pre><span class="cmt"># Three GPUs: CFG branches on their own ranks, only during image_gen_cfg</span>
+<span class="kw">model</span>: <span class="str">"bagel"</span>
+<span class="kw">node_groups</span>:
+  - { node_names: [vit_encoder, vae_encoder, vae_decoder], ranks: [0] }
+  - { node_names: [LLM, combine_cfg], ranks: [0] }
+  - { node_names: [LLM_cfg_text], ranks: [1], graph_walks: [image_gen_cfg] }
+  - { node_names: [LLM_cfg_img],  ranks: [2], graph_walks: [image_gen_cfg] }</pre>
+    <p>The <code>graph_walks</code> key lets you place a node differently <em>per Walk</em> &mdash; for
+      example, prefill for a node can happen on one GPU while decode happens on another.</p>
+
+    <h3>Streaming, by example: Qwen3-Omni</h3>
+    <p>Some components have to overlap in time. Qwen3-Omni speaks by pipelining three components: a
+      <strong>Thinker</strong> (the LLM that produces hidden states and text), a <strong>Talker</strong> (an
+      autoregressive model that turns those into audio codec tokens), and <strong>Code2Wav</strong> (a
+      code-to-waveform codec decoder). To start playing audio before the whole response is computed, the
+      Thinker streams one hidden state at a time to the Talker, and the Talker streams codec frames to
+      Code2Wav.</p>
+    <p>In M*, streaming is a first-class edge type: the producer just marks an output as streaming to a
+      downstream partition, and a <strong>chunk policy</strong> &mdash; declared once in the model's topology
+      and matched to the edge by name &mdash; decides how the consumer reassembles the stream:</p>
+<pre><span class="kw">from</span> mstar.streaming.topology <span class="kw">import</span> Connection, PartitionTopology, StreamingGraphEdge
+<span class="kw">from</span> mstar.streaming.chunk_policy <span class="kw">import</span> FixedChunkPolicy, LeftContextChunkPolicy
+
+<span class="cmt"># Inside the Thinker's walk: hidden states stream to the Talker.</span>
+<span class="fn">StreamingGraphEdge</span>(next_node=<span class="str">"Talker"</span>, name=<span class="str">"thinker_states"</span>, target_partition=<span class="str">"Talker"</span>)
+
+<span class="cmt"># Inside the Talker's walk: codec frames stream to Code2Wav.</span>
+<span class="fn">StreamingGraphEdge</span>(next_node=<span class="str">"Code2Wav"</span>, name=<span class="str">"codec_tokens"</span>, target_partition=<span class="str">"Code2Wav"</span>)
+
+<span class="cmt"># How each stream is reassembled is declared once, in the model's topology:</span>
+<span class="fn">PartitionTopology</span>(
+    partitions=[<span class="str">"Thinker"</span>, <span class="str">"Talker"</span>, <span class="str">"Code2Wav"</span>],
+    connections=[
+        <span class="fn">Connection</span>(from_partition=<span class="str">"Thinker"</span>, to_partition=<span class="str">"Talker"</span>,
+                   edge_name=<span class="str">"thinker_states"</span>,
+                   chunk_policy_factory=<span class="kw">lambda</span>: <span class="fn">FixedChunkPolicy</span>(chunk_size=<span class="kw">1</span>,
+                                                                 continue_after_done=<span class="kw">True</span>)),
+        <span class="fn">Connection</span>(from_partition=<span class="str">"Talker"</span>, to_partition=<span class="str">"Code2Wav"</span>,
+                   edge_name=<span class="str">"codec_tokens"</span>,
+                   chunk_policy_factory=<span class="kw">lambda</span>: <span class="fn">LeftContextChunkPolicy</span>(chunk=<span class="kw">25</span>, left_context=<span class="kw">25</span>)),
+    ],
+)</pre>
+    <p><code>FixedChunkPolicy(chunk_size=1)</code> feeds the Talker one Thinker state per step;
+      <code>LeftContextChunkPolicy</code> hands Code2Wav 25-frame chunks plus 25 frames of left context to
+      warm up its causal convolutions. The Talker runs as an autoregressive <code>Loop</code>; Code2Wav is
+      re-triggered per chunk. The result is three components on three GPUs, overlapping in time, emitting
+      audio incrementally. The same small set of chunk policies &mdash; fixed, sliding-window, left-context
+      &mdash; covers every streaming edge in our models (Orpheus's SNAC decoder uses the sliding-window one),
+      instead of bespoke per-model streaming code.</p>
+  </div>
+</section>
+
+<hr class="divider" />
+
+<!-- §4 what it unlocks -->
+<section class="section-pad" id="unlocks">
+  <div class="wrap narrow reveal">
+    <h2>What the Walk Graph unlocks</h2>
+    <p>Decoupling the model from the runtime is where the performance comes from.</p>
+    <ul class="features">
+      <li><h4>Modality-aware scheduling</h4><p>Run <span class="k">only the components a request needs</span>.
+        A Walk names exactly which parts of the model participate, so text-only responses bypass
+        image-generation paths &mdash; and these optimizations emerge from the model executor itself, not
+        model-specific scheduling logic.</p></li>
+      <li><h4>Reusable systems optimizations</h4><p>Execution stages share a common interface, so paged
+        attention, FlashInfer kernels, <code>torch.compile</code>, and CUDA Graphs apply across diverse
+        components &mdash; from LLM decoding to diffusion transformers and speech modules &mdash; with no
+        bespoke integration per model.</p></li>
+      <li><h4>Flexible parallelism</h4><p>Express parallelism <em>within a graph stage</em> with
+        <code>Parallel</code> (e.g. the three CFG branches); the runtime executes all instances of
+        parallelism uniformly.</p></li>
+      <li><h4>Flexible placement</h4><p>Map each node to GPU rank(s): encoder/decoder disaggregation,
+        prefill/decode/flow split, independent scaling, transparent multiplexing, and tensor-parallel
+        <strong>sharding</strong> of one large component across GPUs.</p></li>
+      <li><h4>Loops are first-class</h4><p>Continuous batching and CUDA-graph replay apply to any loop, so
+        diffusion steps, world-model rollouts, and token decode all ride the same machinery &mdash; and a
+        rollout's KV cache persists across steps instead of being recomputed.</p></li>
+      <li><h4>Streaming is first-class</h4><p>One small set of chunk policies covers every streaming edge,
+        regardless of placement &mdash; and connections between colocated components incur no communication
+        overhead.</p></li>
+    </ul>
+  </div>
+</section>
+
+<hr class="divider" />
+
+<!-- §5 under the hood -->
+<section class="section-pad" id="runtime">
+  <div class="wrap narrow reveal">
+    <h2>Under the hood</h2>
+    <p>M* lowers the graph to a distributed runtime. A <strong>Conductor</strong> tracks each request's Walk
+      and dispatches work to per-GPU <strong>Workers</strong> that route tensors directly to one another.
+      Some key features:</p>
+    <ul class="features">
+      <li><h4>Pluggable data plane</h4><p>Components exchange tensors over shared memory, RDMA, or TCP (via
+        Mooncake), chosen by where the components are located.</p></li>
+      <li><h4>A handful of engines</h4><p>A modality-agnostic AR engine (it also handles any node that needs
+        a KV cache and/or sampling) with a FlashInfer paged-attention KV cache, plus a stateless engine for
+        encoders, decoders, and audio codecs; all support continuous batching and CUDA-graph replay.</p></li>
+      <li><h4>Overlapped scheduling</h4><p>While the current step runs on the GPU, M* prepares the next batch
+        and its attention plan on a separate stream, and keeps loops moving by deferring each stop check one
+        iteration. This is implemented generically over the <code>Loop</code> primitive &mdash; not just text
+        or speculative decoding &mdash; so the GPU rarely stalls on CPU scheduling.</p></li>
+      <li><h4>Sharding &#215; disaggregation</h4><p>Tensor-parallel sharding (parallel linears, vocab-parallel
+        embeddings, sharded MoE and KV cache, NCCL collectives) is built in and set with a
+        <code>tp_size</code> in the placement file, so one large component doesn't have to fit on one
+        GPU.</p></li>
+    </ul>
+    <figure>
+      <img src="assets/img/fig_system.png" alt="M* at a glance: model author defines a graph + Walks; the runtime places component subgraphs across GPU workers" loading="lazy" />
+      <figcaption><strong>Figure 4.</strong> M* at a glance: the author defines a computation graph and a set
+        of Walks; the runtime places component subgraphs onto GPU workers per a user-specified
+        placement.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<hr class="divider" />
+
+<!-- §6 results -->
+<section class="section-pad" id="results">
+  <div class="wrap narrow reveal">
+    <h2>Does it work? &mdash; Matching or beating specialized systems</h2>
+    <p>We instantiate M* on five real models and compare against the strongest specialized baseline for
+      each.</p>
+    <div class="tablewrap card reveal">
+      <table>
+        <thead><tr><th>Model · task</th><th>Baseline(s)</th><th>Setup</th><th>Speedup over baseline</th></tr></thead>
+        <tbody>
+          <tr><td>BAGEL · text&#8594;image</td><td>vLLM-Omni</td><td>3&#215;H100, CFG-parallel, B=1</td><td class="t-win">&#8776;1.3&#215; lower latency</td></tr>
+          <tr><td>BAGEL · image editing</td><td>vLLM-Omni</td><td>3&#215;H100, CFG-parallel, B=1</td><td class="t-win">up to 2.6&#215; lower latency</td></tr>
+          <tr><td>BAGEL · image&#8594;text</td><td>vLLM-Omni</td><td>1&#215;H100, B&#8804;16</td><td class="t-win">&#8776;1.6&#215; faster first token</td></tr>
+          <tr><td>Qwen3-Omni · TTS</td><td>vLLM-Omni, SGLang-Omni</td><td>2&#215;H200</td><td class="t-win">&#8776;2.7&#215; throughput vs vLLM-Omni @ B=16 (&#8776;4&#215; vs SGLang)</td></tr>
+          <tr><td>Qwen3-Omni · TTS (TP-2 thinker)</td><td>SGLang-Omni</td><td>2&#215;H200, Thinker sharded</td><td class="t-win">&#8776;3.8&#215; throughput @ B=16</td></tr>
+          <tr><td>Orpheus · TTS</td><td>VoxServe</td><td>1&#215;H200</td><td class="t-win">&#8776;1.3&#215; throughput @ B=8 and lower RTF</td></tr>
+          <tr><td>V-JEPA&nbsp;2 · rollout</td><td>Meta native</td><td>1&#215;H100</td><td class="t-win">up to 12.5&#215; faster</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="codecap">Table 2. Five models, five specialized baselines &mdash; M* matches or beats each. Benchmarks as of June 2026.</p>
+    <p>The wins come from the abstraction. For image generation and editing (Figure 5), M* runs BAGEL's
+      three-way classifier-free guidance as a <code>Parallel</code> block spread across three GPUs, and
+      finishes faster than every vLLM-Omni configuration: about 1.3&#215; lower end-to-end latency on
+      text-to-image, and up to 2.6&#215; on image editing versus vLLM-Omni's default pipeline. Against
+      vLLM-Omni's best-tuned single-stage configuration, the editing margin is about 1.2&#215;.</p>
+    <div class="callout">
+      <p class="eyebrow">What is vLLM-Omni's &ldquo;single-stage&rdquo; config?</p>
+      <p style="margin:0">By default, vLLM-Omni runs BAGEL as two stages &mdash; a Thinker (text and
+        understanding, on vLLM's autoregressive engine) feeding a separate DiT stage for image generation,
+        with the conditioning KV cache shipped between them. The single-stage config collapses the whole
+        model &mdash; LLM, ViT, VAE, and DiT &mdash; into one diffusion process, eliminating that
+        cross-stage transfer: it matches the default on text-to-image (where the transferred text
+        conditioning is small) but is much faster on editing (where the conditioning includes an encoded
+        image). The catch is that text and understanding then run <em>inside the diffusion engine</em>
+        rather than vLLM's AR engine, giving up continuous batching, token streaming, and paged-attention
+        KV management &mdash; a whole-model choice that speeds up editing at the expense of the text path.
+        M* needs no such bargain: because a Walk names exactly the components a request uses,
+        image-generation and understanding requests each execute the right way, with the engine
+        optimizations intact.</p>
+    </div>
+  </div>
+  <div class="wrap narrow reveal">
+    <figure>
+      <img src="assets/img/bagel_t2i_i2i_e2e.png" alt="BAGEL image generation and editing end-to-end latency" loading="lazy" />
+      <figcaption><strong>Figure 5.</strong> BAGEL image generation and editing. 3&#215;H100, CFG-parallel, B=1; lower is better.</figcaption>
+    </figure>
+  </div>
+  <div class="wrap narrow reveal">
+    <p>Image understanding is more nuanced (Figures 6 to 8). Because a Walk names exactly the components a
+      request touches, an image-to-text request never runs the diffusion path, so M* returns the first token
+      about 1.6&#215; faster than vLLM-Omni and holds a throughput lead that grows with batch size, reaching
+      about 46% for short outputs. The cost is a slightly higher median inter-token latency, roughly 1 to
+      3&nbsp;ms. M*'s advantage is therefore largest under load and for shorter responses, and narrows to
+      near-parity for long outputs at low concurrency.</p>
+  </div>
+  <div class="wrap reveal">
+    <figure>
+      <img src="assets/img/bagel_i2t_1x3.png" alt="BAGEL image-to-text, mid-length outputs" loading="lazy" />
+      <figcaption><strong>Figure 6.</strong> BAGEL image&#8594;text, mid-length outputs (64&ndash;256 tokens), single H100.</figcaption>
+    </figure>
+    <figure>
+      <img src="assets/img/bagel_i2t_1x3_short.png" alt="BAGEL image-to-text, short outputs" loading="lazy" />
+      <figcaption><strong>Figure 7.</strong> BAGEL image&#8594;text, short outputs (16&ndash;128 tokens).</figcaption>
+    </figure>
+    <figure>
+      <img src="assets/img/bagel_i2t_1x3_long.png" alt="BAGEL image-to-text, long outputs" loading="lazy" />
+      <figcaption><strong>Figure 8.</strong> BAGEL image&#8594;text, long outputs (128&ndash;512 tokens).</figcaption>
+    </figure>
+  </div>
+  <div class="wrap narrow reveal">
+    <p>Speech and omni models follow the same pattern (Figures 9 to 11). On Qwen3-Omni text-to-speech, M*
+      sustains about 2.7&#215; the throughput of vLLM-Omni and about 4&#215; that of SGLang-Omni, and it stays
+      real-time through batch size 32, where SGLang-Omni's tail latency runs past the real-time threshold.
+      Sharding the Thinker across two GPUs keeps about a 3.8&#215; throughput lead, an example of sharding and
+      disaggregation working together. On Orpheus, M* posts a lower real-time factor and higher audio
+      throughput than VoxServe at every batch size we benchmarked.</p>
+  </div>
+  <div class="wrap reveal">
+    <figure>
+      <img src="assets/img/qwen3_seedtts.png" alt="Qwen3-Omni text-to-speech, 2 GPUs" loading="lazy" />
+      <figcaption><strong>Figure 9.</strong> Qwen3-Omni text-to-speech, 2&#215;H200.</figcaption>
+    </figure>
+    <figure>
+      <img src="assets/img/qwen3_seedtts_thinker_tp2.png" alt="Qwen3-Omni with a tensor-parallel Thinker" loading="lazy" />
+      <figcaption><strong>Figure 10.</strong> Qwen3-Omni with a tensor-parallel Thinker, 2&#215;H200.</figcaption>
+    </figure>
+    <figure>
+      <img src="assets/img/orpheus_rtf.png" alt="Orpheus text-to-speech vs VoxServe" loading="lazy" />
+      <figcaption><strong>Figure 11.</strong> Orpheus text-to-speech, 1&#215;H200, vs VoxServe.</figcaption>
+    </figure>
+  </div>
+  <div class="wrap narrow reveal">
+    <p>World models show what first-class loops buy (Figure 12). M* expresses the rollout as a
+      <code>Loop</code> with a persistent KV cache instead of recomputing it from scratch each step, which
+      yields up to 12.5&#215; over Meta's native rollout.</p>
+  </div>
+  <div class="wrap narrow reveal">
+    <figure>
+      <img src="assets/img/vjepa2_rollout.png" alt="V-JEPA 2 action-conditioned rollout latency" loading="lazy" />
+      <figcaption><strong>Figure 12.</strong> V-JEPA&nbsp;2-AC rollout, 1&#215;H100, horizons 4/15/30.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<hr class="divider" />
+
+<!-- §7 coming soon -->
+<section class="section-pad" id="soon">
+  <div class="wrap narrow reveal">
+    <h2>Coming soon</h2>
+    <ul class="roadmap">
+      <li><span class="ic">&#43;</span><span><b>More models, coming soon.</b> More omni models
+        (Ming-flash-omni-2.0, Qwen2.5-Omni), world models (Cosmos&nbsp;3), and more VLAs &mdash; among others. Want a
+        model supported? <a href="mailto:atindra@cs.stanford.edu">Get in touch</a> or
+        <a href="https://github.com/mstar-project/mstar/issues">open a GitHub issue</a>.</span></li>
+      <li><span class="ic">&#43;</span><span><b>More parallelism, everywhere.</b> Tensor-parallel sharding is
+        live and rolling out across model families; sequence/context and DiT-specific parallelism are coming
+        soon.</span></li>
+      <li><span class="ic">&#43;</span><span><b>Unified engine plugins.</b> Converging the AR,
+        encoder/decoder, and audio-codec engines behind one interface.</span></li>
+    </ul>
+  </div>
+</section>
+
+<hr class="divider" />
+
+<!-- §7b what's next -->
+<section class="section-pad" id="next">
+  <div class="wrap narrow reveal">
+    <h2>What's next</h2>
+    <p>The bigger picture the Walk Graph opens up &mdash; three directions we are actively pursuing.</p>
+    <ul class="roadmap">
+      <li><span class="ic">&#8594;</span><span><b>SLO-aware placement and path-aware autoscaling.</b> Search
+        automatically for a node-and-Walk &#8594; worker placement that meets an objective (throughput,
+        latency, or cost), and rescale to the live traffic mix: scale up only the components on hot Walks,
+        and offload cold ones to host memory off the critical path.</span></li>
+      <li><span class="ic">&#8594;</span><span><b>An agentic serving layer.</b> An agent is itself a graph
+        over model calls, the same shape M* runs inside one model; we are building a layer that places the
+        inter-model agent graph and the intra-model component graph under one runtime, so calls across many
+        agents share scheduling, placement, batching, and cached state.</span></li>
+      <li><span class="ic">&#8594;</span><span><b>A compiler for the Walk Graph.</b> Treated as an IR, the
+        graph enables graph-level optimization (eliminating components a request never touches, fusing
+        operations, scheduling the overlap above) and mapping each component to the hardware it runs best
+        on.</span></li>
+    </ul>
+  </div>
+</section>
+
+<hr class="divider" />
+
+<!-- §8 get the code -->
+<section class="section-pad" id="start">
+  <div class="wrap narrow reveal">
+    <h2>Get the code</h2>
+    <p><strong>Try it:</strong> install M*, point it at a model with a placement config, and serve in one
+      command (see the <a href="/mstar/quickstart.html">quickstart</a>). We'd love your feedback: open a
+      <a href="https://github.com/mstar-project/mstar/issues">GitHub issue</a>, or email
+      <a href="mailto:atindra@cs.stanford.edu">atindra@cs.stanford.edu</a>. If there's a model you'd like to
+      see supported, tell us.</p>
+    <p>M* is open source. If you build on this work, please cite it:</p>
+
+    <div class="btnrow">
+      <a class="btn btn-primary" href="https://arxiv.org/abs/2606.12688">Read the paper <span class="tag">arXiv</span></a>
+      <a class="btn btn-ghost" href="https://github.com/mstar-project/mstar">Code <span class="tag">GitHub</span></a>
+      <a class="btn btn-ghost" href="/mstar/">Docs <span class="tag">guide</span></a>
+    </div>
+
+    <h3>Cite</h3>
+<pre>@article{mstar2026,
+  title     = {M*: A Modular, Extensible, Serving System for Multimodal Models},
+  author    = {Atindra Jha and Naomi Sagan and Keisuke Kamahori and Irmak Sivgin and
+               Rohan Sanda and Steven Gao and Mark Horowitz and Luke Zettlemoyer and
+               Olivia Hsu and Jure Leskovec and Baris Kasikci and Stephanie Wang},
+  year      = {2026},
+  eprint    = {2606.12688},
+  archivePrefix = {arXiv},
+  primaryClass = {cs.LG}
+}</pre>
+  </div>
+</section>
+
+</main>
+
+<!-- ===================== footer ===================== -->
+<footer class="foot">
+  <div class="wrap">
+    <div class="small">
+      <span class="brand">M<span class="star">&#42;</span></span> &mdash; a universal serving system for
+      composite multimodal models. A collaboration between Stanford University and the University of
+      Washington.<br />Correspondence: <a href="mailto:atindra@cs.stanford.edu">atindra@cs.stanford.edu</a>
+    </div>
+    <div class="small">
+      <a href="https://arxiv.org/abs/2606.12688">Paper</a> &nbsp;·&nbsp;
+      <a href="https://github.com/mstar-project/mstar">Code</a> &nbsp;·&nbsp;
+      <a href="/mstar/">Docs</a> &nbsp;·&nbsp;
+      <a href="#idea">Top</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

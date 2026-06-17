@@ -1,0 +1,61 @@
+name: Mirror site to m-star.org
+
+# Rebuilds this repo as a copy of the public M* site so it can be served at
+# m-star.org: the blog (mstar-project.github.io @ main) at the root, and the
+# docs (mstar @ gh-pages) under /mstar/. The two upstream repos stay the single
+# source of truth; this repo is generated. Reads the public sources without
+# auth and commits to itself with the built-in token (no secrets required).
+
+on:
+  schedule:
+    - cron: "17 * * * *"   # hourly; run the workflow manually for an instant sync
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: mirror
+  cancel-in-progress: true
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out this repo
+        uses: actions/checkout@v4
+
+      - name: Fetch upstream sources
+        run: |
+          git clone --depth 1 https://github.com/mstar-project/mstar-project.github.io.git /tmp/blog
+          git clone --depth 1 --branch gh-pages https://github.com/mstar-project/mstar.git /tmp/docs
+
+      - name: Sync blog -> root and docs -> /mstar
+        run: |
+          # Blog at the root. --delete keeps the root in lockstep with upstream,
+          # while the excludes protect this repo's own files and the docs folder.
+          rsync -a --delete \
+            --exclude='.git/' \
+            --exclude='.github/' \
+            --exclude='CNAME' \
+            --exclude='README.md' \
+            --exclude='mstar/' \
+            /tmp/blog/ ./
+          # Docs under /mstar (mirror exactly; drop any stray CNAME).
+          mkdir -p ./mstar
+          rsync -a --delete \
+            --exclude='.git/' \
+            --exclude='CNAME' \
+            /tmp/docs/ ./mstar/
+
+      - name: Commit and push if changed
+        run: |
+          git config user.name "mstar-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No changes to mirror."
+          else
+            git commit -m "mirror: sync blog + docs"
+            git push
+          fi
