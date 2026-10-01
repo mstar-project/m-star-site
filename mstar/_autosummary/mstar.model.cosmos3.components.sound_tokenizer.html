@@ -50,12 +50,12 @@
     <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="mstar.model.cosmos3.config" href="mstar.model.cosmos3.config.html" />
-    <link rel="prev" title="mstar.model.cosmos3.components.packing" href="mstar.model.cosmos3.components.packing.html" />
+    <link rel="next" title="mstar.model.cosmos3.components.vision" href="mstar.model.cosmos3.components.vision.html" />
+    <link rel="prev" title="mstar.model.cosmos3.components.reasoner" href="mstar.model.cosmos3.components.reasoner.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="0.2.1" />
-    <meta name="docbuild:last-update" content="Sep 30, 2026"/>
+    <meta name="docbuild:last-update" content="Oct 01, 2026"/>
   
     
     <script src="../_static/searchtools.js"></script>
@@ -283,6 +283,7 @@
 <li class="toctree-l4"><a class="reference internal" href="mstar.model.cosmos3.config.html">mstar.model.cosmos3.config</a></li>
 <li class="toctree-l4"><a class="reference internal" href="mstar.model.cosmos3.constants.html">mstar.model.cosmos3.constants</a></li>
 <li class="toctree-l4"><a class="reference internal" href="mstar.model.cosmos3.loader.html">mstar.model.cosmos3.loader</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mstar.model.cosmos3.sessions.html">mstar.model.cosmos3.sessions</a></li>
 <li class="toctree-l4"><a class="reference internal" href="mstar.model.cosmos3.submodules.html">mstar.model.cosmos3.submodules</a></li>
 <li class="toctree-l4"><a class="reference internal" href="mstar.model.cosmos3.tests.html">mstar.model.cosmos3.tests</a></li>
 </ul>
@@ -290,6 +291,14 @@
 <li class="toctree-l3 has-children"><a class="reference internal" href="mstar.model.higgs_audio.html">mstar.model.higgs_audio</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="mstar.model.higgs_audio.components.html">mstar.model.higgs_audio.components</a></li>
 <li class="toctree-l4"><a class="reference internal" href="mstar.model.higgs_audio.config.html">mstar.model.higgs_audio.config</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="mstar.model.kokoro.html">mstar.model.kokoro</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="mstar.model.kokoro.components.html">mstar.model.kokoro.components</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mstar.model.kokoro.config.html">mstar.model.kokoro.config</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mstar.model.kokoro.g2p.html">mstar.model.kokoro.g2p</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mstar.model.kokoro.submodules.html">mstar.model.kokoro.submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mstar.model.kokoro.voices.html">mstar.model.kokoro.voices</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3"><a class="reference internal" href="mstar.model.multimodal.html">mstar.model.multimodal</a></li>
@@ -652,7 +661,7 @@ parameter must be filled, so a layout drift surfaces as a load error rather
 than silently wrong audio.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>config</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#dict" title="(in Python v3.12)"><em>dict</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a><em>, </em><em>Any</em><em>]</em>)</p>
+<dd class="field-odd"><p><strong>config</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>)</p>
 </dd>
 </dl>
 <dl class="py attribute">
@@ -686,8 +695,8 @@ than silently wrong audio.</p>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>checkpoint_dir</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3.12/library/pathlib.html#pathlib.Path" title="(in Python v3.12)"><em>Path</em></a>)</p></li>
-<li><p><strong>device</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>)</p></li>
+<li><p><strong>checkpoint_dir</strong> (<em>str</em><em> | </em><em>Path</em>)</p></li>
+<li><p><strong>device</strong> (<em>str</em>)</p></li>
 <li><p><strong>dtype</strong> (<a class="reference external" href="https://docs.pytorch.org/docs/stable/tensor_attributes.html#torch.dtype" title="(in PyTorch v2.14)"><em>dtype</em></a>)</p></li>
 </ul>
 </dd>
@@ -702,10 +711,10 @@ than silently wrong audio.</p>
 <span class="sig-name descname"><span class="pre">get_audio_num_samples</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_latent_frames</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mstar/model/cosmos3/components/sound_tokenizer.html#Cosmos3SoundTokenizer.get_audio_num_samples"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mstar.model.cosmos3.components.sound_tokenizer.Cosmos3SoundTokenizer.get_audio_num_samples" title="Link to this definition">#</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>num_latent_frames</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a>)</p>
+<dd class="field-odd"><p><strong>num_latent_frames</strong> (<em>int</em>)</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.12/library/functions.html#int" title="(in Python v3.12)">int</a></p>
+<dd class="field-even"><p>int</p>
 </dd>
 </dl>
 </dd></dl>
@@ -715,10 +724,10 @@ than silently wrong audio.</p>
 <span class="sig-name descname"><span class="pre">get_latent_num_frames</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_audio_samples</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mstar/model/cosmos3/components/sound_tokenizer.html#Cosmos3SoundTokenizer.get_latent_num_frames"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mstar.model.cosmos3.components.sound_tokenizer.Cosmos3SoundTokenizer.get_latent_num_frames" title="Link to this definition">#</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>num_audio_samples</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a>)</p>
+<dd class="field-odd"><p><strong>num_audio_samples</strong> (<em>int</em>)</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.12/library/functions.html#int" title="(in Python v3.12)">int</a></p>
+<dd class="field-even"><p>int</p>
 </dd>
 </dl>
 </dd></dl>
@@ -733,11 +742,11 @@ than silently wrong audio.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>channels</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a>)</p></li>
-<li><p><strong>input_channels</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a>)</p></li>
-<li><p><strong>audio_channels</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a>)</p></li>
-<li><p><strong>upsampling_ratios</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#list" title="(in Python v3.12)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.12/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a><em>]</em>)</p></li>
-<li><p><strong>channel_multiples</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#list" title="(in Python v3.12)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.12/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a><em>]</em>)</p></li>
+<li><p><strong>channels</strong> (<em>int</em>)</p></li>
+<li><p><strong>input_channels</strong> (<em>int</em>)</p></li>
+<li><p><strong>audio_channels</strong> (<em>int</em>)</p></li>
+<li><p><strong>upsampling_ratios</strong> (<em>list</em><em>[</em><em>int</em><em>]</em>)</p></li>
+<li><p><strong>channel_multiples</strong> (<em>list</em><em>[</em><em>int</em><em>]</em>)</p></li>
 </ul>
 </dd>
 </dl>
@@ -773,10 +782,10 @@ registered hooks while the latter silently ignores them.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>input_dim</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a>)</p></li>
-<li><p><strong>output_dim</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a>)</p></li>
-<li><p><strong>stride</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a>)</p></li>
-<li><p><strong>output_padding</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a>)</p></li>
+<li><p><strong>input_dim</strong> (<em>int</em>)</p></li>
+<li><p><strong>output_dim</strong> (<em>int</em>)</p></li>
+<li><p><strong>stride</strong> (<em>int</em>)</p></li>
+<li><p><strong>output_padding</strong> (<em>int</em>)</p></li>
 </ul>
 </dd>
 </dl>
@@ -812,8 +821,8 @@ registered hooks while the latter silently ignores them.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>dimension</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a>)</p></li>
-<li><p><strong>dilation</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a>)</p></li>
+<li><p><strong>dimension</strong> (<em>int</em>)</p></li>
+<li><p><strong>dilation</strong> (<em>int</em>)</p></li>
 </ul>
 </dd>
 </dl>
@@ -849,8 +858,8 @@ registered hooks while the latter silently ignores them.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>hidden_dim</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a>)</p></li>
-<li><p><strong>logscale</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/functions.html#bool" title="(in Python v3.12)"><em>bool</em></a>)</p></li>
+<li><p><strong>hidden_dim</strong> (<em>int</em>)</p></li>
+<li><p><strong>logscale</strong> (<em>bool</em>)</p></li>
 </ul>
 </dd>
 </dl>
@@ -892,20 +901,20 @@ registered hooks while the latter silently ignores them.</p>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="mstar.model.cosmos3.components.packing.html"
+       href="mstar.model.cosmos3.components.reasoner.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">mstar.model.cosmos3.components.packing</p>
+        <p class="prev-next-title">mstar.model.cosmos3.components.reasoner</p>
       </div>
     </a>
     <a class="right-next"
-       href="mstar.model.cosmos3.config.html"
+       href="mstar.model.cosmos3.components.vision.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">mstar.model.cosmos3.config</p>
+        <p class="prev-next-title">mstar.model.cosmos3.components.vision</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -985,7 +994,7 @@ By M* Team
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Sep 30, 2026.
+  Last updated on Oct 01, 2026.
   <br/>
 </p>
   </div>

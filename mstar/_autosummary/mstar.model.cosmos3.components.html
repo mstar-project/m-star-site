@@ -50,12 +50,12 @@
     <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="mstar.model.cosmos3.components.packing" href="mstar.model.cosmos3.components.packing.html" />
+    <link rel="next" title="mstar.model.cosmos3.components.conditioning" href="mstar.model.cosmos3.components.conditioning.html" />
     <link rel="prev" title="mstar.model.cosmos3" href="mstar.model.cosmos3.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="0.2.1" />
-    <meta name="docbuild:last-update" content="Sep 30, 2026"/>
+    <meta name="docbuild:last-update" content="Oct 01, 2026"/>
   
     
     <script src="../_static/searchtools.js"></script>
@@ -279,6 +279,7 @@
 <li class="toctree-l4"><a class="reference internal" href="mstar.model.cosmos3.config.html">mstar.model.cosmos3.config</a></li>
 <li class="toctree-l4"><a class="reference internal" href="mstar.model.cosmos3.constants.html">mstar.model.cosmos3.constants</a></li>
 <li class="toctree-l4"><a class="reference internal" href="mstar.model.cosmos3.loader.html">mstar.model.cosmos3.loader</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mstar.model.cosmos3.sessions.html">mstar.model.cosmos3.sessions</a></li>
 <li class="toctree-l4"><a class="reference internal" href="mstar.model.cosmos3.submodules.html">mstar.model.cosmos3.submodules</a></li>
 <li class="toctree-l4"><a class="reference internal" href="mstar.model.cosmos3.tests.html">mstar.model.cosmos3.tests</a></li>
 </ul>
@@ -286,6 +287,14 @@
 <li class="toctree-l3 has-children"><a class="reference internal" href="mstar.model.higgs_audio.html">mstar.model.higgs_audio</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="mstar.model.higgs_audio.components.html">mstar.model.higgs_audio.components</a></li>
 <li class="toctree-l4"><a class="reference internal" href="mstar.model.higgs_audio.config.html">mstar.model.higgs_audio.config</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="mstar.model.kokoro.html">mstar.model.kokoro</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="mstar.model.kokoro.components.html">mstar.model.kokoro.components</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mstar.model.kokoro.config.html">mstar.model.kokoro.config</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mstar.model.kokoro.g2p.html">mstar.model.kokoro.g2p</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mstar.model.kokoro.submodules.html">mstar.model.kokoro.submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mstar.model.kokoro.voices.html">mstar.model.kokoro.voices</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3"><a class="reference internal" href="mstar.model.multimodal.html">mstar.model.multimodal</a></li>
@@ -577,11 +586,20 @@
 <p class="rubric">Modules</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="mstar.model.cosmos3.components.packing.html#module-mstar.model.cosmos3.components.packing" title="mstar.model.cosmos3.components.packing"><code class="xref py py-obj docutils literal notranslate"><span class="pre">packing</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="mstar.model.cosmos3.components.conditioning.html#module-mstar.model.cosmos3.components.conditioning" title="mstar.model.cosmos3.components.conditioning"><code class="xref py py-obj docutils literal notranslate"><span class="pre">conditioning</span></code></a></p></td>
+<td><p>Conditioning-frame preprocessing for image-to-video.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="mstar.model.cosmos3.components.packing.html#module-mstar.model.cosmos3.components.packing" title="mstar.model.cosmos3.components.packing"><code class="xref py py-obj docutils literal notranslate"><span class="pre">packing</span></code></a></p></td>
 <td><p>Joint-sequence packing for Cosmos3 generation (ported from the diffusers <code class="docutils literal notranslate"><span class="pre">Cosmos3OmniPipeline</span></code>).</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="mstar.model.cosmos3.components.reasoner.html#module-mstar.model.cosmos3.components.reasoner" title="mstar.model.cosmos3.components.reasoner"><code class="xref py py-obj docutils literal notranslate"><span class="pre">reasoner</span></code></a></p></td>
+<td><p>Prompt-side plumbing for the Cosmos3-Edge reasoner: media preprocessing, placeholder expansion and the 3D mRoPE positions of a VLM prompt.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="mstar.model.cosmos3.components.sound_tokenizer.html#module-mstar.model.cosmos3.components.sound_tokenizer" title="mstar.model.cosmos3.components.sound_tokenizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sound_tokenizer</span></code></a></p></td>
 <td><p>Cosmos3 AVAE sound tokenizer (decoder-only), ported from the diffusers-format <code class="docutils literal notranslate"><span class="pre">sound_tokenizer/</span></code> checkpoint component that ships with the Cosmos3 models.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="mstar.model.cosmos3.components.vision.html#module-mstar.model.cosmos3.components.vision" title="mstar.model.cosmos3.components.vision"><code class="xref py py-obj docutils literal notranslate"><span class="pre">vision</span></code></a></p></td>
+<td><p>The Cosmos3-Edge reasoner's vision tower and projector.</p></td>
 </tr>
 </tbody>
 </table>
@@ -609,11 +627,11 @@
       </div>
     </a>
     <a class="right-next"
-       href="mstar.model.cosmos3.components.packing.html"
+       href="mstar.model.cosmos3.components.conditioning.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">mstar.model.cosmos3.components.packing</p>
+        <p class="prev-next-title">mstar.model.cosmos3.components.conditioning</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -652,7 +670,7 @@ By M* Team
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Sep 30, 2026.
+  Last updated on Oct 01, 2026.
   <br/>
 </p>
   </div>
