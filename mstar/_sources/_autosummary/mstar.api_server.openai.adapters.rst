@@ -27,12 +27,14 @@ mstar.api\_server.openai.adapters
       BagelAdapter
       Cosmos3Adapter
       Cosmos3EdgeAdapter
+      DiffusionImageAdapter
       HiggsAudioAdapter
       KokoroAdapter
       OmniVoiceAdapter
       OpenAIAdapter
       OrpheusAdapter
       Qwen3OmniAdapter
+      Qwen3TTSAdapter
       SubmitArgs
       Transcript
       Wan22Adapter

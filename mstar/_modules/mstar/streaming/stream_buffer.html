@@ -629,6 +629,7 @@ window.runMermaid = runMermaid;</script>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.components.audio_features.html">mstar.model.components.audio_features</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.components.aut_encoder.html">mstar.model.components.aut_encoder</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.components.decoder_layer.html">mstar.model.components.decoder_layer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.components.diffusion.html">mstar.model.components.diffusion</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.components.distributed.html">mstar.model.components.distributed</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.components.linear.html">mstar.model.components.linear</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.components.mlp.html">mstar.model.components.mlp</a></li>
@@ -979,6 +980,16 @@ window.runMermaid = runMermaid;</script>
 
     <span class="n">_num_tensors_registered</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">_num_buffer_writes</span> <span class="o">=</span> <span class="mi">0</span>
+
+<div class="viewcode-block" id="StreamBuffer.prime_context">
+<a class="viewcode-back" href="../../../_autosummary/mstar.streaming.stream_buffer.html#mstar.streaming.stream_buffer.StreamBuffer.prime_context">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">prime_context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context_items</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""The first ``context_items`` items the producer sends are context only</span>
+<span class="sd">        (e.g. a voice clone's reference frames): the first chunk carries them</span>
+<span class="sd">        ahead of its new items, reported as ``context_items``."""</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">policy</span><span class="o">.</span><span class="n">prime</span><span class="p">(</span><span class="n">context_items</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_delivered_end</span> <span class="o">=</span> <span class="n">context_items</span></div>
+
 
 <div class="viewcode-block" id="StreamBuffer.pre_read_register">
 <a class="viewcode-back" href="../../../_autosummary/mstar.streaming.stream_buffer.html#mstar.streaming.stream_buffer.StreamBuffer.pre_read_register">[docs]</a>

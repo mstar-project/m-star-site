@@ -629,6 +629,7 @@ window.runMermaid = runMermaid;</script>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.components.audio_features.html">mstar.model.components.audio_features</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.components.aut_encoder.html">mstar.model.components.aut_encoder</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.components.decoder_layer.html">mstar.model.components.decoder_layer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.components.diffusion.html">mstar.model.components.diffusion</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.components.distributed.html">mstar.model.components.distributed</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.components.linear.html">mstar.model.components.linear</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.components.mlp.html">mstar.model.components.mlp</a></li>
@@ -949,6 +950,11 @@ window.runMermaid = runMermaid;</script>
     <span class="c1"># Per-loop stop indices are worker-only, so they live on the graph runtime</span>
     <span class="c1"># rather than riding on this object across the wire.</span>
     <span class="n">dynamic_loop_iter_counts</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+
+    <span class="c1"># stream edge -&gt; items it starts with that are context only (a voice</span>
+    <span class="c1"># clone's reference frames); primes the consumer's StreamBuffer. Make this</span>
+    <span class="c1"># a per-stream dataclass if more per-request stream settings appear.</span>
+    <span class="n">stream_lead_items</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
 
 <div class="viewcode-block" id="CurrentForwardPassInfo.update_publish_info">
 <a class="viewcode-back" href="../../../_autosummary/mstar.conductor.request_info.html#mstar.conductor.request_info.CurrentForwardPassInfo.update_publish_info">[docs]</a>
