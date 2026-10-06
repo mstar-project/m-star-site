@@ -55,7 +55,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="0.2.1" />
-    <meta name="docbuild:last-update" content="Oct 04, 2026"/>
+    <meta name="docbuild:last-update" content="Oct 06, 2026"/>
   
     
     <script src="../_static/searchtools.js"></script>
@@ -628,6 +628,10 @@ adapter’s <code class="docutils literal notranslate"><span class="pre">speech_
 <p>A streaming request only commits to HTTP 200 once its first result chunk has
 arrived and is not an error; an error chunk before that becomes the HTTP error
 it carries (the non-streaming path gets the same from <code class="docutils literal notranslate"><span class="pre">collect_results</span></code>).</p>
+<p>The adapter maps the request before anything is submitted, and that step can
+decode an uploaded clip or, where the server allows it, fetch one over HTTP.
+It runs in a worker thread so a slow reference cannot stall the streams the
+event loop is serving.</p>
 <p class="rubric">Functions</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
@@ -740,7 +744,7 @@ By M* Team
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Oct 04, 2026.
+  Last updated on Oct 06, 2026.
   <br/>
 </p>
   </div>
