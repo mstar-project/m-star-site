@@ -410,7 +410,7 @@ window.runMermaid = runMermaid;</script>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="0.2.1" />
-    <meta name="docbuild:last-update" content="Oct 06, 2026"/>
+    <meta name="docbuild:last-update" content="Oct 07, 2026"/>
   
     
     <script src="../../../../_static/searchtools.js"></script>
@@ -622,6 +622,10 @@ window.runMermaid = runMermaid;</script>
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../../_autosummary/mstar.model.html">mstar.model</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../_autosummary/mstar.model.chatterbox.html">mstar.model.chatterbox</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../_autosummary/mstar.model.chatterbox.config.html">mstar.model.chatterbox.config</a></li>
+</ul>
+</details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../../_autosummary/mstar.model.components.html">mstar.model.components</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../../_autosummary/mstar.model.components.attention.html">mstar.model.components.attention</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../_autosummary/mstar.model.components.audio_features.html">mstar.model.components.audio_features</a></li>
@@ -982,11 +986,15 @@ window.runMermaid = runMermaid;</script>
 <div class="viewcode-block" id="create_speech">
 <a class="viewcode-back" href="../../../../_autosummary/mstar.api_server.openai.serving_speech.html#mstar.api_server.openai.serving_speech.create_speech">[docs]</a>
 <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">create_speech</span><span class="p">(</span><span class="n">api</span><span class="p">,</span> <span class="n">model_name</span><span class="p">,</span> <span class="n">adapter</span><span class="p">,</span> <span class="n">req</span><span class="p">,</span> <span class="n">raw_request</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>  <span class="c1"># noqa: ARG001</span>
+    <span class="n">sample_rate</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">get_output_sample_rate</span><span class="p">(</span><span class="s2">"audio"</span><span class="p">)</span> <span class="k">if</span> <span class="n">api</span><span class="o">.</span><span class="n">model</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">24000</span>
+    <span class="c1"># before any upload or GPU work: a format we cannot produce is the client's error</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">fmt</span> <span class="o">=</span> <span class="n">media_io</span><span class="o">.</span><span class="n">check_audio_format</span><span class="p">(</span><span class="n">req</span><span class="o">.</span><span class="n">response_format</span><span class="p">,</span> <span class="nb">bool</span><span class="p">(</span><span class="n">req</span><span class="o">.</span><span class="n">stream</span><span class="p">),</span> <span class="n">sample_rate</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">exc</span><span class="p">))</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
     <span class="c1"># blocking work (base64 decode, file write, an allowed remote fetch) off the loop</span>
     <span class="n">args</span> <span class="o">=</span> <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">to_thread</span><span class="p">(</span><span class="n">adapter</span><span class="o">.</span><span class="n">speech_to_request</span><span class="p">,</span> <span class="n">req</span><span class="p">,</span> <span class="n">api</span><span class="o">.</span><span class="n">upload_dir</span><span class="p">)</span>
     <span class="n">request_id</span> <span class="o">=</span> <span class="n">rid</span><span class="p">(</span><span class="s2">"speech"</span><span class="p">)</span>
-    <span class="n">sample_rate</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">get_output_sample_rate</span><span class="p">(</span><span class="s2">"audio"</span><span class="p">)</span> <span class="k">if</span> <span class="n">api</span><span class="o">.</span><span class="n">model</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">24000</span>
-    <span class="n">fmt</span> <span class="o">=</span> <span class="p">(</span><span class="n">req</span><span class="o">.</span><span class="n">response_format</span> <span class="ow">or</span> <span class="s2">"wav"</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
     <span class="n">chunks</span> <span class="o">=</span> <span class="n">_plan_chunks</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="n">adapter</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">text</span> <span class="ow">or</span> <span class="s2">""</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">submit</span><span class="p">(</span><span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
@@ -1149,7 +1157,7 @@ By M* Team
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Oct 06, 2026.
+  Last updated on Oct 07, 2026.
   <br/>
 </p>
   </div>
