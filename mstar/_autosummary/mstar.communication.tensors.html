@@ -241,8 +241,9 @@
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="mstar.engine.html">mstar.engine</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3"><a class="reference internal" href="mstar.engine.cuda_graph_config.html">mstar.engine.cuda_graph_config</a></li>
-<li class="toctree-l3"><a class="reference internal" href="mstar.engine.cuda_graph_runner.html">mstar.engine.cuda_graph_runner</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mstar.engine.accelerator_graph_backend.html">mstar.engine.accelerator_graph_backend</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mstar.engine.accelerator_graph_config.html">mstar.engine.accelerator_graph_config</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mstar.engine.accelerator_graph_runner.html">mstar.engine.accelerator_graph_runner</a></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="mstar.engine.resources.html">mstar.engine.resources</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="mstar.engine.resources.attn.html">mstar.engine.resources.attn</a></li>
 <li class="toctree-l4"><a class="reference internal" href="mstar.engine.resources.base.html">mstar.engine.resources.base</a></li>
@@ -300,6 +301,7 @@
 <li class="toctree-l4"><a class="reference internal" href="mstar.model.ltx2_5.components.html">mstar.model.ltx2_5.components</a></li>
 </ul>
 </details></li>
+<li class="toctree-l3"><a class="reference internal" href="mstar.model.media_limits.html">mstar.model.media_limits</a></li>
 <li class="toctree-l3"><a class="reference internal" href="mstar.model.multimodal.html">mstar.model.multimodal</a></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="mstar.model.nemotron_duplex.html">mstar.model.nemotron_duplex</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="mstar.model.nemotron_duplex.components.html">mstar.model.nemotron_duplex.components</a></li>
@@ -368,6 +370,7 @@
 <li class="toctree-l2 has-children"><a class="reference internal" href="mstar.utils.html">mstar.utils</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="mstar.utils.adarms_norm.html">mstar.utils.adarms_norm</a></li>
 <li class="toctree-l3"><a class="reference internal" href="mstar.utils.containers.html">mstar.utils.containers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mstar.utils.device.html">mstar.utils.device</a></li>
 <li class="toctree-l3"><a class="reference internal" href="mstar.utils.exitcode.html">mstar.utils.exitcode</a></li>
 <li class="toctree-l3"><a class="reference internal" href="mstar.utils.fast_tokenize.html">mstar.utils.fast_tokenize</a></li>
 <li class="toctree-l3"><a class="reference internal" href="mstar.utils.gc_freeze.html">mstar.utils.gc_freeze</a></li>
@@ -639,6 +642,7 @@
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.communication.tensors.LocalTransferEngine.unregister_memory"><code class="docutils literal notranslate"><span class="pre">LocalTransferEngine.unregister_memory()</span></code></a></li>
 </ul>
 </li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.communication.tensors.MOONCAKE_PATCHED_VERSION"><code class="docutils literal notranslate"><span class="pre">MOONCAKE_PATCHED_VERSION</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.communication.tensors.MooncakeCommunicationManager"><code class="docutils literal notranslate"><span class="pre">MooncakeCommunicationManager</span></code></a><ul class="pst-show_toc_level nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.communication.tensors.MooncakeCommunicationManager.register_for_send"><code class="docutils literal notranslate"><span class="pre">MooncakeCommunicationManager.register_for_send()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.communication.tensors.MooncakeCommunicationManager.register_for_send_uuids"><code class="docutils literal notranslate"><span class="pre">MooncakeCommunicationManager.register_for_send_uuids()</span></code></a></li>
@@ -734,6 +738,15 @@
                   
   <section id="module-mstar.communication.tensors">
 <span id="mstar-communication-tensors"></span><h1>mstar.communication.tensors<a class="headerlink" href="#module-mstar.communication.tensors" title="Link to this heading">#</a></h1>
+<p class="rubric">Module Attributes</p>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#mstar.communication.tensors.MOONCAKE_PATCHED_VERSION" title="mstar.communication.tensors.MOONCAKE_PATCHED_VERSION"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MOONCAKE_PATCHED_VERSION</span></code></a></p></td>
+<td><p>Earlier Mooncake releases let any host that reaches the TCP data port read or write arbitrary process memory (CVE-2026-103764).</p></td>
+</tr>
+</tbody>
+</table>
+</div>
 <p class="rubric">Functions</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
@@ -973,6 +986,15 @@ is ready before the background thread reads it.</p>
 </dl>
 </dd></dl>
 
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="mstar.communication.tensors.MOONCAKE_PATCHED_VERSION">
+<span class="sig-prename descclassname"><span class="pre">mstar.communication.tensors.</span></span><span class="sig-name descname"><span class="pre">MOONCAKE_PATCHED_VERSION</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'0.3.12.post1'</span></span><a class="headerlink" href="#mstar.communication.tensors.MOONCAKE_PATCHED_VERSION" title="Link to this definition">#</a></dt>
+<dd><p>Earlier Mooncake releases let any host that reaches the TCP data port read
+or write arbitrary process memory (CVE-2026-103764). NVD lists “before
+0.3.13” because it points at a later refactor; the fix (Mooncake #2314)
+shipped in 0.3.12.post1, see <a class="github reference external" href="https://github.com/kvcache-ai/Mooncake/issues/4626">kvcache-ai/Mooncake#4626</a>.</p>
 </dd></dl>
 
 <dl class="py class">
@@ -1985,6 +2007,7 @@ file-transport consumer cannot read an arena producer.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.communication.tensors.LocalTransferEngine.unregister_memory"><code class="docutils literal notranslate"><span class="pre">LocalTransferEngine.unregister_memory()</span></code></a></li>
 </ul>
 </li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.communication.tensors.MOONCAKE_PATCHED_VERSION"><code class="docutils literal notranslate"><span class="pre">MOONCAKE_PATCHED_VERSION</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.communication.tensors.MooncakeCommunicationManager"><code class="docutils literal notranslate"><span class="pre">MooncakeCommunicationManager</span></code></a><ul class="pst-show_toc_level nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.communication.tensors.MooncakeCommunicationManager.register_for_send"><code class="docutils literal notranslate"><span class="pre">MooncakeCommunicationManager.register_for_send()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.communication.tensors.MooncakeCommunicationManager.register_for_send_uuids"><code class="docutils literal notranslate"><span class="pre">MooncakeCommunicationManager.register_for_send_uuids()</span></code></a></li>
