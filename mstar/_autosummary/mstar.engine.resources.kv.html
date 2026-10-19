@@ -205,6 +205,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../models.html">Supported Models</a></li>
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="../api.html">API Reference</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l2 has-children"><a class="reference internal" href="mstar.api_server.html">mstar.api_server</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="mstar.api_server.auth.html">mstar.api_server.auth</a></li>
 <li class="toctree-l3"><a class="reference internal" href="mstar.api_server.media_io.html">mstar.api_server.media_io</a></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="mstar.api_server.openai.html">mstar.api_server.openai</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="mstar.api_server.openai.protocol.html">mstar.api_server.openai.protocol</a></li>
@@ -623,13 +624,16 @@
 <tr class="row-even"><td><p><a class="reference internal" href="mstar.engine.resources.kv.keys.html#module-mstar.engine.resources.kv.keys" title="mstar.engine.resources.kv.keys"><code class="xref py py-obj docutils literal notranslate"><span class="pre">keys</span></code></a></p></td>
 <td><p>Page keys for cross-request prefix reuse.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="mstar.engine.resources.kv.plan.html#module-mstar.engine.resources.kv.plan" title="mstar.engine.resources.kv.plan"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plan</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="mstar.engine.resources.kv.page_copier.html#module-mstar.engine.resources.kv.page_copier" title="mstar.engine.resources.kv.page_copier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">page_copier</span></code></a></p></td>
+<td><p>Whole-page copies between the device KV cache and the host page pool.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="mstar.engine.resources.kv.plan.html#module-mstar.engine.resources.kv.plan" title="mstar.engine.resources.kv.plan"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plan</span></code></a></p></td>
 <td><p>The KV plan: what <cite>KVManager.plan</cite> hands its dependents.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="mstar.engine.resources.kv.prefix_index.html#module-mstar.engine.resources.kv.prefix_index" title="mstar.engine.resources.kv.prefix_index"><code class="xref py py-obj docutils literal notranslate"><span class="pre">prefix_index</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="mstar.engine.resources.kv.prefix_index.html#module-mstar.engine.resources.kv.prefix_index" title="mstar.engine.resources.kv.prefix_index"><code class="xref py py-obj docutils literal notranslate"><span class="pre">prefix_index</span></code></a></p></td>
 <td><p>The prefix index: which cached page holds which key, and which to drop first.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="mstar.engine.resources.kv.ring.html#module-mstar.engine.resources.kv.ring" title="mstar.engine.resources.kv.ring"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ring</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="mstar.engine.resources.kv.ring.html#module-mstar.engine.resources.kv.ring" title="mstar.engine.resources.kv.ring"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ring</span></code></a></p></td>
 <td><p>Ring KV storage: a fixed horizon of frame slots, overwritten in place.</p></td>
 </tr>
 </tbody>
