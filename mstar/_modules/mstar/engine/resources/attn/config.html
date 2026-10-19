@@ -554,6 +554,7 @@ window.runMermaid = runMermaid;</script>
 <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="../../../../../serving.html">Serving</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../clients.html">Using a Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../evaluation.html">Evaluation and Benchmarks</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Reference</span></p>
 <ul class="nav bd-sidenav">
@@ -731,6 +732,7 @@ window.runMermaid = runMermaid;</script>
 <li class="toctree-l3"><a class="reference internal" href="../../../../../_autosummary/mstar.utils.logging_config.html">mstar.utils.logging_config</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../../_autosummary/mstar.utils.orphan.html">mstar.utils.orphan</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../../_autosummary/mstar.utils.profiler.html">mstar.utils.profiler</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../../_autosummary/mstar.utils.socket_prefix.html">mstar.utils.socket_prefix</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../../_autosummary/mstar.utils.streams.html">mstar.utils.streams</a></li>
 </ul>
 </details></li>
@@ -910,7 +912,7 @@ window.runMermaid = runMermaid;</script>
 <span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">mstar.engine.resources.spec</span><span class="w"> </span><span class="kn">import</span> <span class="n">NodeResourceSpec</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mstar.engine.resources.spec</span><span class="w"> </span><span class="kn">import</span> <span class="n">CombinedSplit</span><span class="p">,</span> <span class="n">NodeResourceSpec</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">mstar.engine.resources.step</span><span class="w"> </span><span class="kn">import</span> <span class="n">ResourceStep</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
@@ -935,7 +937,11 @@ window.runMermaid = runMermaid;</script>
 <span class="k">class</span><span class="w"> </span><span class="nc">AttentionConfig</span><span class="p">:</span>
     <span class="n">kv_cache</span><span class="p">:</span> <span class="nb">str</span> <span class="c1"># name of the KV cache</span>
     <span class="n">backend</span><span class="p">:</span> <span class="n">AttnBackend</span> <span class="o">=</span> <span class="n">AttnBackend</span><span class="o">.</span><span class="n">AUTO</span>
-    <span class="n">flashinfer_backend</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"auto"</span></div>
+    <span class="n">flashinfer_backend</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"auto"</span>
+    <span class="c1"># FlashInfer only: combined walks whose captured steps plan their</span>
+    <span class="c1"># one-token rows on the decode wrapper and their prompt rows on a prefill</span>
+    <span class="c1"># wrapper sized to them (`FlashInferMixedWrapper`)</span>
+    <span class="n">splits</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">CombinedSplit</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">()</span></div>
 
 
 

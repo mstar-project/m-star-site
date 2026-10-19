@@ -554,6 +554,7 @@ window.runMermaid = runMermaid;</script>
 <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="../../../../serving.html">Serving</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../clients.html">Using a Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../evaluation.html">Evaluation and Benchmarks</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Reference</span></p>
 <ul class="nav bd-sidenav">
@@ -731,6 +732,7 @@ window.runMermaid = runMermaid;</script>
 <li class="toctree-l3"><a class="reference internal" href="../../../../_autosummary/mstar.utils.logging_config.html">mstar.utils.logging_config</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../_autosummary/mstar.utils.orphan.html">mstar.utils.orphan</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../_autosummary/mstar.utils.profiler.html">mstar.utils.profiler</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../_autosummary/mstar.utils.socket_prefix.html">mstar.utils.socket_prefix</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../_autosummary/mstar.utils.streams.html">mstar.utils.streams</a></li>
 </ul>
 </details></li>
@@ -974,6 +976,11 @@ window.runMermaid = runMermaid;</script>
     <span class="n">needs_remote_transfer</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="c1"># the specs this one named in `depends_on`, by resource key</span>
     <span class="n">dependencies</span><span class="p">:</span> <span class="s2">"Mapping[str, NodeResourceSpec]"</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span>
+    <span class="p">)</span>
+    <span class="c1"># walk -&gt; rows of it a step of its combined walk may hold (None uncapped),</span>
+    <span class="c1"># for every walk of this resource's local nodes</span>
+    <span class="n">max_rows_in_combined</span><span class="p">:</span> <span class="s2">"Mapping[str, int | None]"</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
         <span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span>
     <span class="p">)</span>
 

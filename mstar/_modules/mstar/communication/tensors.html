@@ -554,6 +554,7 @@ window.runMermaid = runMermaid;</script>
 <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="../../../serving.html">Serving</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../clients.html">Using a Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../evaluation.html">Evaluation and Benchmarks</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Reference</span></p>
 <ul class="nav bd-sidenav">
@@ -731,6 +732,7 @@ window.runMermaid = runMermaid;</script>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.utils.logging_config.html">mstar.utils.logging_config</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.utils.orphan.html">mstar.utils.orphan</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.utils.profiler.html">mstar.utils.profiler</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.utils.socket_prefix.html">mstar.utils.socket_prefix</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.utils.streams.html">mstar.utils.streams</a></li>
 </ul>
 </details></li>
@@ -903,6 +905,7 @@ window.runMermaid = runMermaid;</script>
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">errno</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">hashlib</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">platform</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">shutil</span>
@@ -2084,13 +2087,22 @@ window.runMermaid = runMermaid;</script>
             <span class="c1"># Canonical layout has shard_dim leading and is contiguous, so a</span>
             <span class="c1"># contiguous byte range maps to a contiguous range of rows along</span>
             <span class="c1"># dim 0. Slicing along dim 0 keeps the view contiguous.</span>
-            <span class="n">bytes_per_row</span> <span class="o">=</span> <span class="n">canonical_tensor</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">nbytes</span>
-            <span class="k">assert</span> <span class="n">info</span><span class="o">.</span><span class="n">offset</span> <span class="o">%</span> <span class="n">bytes_per_row</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">info</span><span class="o">.</span><span class="n">nbytes</span> <span class="o">%</span> <span class="n">bytes_per_row</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="p">(</span>
-                <span class="sa">f</span><span class="s2">"slice offset </span><span class="si">{</span><span class="n">info</span><span class="o">.</span><span class="n">offset</span><span class="si">}</span><span class="s2"> / nbytes </span><span class="si">{</span><span class="n">info</span><span class="o">.</span><span class="n">nbytes</span><span class="si">}</span><span class="s2"> not aligned "</span>
-                <span class="sa">f</span><span class="s2">"to canonical row size </span><span class="si">{</span><span class="n">bytes_per_row</span><span class="si">}</span><span class="s2">"</span>
+            <span class="n">bytes_per_row</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">canonical_tensor</span><span class="o">.</span><span class="n">element_size</span><span class="p">()</span>
+                <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">canonical_tensor</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
             <span class="p">)</span>
-            <span class="n">start</span> <span class="o">=</span> <span class="n">info</span><span class="o">.</span><span class="n">offset</span> <span class="o">//</span> <span class="n">bytes_per_row</span>
-            <span class="n">end</span> <span class="o">=</span> <span class="n">start</span> <span class="o">+</span> <span class="n">info</span><span class="o">.</span><span class="n">nbytes</span> <span class="o">//</span> <span class="n">bytes_per_row</span>
+            <span class="k">if</span> <span class="n">bytes_per_row</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="c1"># Rows of zero bytes (a [4, 0] tensor) carry no offset to</span>
+                <span class="c1"># recover the start from, and hold nothing to read: only the</span>
+                <span class="c1"># row count matters.</span>
+                <span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">info</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="n">info</span><span class="o">.</span><span class="n">offset</span> <span class="o">%</span> <span class="n">bytes_per_row</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">info</span><span class="o">.</span><span class="n">nbytes</span> <span class="o">%</span> <span class="n">bytes_per_row</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">"slice offset </span><span class="si">{</span><span class="n">info</span><span class="o">.</span><span class="n">offset</span><span class="si">}</span><span class="s2"> / nbytes </span><span class="si">{</span><span class="n">info</span><span class="o">.</span><span class="n">nbytes</span><span class="si">}</span><span class="s2"> not aligned "</span>
+                    <span class="sa">f</span><span class="s2">"to canonical row size </span><span class="si">{</span><span class="n">bytes_per_row</span><span class="si">}</span><span class="s2">"</span>
+                <span class="p">)</span>
+                <span class="n">start</span> <span class="o">=</span> <span class="n">info</span><span class="o">.</span><span class="n">offset</span> <span class="o">//</span> <span class="n">bytes_per_row</span>
+                <span class="n">end</span> <span class="o">=</span> <span class="n">start</span> <span class="o">+</span> <span class="n">info</span><span class="o">.</span><span class="n">nbytes</span> <span class="o">//</span> <span class="n">bytes_per_row</span>
             <span class="n">slice_view</span> <span class="o">=</span> <span class="n">canonical_tensor</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">]</span>
             <span class="n">new_uuid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_uuid_minter</span><span class="o">.</span><span class="n">mint</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">uuid_to_shard_dim</span><span class="p">[</span><span class="n">new_uuid</span><span class="p">]</span> <span class="o">=</span> <span class="n">shard_dim</span>
@@ -2558,9 +2570,12 @@ window.runMermaid = runMermaid;</script>
             <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"Registering </span><span class="si">%s</span><span class="s2"> for send"</span><span class="p">,</span> <span class="n">uuid</span><span class="p">)</span>
             <span class="n">tensor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tensor_store</span><span class="o">.</span><span class="n">get_tensor</span><span class="p">(</span><span class="n">uuid</span><span class="p">)</span>
             <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
+            <span class="c1"># Mooncake rejects a 0-byte region, and a reader of an empty</span>
+            <span class="c1"># tensor copies nothing (see start_read_tensors), so there is</span>
+            <span class="c1"># nothing to pin.</span>
             <span class="n">ret_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transfer_engine</span><span class="o">.</span><span class="n">register_memory</span><span class="p">(</span>
                 <span class="n">tensor</span><span class="o">.</span><span class="n">data_ptr</span><span class="p">(),</span> <span class="n">tensor</span><span class="o">.</span><span class="n">nbytes</span>
-            <span class="p">)</span>
+            <span class="p">)</span> <span class="k">if</span> <span class="n">tensor</span><span class="o">.</span><span class="n">nbytes</span> <span class="k">else</span> <span class="mi">0</span>
             <span class="k">if</span> <span class="n">PHASE_PERIOD</span><span class="p">:</span>
                 <span class="n">phase_record</span><span class="p">(</span>
                     <span class="s2">"tensors.register_memory"</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span> <span class="o">-</span> <span class="n">t0</span><span class="p">,</span>
@@ -2590,11 +2605,12 @@ window.runMermaid = runMermaid;</script>
         <span class="k">if</span> <span class="n">registered</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">registered</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tensor_store</span><span class="o">.</span><span class="n">is_registered</span><span class="p">(</span><span class="n">uuid</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">protocol</span> <span class="ow">in</span> <span class="p">(</span><span class="n">CommProtocol</span><span class="o">.</span><span class="n">RDMA</span><span class="p">,</span> <span class="n">CommProtocol</span><span class="o">.</span><span class="n">TCP</span><span class="p">)</span> <span class="ow">and</span> <span class="n">registered</span><span class="p">:</span>
-            <span class="n">ret_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transfer_engine</span><span class="o">.</span><span class="n">unregister_memory</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">tensor_store</span><span class="o">.</span><span class="n">get_tensor</span><span class="p">(</span><span class="n">uuid</span><span class="p">)</span><span class="o">.</span><span class="n">data_ptr</span><span class="p">()</span>
-            <span class="p">)</span>
-            <span class="k">if</span> <span class="n">ret_value</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">"Mooncake memory unregistration failed."</span><span class="p">)</span>
+            <span class="n">tensor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tensor_store</span><span class="o">.</span><span class="n">get_tensor</span><span class="p">(</span><span class="n">uuid</span><span class="p">)</span>
+            <span class="c1"># an empty tensor is marked ready without being registered</span>
+            <span class="k">if</span> <span class="n">tensor</span><span class="o">.</span><span class="n">nbytes</span><span class="p">:</span>
+                <span class="n">ret_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transfer_engine</span><span class="o">.</span><span class="n">unregister_memory</span><span class="p">(</span><span class="n">tensor</span><span class="o">.</span><span class="n">data_ptr</span><span class="p">())</span>
+                <span class="k">if</span> <span class="n">ret_value</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">"Mooncake memory unregistration failed."</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tensor_store</span><span class="o">.</span><span class="n">remove_tensor</span><span class="p">(</span><span class="n">uuid</span><span class="p">)</span>
 
 <div class="viewcode-block" id="MooncakeCommunicationManager.start_read_tensors">
@@ -2638,6 +2654,11 @@ window.runMermaid = runMermaid;</script>
                 <span class="c1"># +1 for graph-node usage (released by _cleanup_consumed_inputs)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">tensor_store</span><span class="o">.</span><span class="n">increment_ref</span><span class="p">(</span><span class="n">info</span><span class="o">.</span><span class="n">uuid</span><span class="p">,</span> <span class="mi">2</span>
                 <span class="p">)</span>
+                <span class="c1"># Nothing to read, and Mooncake rejects a 0-byte region: the</span>
+                <span class="c1"># empty buffer is the whole tensor. With no reads, the edge</span>
+                <span class="c1"># gets no future and is ready once earlier reads are.</span>
+                <span class="k">if</span> <span class="n">info</span><span class="o">.</span><span class="n">nbytes</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">continue</span>
 
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">protocol</span> <span class="ow">in</span> <span class="p">(</span><span class="n">CommProtocol</span><span class="o">.</span><span class="n">RDMA</span><span class="p">,</span> <span class="n">CommProtocol</span><span class="o">.</span><span class="n">TCP</span><span class="p">):</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">transfer_engine</span><span class="o">.</span><span class="n">register_memory</span><span class="p">(</span><span class="n">buffer</span><span class="o">.</span><span class="n">data_ptr</span><span class="p">(),</span> <span class="n">info</span><span class="o">.</span><span class="n">nbytes</span><span class="p">)</span>

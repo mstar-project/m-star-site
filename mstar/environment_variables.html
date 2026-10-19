@@ -201,6 +201,7 @@
 <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="serving.html">Serving</a></li>
 <li class="toctree-l1"><a class="reference internal" href="clients.html">Using a Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="evaluation.html">Evaluation and Benchmarks</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Reference</span></p>
 <ul class="current nav bd-sidenav">
@@ -378,6 +379,7 @@
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.utils.logging_config.html">mstar.utils.logging_config</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.utils.orphan.html">mstar.utils.orphan</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.utils.profiler.html">mstar.utils.profiler</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.utils.socket_prefix.html">mstar.utils.socket_prefix</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.utils.streams.html">mstar.utils.streams</a></li>
 </ul>
 </details></li>
@@ -869,6 +871,14 @@ deployment at a prefix and does not strip that prefix before the
 request reaches the pod (Run:AI serves a workload at
 <code class="docutils literal notranslate"><span class="pre">/&lt;project&gt;/&lt;job-name&gt;/</span></code>, for instance); without it FastAPI 404s
 every route. Empty by default, so a direct deployment is unaffected.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_MAX_IMAGES_PER_REQUEST</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">10</span></code></p></td>
+<td><p>Largest <code class="docutils literal notranslate"><span class="pre">n</span></code> one <code class="docutils literal notranslate"><span class="pre">/v1/images/generations</span></code> request may ask for (see
+<a class="reference internal" href="_autosummary/mstar.api_server.openai.serving_images.html#mstar.api_server.openai.serving_images.max_images_per_request" title="mstar.api_server.openai.serving_images.max_images_per_request"><code class="xref py py-func docutils literal notranslate"><span class="pre">mstar.api_server.openai.serving_images.max_images_per_request()</span></code></a>);
+<code class="docutils literal notranslate"><span class="pre">n</span></code> outside <code class="docutils literal notranslate"><span class="pre">1</span></code> to this value is a 400 before anything is
+submitted. The Rust frontend and the Dynamo bridge apply the same
+variable and default.</p></td>
 </tr>
 </tbody>
 </table>

@@ -50,7 +50,7 @@
     <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Architecture" href="architecture.html" />
+    <link rel="next" title="Evaluation and Benchmarks" href="evaluation.html" />
     <link rel="prev" title="Serving" href="serving.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -201,6 +201,7 @@
 <ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="serving.html">Serving</a></li>
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">Using a Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="evaluation.html">Evaluation and Benchmarks</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Reference</span></p>
 <ul class="nav bd-sidenav">
@@ -378,6 +379,7 @@
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.utils.logging_config.html">mstar.utils.logging_config</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.utils.orphan.html">mstar.utils.orphan</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.utils.profiler.html">mstar.utils.profiler</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.utils.socket_prefix.html">mstar.utils.socket_prefix</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.utils.streams.html">mstar.utils.streams</a></li>
 </ul>
 </details></li>
@@ -678,7 +680,10 @@ replaces it.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">request_id</span></code></p></td>
 <td><p><em>(uuid)</em></p></td>
-<td><p>Optional client-supplied id; the server generates one when omitted.</p></td>
+<td><p>Optional client-supplied id; the server generates one when omitted. An id
+that still has a request in flight is refused with <code class="docutils literal notranslate"><span class="pre">409</span></code>; it is free
+again once that request finished, failed or was aborted (a client that
+drops a stream can resubmit its id at once).</p></td>
 </tr>
 </tbody>
 </table>
@@ -723,7 +728,8 @@ as a msgpack binary frame (<code class="docutils literal notranslate"><span clas
 message: one frame per result chunk, <code class="docutils literal notranslate"><span class="pre">{&quot;request_id&quot;,</span> <span class="pre">&quot;modality&quot;,</span> <span class="pre">&quot;data&quot;,</span> <span class="pre">&quot;metadata&quot;}</span></code>,
 then <code class="docutils literal notranslate"><span class="pre">{&quot;request_id&quot;,</span> <span class="pre">&quot;finish&quot;:</span> <span class="pre">true}</span></code>. A rejected message answers
 <code class="docutils literal notranslate"><span class="pre">{&quot;request_id&quot;,</span> <span class="pre">&quot;error&quot;:</span> <span class="pre">...}</span></code> and the socket stays open; a request that fails after it
-was accepted ends the same way, with the HTTP <code class="docutils literal notranslate"><span class="pre">status</span></code> it would have had, and no
+was accepted ends the same way. Both carry the HTTP <code class="docutils literal notranslate"><span class="pre">status</span></code> when there is one
+(<code class="docutils literal notranslate"><span class="pre">409</span></code> for a <code class="docutils literal notranslate"><span class="pre">request_id</span></code> still in flight, as on <code class="docutils literal notranslate"><span class="pre">/generate</span></code>), and no
 <code class="docutils literal notranslate"><span class="pre">finish</span></code> follows. Messages may be pipelined —
 send the next observation before the current action chunk has returned — and the
 <code class="docutils literal notranslate"><span class="pre">request_id</span></code> tells the replies apart. Closing the socket aborts whatever is still in
@@ -988,11 +994,11 @@ in the Orpheus config).</p></li>
       </div>
     </a>
     <a class="right-next"
-       href="architecture.html"
+       href="evaluation.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Architecture</p>
+        <p class="prev-next-title">Evaluation and Benchmarks</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

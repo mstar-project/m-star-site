@@ -201,6 +201,7 @@
 <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="../serving.html">Serving</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../clients.html">Using a Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../evaluation.html">Evaluation and Benchmarks</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Reference</span></p>
 <ul class="current nav bd-sidenav">
@@ -378,6 +379,7 @@
 <li class="toctree-l3"><a class="reference internal" href="mstar.utils.logging_config.html">mstar.utils.logging_config</a></li>
 <li class="toctree-l3"><a class="reference internal" href="mstar.utils.orphan.html">mstar.utils.orphan</a></li>
 <li class="toctree-l3"><a class="reference internal" href="mstar.utils.profiler.html">mstar.utils.profiler</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mstar.utils.socket_prefix.html">mstar.utils.socket_prefix</a></li>
 <li class="toctree-l3"><a class="reference internal" href="mstar.utils.streams.html">mstar.utils.streams</a></li>
 </ul>
 </details></li>
@@ -1022,7 +1024,11 @@ loader’s concat into <code class="docutils literal notranslate"><span class="p
 <p>sigma -&gt; Fourier features -&gt; MLP, the DiT’s only noise-level input.</p>
 <p>fp32 island: <code class="docutils literal notranslate"><span class="pre">FP32_MODULE_PATHS</span></code> pins <code class="docutils literal notranslate"><span class="pre">self.mlp</span></code> back to fp32 after the
 serving bf16 cast, and the body runs under <code class="docutils literal notranslate"><span class="pre">autocast(enabled=False)</span></code> on a
-<code class="docutils literal notranslate"><span class="pre">.float()</span></code> sigma. <code class="docutils literal notranslate"><span class="pre">*</span> <span class="pre">1000</span></code> scales [0, 1] into the Fourier basis’s
+<code class="docutils literal notranslate"><span class="pre">.float()</span></code> sigma and, eagerly, under <code class="docutils literal notranslate"><span class="pre">fp32_matmul_highest</span></code> (a batched
+call rounds through TF32 at <code class="docutils literal notranslate"><span class="pre">'high'</span></code>, and cuBLAS 13 on a B200 rounds
+even the served <code class="docutils literal notranslate"><span class="pre">[1,</span> <span class="pre">512]</span> <span class="pre">&#64;</span> <span class="pre">[512,</span> <span class="pre">8192]</span></code> GEMV). Compiled regions read
+the rows <code class="docutils literal notranslate"><span class="pre">WaypointDiT</span></code> builds eagerly instead of running the island.
+<code class="docutils literal notranslate"><span class="pre">*</span> <span class="pre">1000</span></code> scales [0, 1] into the Fourier basis’s
 rotating range; <code class="docutils literal notranslate"><span class="pre">*</span> <span class="pre">2**0.5</span></code> restores unit variance after the sin/cos concat.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>

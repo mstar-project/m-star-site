@@ -554,6 +554,7 @@ window.runMermaid = runMermaid;</script>
 <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="../../../../serving.html">Serving</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../clients.html">Using a Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../evaluation.html">Evaluation and Benchmarks</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Reference</span></p>
 <ul class="nav bd-sidenav">
@@ -731,6 +732,7 @@ window.runMermaid = runMermaid;</script>
 <li class="toctree-l3"><a class="reference internal" href="../../../../_autosummary/mstar.utils.logging_config.html">mstar.utils.logging_config</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../_autosummary/mstar.utils.orphan.html">mstar.utils.orphan</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../_autosummary/mstar.utils.profiler.html">mstar.utils.profiler</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../_autosummary/mstar.utils.socket_prefix.html">mstar.utils.socket_prefix</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../_autosummary/mstar.utils.streams.html">mstar.utils.streams</a></li>
 </ul>
 </details></li>
@@ -964,7 +966,12 @@ window.runMermaid = runMermaid;</script>
 
 
 
-<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_stream_ndjson</span><span class="p">(</span><span class="n">api</span><span class="p">,</span> <span class="n">request_id</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_stream_ndjson</span><span class="p">(</span><span class="n">api</span><span class="p">,</span> <span class="n">request_id</span><span class="p">):</span>
+    <span class="c1"># Bound to the submission now: the body is iterated later, by Starlette.</span>
+    <span class="k">return</span> <span class="n">_ndjson_lines</span><span class="p">(</span><span class="n">api</span><span class="o">.</span><span class="n">iter_result_chunks</span><span class="p">(</span><span class="n">request_id</span><span class="p">))</span>
+
+
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_ndjson_lines</span><span class="p">(</span><span class="n">chunks</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""Yield one NDJSON line per result chunk for a ``stream_video`` request.</span>
 
 <span class="sd">    A windowed request emits each window's mp4 as its own ``video`` chunk;</span>
@@ -976,7 +983,7 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">    """</span>
     <span class="n">index</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">failed</span> <span class="o">=</span> <span class="kc">False</span>
-    <span class="k">async</span> <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="n">api</span><span class="o">.</span><span class="n">iter_result_chunks</span><span class="p">(</span><span class="n">request_id</span><span class="p">):</span>
+    <span class="k">async</span> <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="n">chunks</span><span class="p">:</span>
         <span class="n">metadata</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">chunk</span><span class="o">.</span><span class="n">metadata</span> <span class="ow">or</span> <span class="p">{})</span>
         <span class="k">if</span> <span class="n">chunk</span><span class="o">.</span><span class="n">modality</span> <span class="o">==</span> <span class="s2">"error"</span><span class="p">:</span>
             <span class="n">failed</span> <span class="o">=</span> <span class="kc">True</span>

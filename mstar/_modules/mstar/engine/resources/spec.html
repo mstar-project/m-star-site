@@ -554,6 +554,7 @@ window.runMermaid = runMermaid;</script>
 <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="../../../../serving.html">Serving</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../clients.html">Using a Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../evaluation.html">Evaluation and Benchmarks</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Reference</span></p>
 <ul class="nav bd-sidenav">
@@ -731,6 +732,7 @@ window.runMermaid = runMermaid;</script>
 <li class="toctree-l3"><a class="reference internal" href="../../../../_autosummary/mstar.utils.logging_config.html">mstar.utils.logging_config</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../_autosummary/mstar.utils.orphan.html">mstar.utils.orphan</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../_autosummary/mstar.utils.profiler.html">mstar.utils.profiler</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../_autosummary/mstar.utils.socket_prefix.html">mstar.utils.socket_prefix</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../_autosummary/mstar.utils.streams.html">mstar.utils.streams</a></li>
 </ul>
 </details></li>
@@ -919,6 +921,30 @@ window.runMermaid = runMermaid;</script>
     <span class="kn">from</span><span class="w"> </span><span class="nn">mstar.engine.resources.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">Resource</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="CombinedSplit">
+<a class="viewcode-back" href="../../../../_autosummary/mstar.engine.resources.spec.html#mstar.engine.resources.CombinedSplit">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">CombinedSplit</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""A combined walk run on two kernels: decode for one-token rows, prefill</span>
+<span class="sd">    for the rows of ``prefill_walks``, captured for as many as</span>
+<span class="sd">    ``max_rows_in_combined`` lets in (an uncapped walk: the bucket's rows)."""</span>
+    <span class="n">combined_walk</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">prefill_walks</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
+
+<div class="viewcode-block" id="CombinedSplit.max_prefill_rows">
+<a class="viewcode-back" href="../../../../_autosummary/mstar.engine.resources.spec.html#mstar.engine.resources.CombinedSplit.max_prefill_rows">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">max_prefill_rows</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">max_rows_in_combined</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="s2">"int | None"</span><span class="p">],</span> <span class="n">bucket_rows</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="n">total</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">walk</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">prefill_walks</span><span class="p">:</span>
+            <span class="n">cap</span> <span class="o">=</span> <span class="n">max_rows_in_combined</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">walk</span><span class="p">)</span>
+            <span class="n">total</span> <span class="o">+=</span> <span class="n">bucket_rows</span> <span class="k">if</span> <span class="n">cap</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">cap</span>
+        <span class="k">return</span> <span class="nb">min</span><span class="p">(</span><span class="n">total</span><span class="p">,</span> <span class="n">bucket_rows</span><span class="p">)</span></div>
+</div>
+
 
 
 <div class="viewcode-block" id="NodeResourceSpec">
