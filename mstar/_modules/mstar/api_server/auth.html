@@ -622,6 +622,7 @@ window.runMermaid = runMermaid;</script>
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../_autosummary/mstar.model.html">mstar.model</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.model.audio_watermark.html">mstar.model.audio_watermark</a></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../_autosummary/mstar.model.chatterbox.html">mstar.model.chatterbox</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.chatterbox.config.html">mstar.model.chatterbox.config</a></li>
 </ul>
@@ -651,6 +652,11 @@ window.runMermaid = runMermaid;</script>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.kokoro.voices.html">mstar.model.kokoro.voices</a></li>
 </ul>
 </details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../_autosummary/mstar.model.lingbot_world.html">mstar.model.lingbot_world</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.lingbot_world.components.html">mstar.model.lingbot_world.components</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.lingbot_world.config.html">mstar.model.lingbot_world.config</a></li>
+</ul>
+</details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../_autosummary/mstar.model.ltx2_5.html">mstar.model.ltx2_5</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.ltx2_5.components.html">mstar.model.ltx2_5.components</a></li>
 </ul>
@@ -662,6 +668,14 @@ window.runMermaid = runMermaid;</script>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.nemotron_duplex.config.html">mstar.model.nemotron_duplex.config</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.nemotron_duplex.realtime_api.html">mstar.model.nemotron_duplex.realtime_api</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.nemotron_duplex.submodules.html">mstar.model.nemotron_duplex.submodules</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../_autosummary/mstar.model.omnilingual_asr.html">mstar.model.omnilingual_asr</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.omnilingual_asr.audio.html">mstar.model.omnilingual_asr.audio</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.omnilingual_asr.components.html">mstar.model.omnilingual_asr.components</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.omnilingual_asr.config.html">mstar.model.omnilingual_asr.config</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.omnilingual_asr.tokenizer.html">mstar.model.omnilingual_asr.tokenizer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.omnilingual_asr.weight_loader.html">mstar.model.omnilingual_asr.weight_loader</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../_autosummary/mstar.model.omnivoice.html">mstar.model.omnivoice</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -713,6 +727,10 @@ window.runMermaid = runMermaid;</script>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.z_image.components.html">mstar.model.z_image.components</a></li>
 </ul>
 </details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../_autosummary/mstar.observability.html">mstar.observability</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.observability.metrics.html">mstar.observability.metrics</a></li>
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../_autosummary/mstar.streaming.html">mstar.streaming</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -909,7 +927,7 @@ window.runMermaid = runMermaid;</script>
 <span></span><span class="sd">"""Optional API key for the HTTP and WebSocket surface.</span>
 
 <span class="sd">Off unless ``--api-key`` or ``MSTAR_API_KEY`` sets a key. When set, every</span>
-<span class="sd">request except the probe paths in ``UNAUTHENTICATED_PATHS`` must carry</span>
+<span class="sd">request except the probe and scrape paths in ``UNAUTHENTICATED_PATHS`` must carry</span>
 <span class="sd">``Authorization: Bearer &lt;key&gt;`` (what the OpenAI SDKs send for ``api_key``);</span>
 <span class="sd">WebSocket routes are checked at the handshake. The check is one ASGI</span>
 <span class="sd">middleware over the whole app rather than a per-route dependency, so a route</span>
@@ -929,8 +947,10 @@ window.runMermaid = runMermaid;</script>
 
 <span class="n">API_KEY_ENV</span> <span class="o">=</span> <span class="s2">"MSTAR_API_KEY"</span>
 
-<span class="c1">#: Served without a key: liveness probes from load balancers and orchestrators.</span>
-<span class="n">UNAUTHENTICATED_PATHS</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">({</span><span class="s2">"/health"</span><span class="p">})</span>
+<span class="c1">#: Served without a key: liveness probes from load balancers and orchestrators,</span>
+<span class="c1">#: and the Prometheus scrape endpoint (request counts, latencies and the model</span>
+<span class="c1">#: name; never prompts or outputs).</span>
+<span class="n">UNAUTHENTICATED_PATHS</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">({</span><span class="s2">"/health"</span><span class="p">,</span> <span class="s2">"/metrics"</span><span class="p">})</span>
 
 <span class="n">_UNAUTHORIZED_BODY</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span><span class="s2">"error"</span><span class="p">:</span> <span class="p">{</span>
     <span class="s2">"message"</span><span class="p">:</span> <span class="s2">"missing or invalid API key; send 'Authorization: Bearer &lt;key&gt;'"</span><span class="p">,</span>

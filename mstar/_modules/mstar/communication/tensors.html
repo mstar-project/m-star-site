@@ -622,6 +622,7 @@ window.runMermaid = runMermaid;</script>
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../_autosummary/mstar.model.html">mstar.model</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.model.audio_watermark.html">mstar.model.audio_watermark</a></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../_autosummary/mstar.model.chatterbox.html">mstar.model.chatterbox</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.chatterbox.config.html">mstar.model.chatterbox.config</a></li>
 </ul>
@@ -651,6 +652,11 @@ window.runMermaid = runMermaid;</script>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.kokoro.voices.html">mstar.model.kokoro.voices</a></li>
 </ul>
 </details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../_autosummary/mstar.model.lingbot_world.html">mstar.model.lingbot_world</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.lingbot_world.components.html">mstar.model.lingbot_world.components</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.lingbot_world.config.html">mstar.model.lingbot_world.config</a></li>
+</ul>
+</details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../_autosummary/mstar.model.ltx2_5.html">mstar.model.ltx2_5</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.ltx2_5.components.html">mstar.model.ltx2_5.components</a></li>
 </ul>
@@ -662,6 +668,14 @@ window.runMermaid = runMermaid;</script>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.nemotron_duplex.config.html">mstar.model.nemotron_duplex.config</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.nemotron_duplex.realtime_api.html">mstar.model.nemotron_duplex.realtime_api</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.nemotron_duplex.submodules.html">mstar.model.nemotron_duplex.submodules</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../_autosummary/mstar.model.omnilingual_asr.html">mstar.model.omnilingual_asr</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.omnilingual_asr.audio.html">mstar.model.omnilingual_asr.audio</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.omnilingual_asr.components.html">mstar.model.omnilingual_asr.components</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.omnilingual_asr.config.html">mstar.model.omnilingual_asr.config</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.omnilingual_asr.tokenizer.html">mstar.model.omnilingual_asr.tokenizer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.omnilingual_asr.weight_loader.html">mstar.model.omnilingual_asr.weight_loader</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../_autosummary/mstar.model.omnivoice.html">mstar.model.omnivoice</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -713,6 +727,10 @@ window.runMermaid = runMermaid;</script>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.z_image.components.html">mstar.model.z_image.components</a></li>
 </ul>
 </details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../_autosummary/mstar.observability.html">mstar.observability</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.observability.metrics.html">mstar.observability.metrics</a></li>
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../_autosummary/mstar.streaming.html">mstar.streaming</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -1264,17 +1282,17 @@ window.runMermaid = runMermaid;</script>
     <span class="n">needed</span> <span class="o">=</span> <span class="n">missing</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">needed</span> <span class="o">==</span> <span class="n">major</span><span class="p">:</span>
         <span class="n">fix</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="s2">"`pip install nvidia-cuda-runtime-cu12`"</span>
+            <span class="s2">"`uv pip install nvidia-cuda-runtime-cu12`"</span>
             <span class="k">if</span> <span class="n">needed</span> <span class="o">==</span> <span class="s2">"12"</span>
             <span class="k">else</span> <span class="sa">f</span><span class="s2">"put libcudart.so.</span><span class="si">{</span><span class="n">needed</span><span class="si">}</span><span class="s2"> on the library path"</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="sa">f</span><span class="s2">"torch is built for CUDA </span><span class="si">{</span><span class="n">torch_cuda</span><span class="si">}</span><span class="s2"> too, so </span><span class="si">{</span><span class="n">fix</span><span class="si">}</span><span class="s2">, or use SHM protocol."</span>
     <span class="n">torch_desc</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"built for CUDA </span><span class="si">{</span><span class="n">torch_cuda</span><span class="si">}</span><span class="s2">"</span> <span class="k">if</span> <span class="n">major</span> <span class="k">else</span> <span class="s2">"built without CUDA"</span>
     <span class="n">have</span> <span class="o">=</span> <span class="n">_MOONCAKE_WHEELS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">needed</span><span class="p">)</span>
-    <span class="n">uninstall</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"pip uninstall -y </span><span class="si">{</span><span class="n">have</span><span class="si">}</span><span class="s2"> &amp;&amp; "</span> <span class="k">if</span> <span class="n">have</span> <span class="k">else</span> <span class="s2">""</span>
+    <span class="n">uninstall</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"uv pip uninstall </span><span class="si">{</span><span class="n">have</span><span class="si">}</span><span class="s2"> &amp;&amp; "</span> <span class="k">if</span> <span class="n">have</span> <span class="k">else</span> <span class="s2">""</span>
     <span class="k">return</span> <span class="p">(</span>
         <span class="sa">f</span><span class="s2">"This Mooncake build needs the CUDA </span><span class="si">{</span><span class="n">needed</span><span class="si">}</span><span class="s2"> runtime, but torch is </span><span class="si">{</span><span class="n">torch_desc</span><span class="si">}</span><span class="s2">. "</span>
-        <span class="sa">f</span><span class="s2">"Switch to </span><span class="si">{</span><span class="n">want</span><span class="si">}</span><span class="s2">: `</span><span class="si">{</span><span class="n">uninstall</span><span class="si">}</span><span class="s2">pip install --force-reinstall --no-deps </span><span class="si">{</span><span class="n">want</span><span class="si">}</span><span class="s2">`, "</span>
+        <span class="sa">f</span><span class="s2">"Switch to </span><span class="si">{</span><span class="n">want</span><span class="si">}</span><span class="s2">: `</span><span class="si">{</span><span class="n">uninstall</span><span class="si">}</span><span class="s2">uv pip install --reinstall --no-deps </span><span class="si">{</span><span class="n">want</span><span class="si">}</span><span class="s2">`, "</span>
         <span class="s2">"or use SHM protocol."</span>
     <span class="p">)</span>
 

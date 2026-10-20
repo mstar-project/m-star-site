@@ -269,6 +269,7 @@
 </ul>
 </details></li>
 <li class="toctree-l2 current active has-children"><a class="reference internal" href="mstar.model.html">mstar.model</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="mstar.model.audio_watermark.html">mstar.model.audio_watermark</a></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="mstar.model.chatterbox.html">mstar.model.chatterbox</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="mstar.model.chatterbox.config.html">mstar.model.chatterbox.config</a></li>
 </ul>
@@ -298,6 +299,11 @@
 <li class="toctree-l4"><a class="reference internal" href="mstar.model.kokoro.voices.html">mstar.model.kokoro.voices</a></li>
 </ul>
 </details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="mstar.model.lingbot_world.html">mstar.model.lingbot_world</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="mstar.model.lingbot_world.components.html">mstar.model.lingbot_world.components</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mstar.model.lingbot_world.config.html">mstar.model.lingbot_world.config</a></li>
+</ul>
+</details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="mstar.model.ltx2_5.html">mstar.model.ltx2_5</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="mstar.model.ltx2_5.components.html">mstar.model.ltx2_5.components</a></li>
 </ul>
@@ -309,6 +315,14 @@
 <li class="toctree-l4"><a class="reference internal" href="mstar.model.nemotron_duplex.config.html">mstar.model.nemotron_duplex.config</a></li>
 <li class="toctree-l4"><a class="reference internal" href="mstar.model.nemotron_duplex.realtime_api.html">mstar.model.nemotron_duplex.realtime_api</a></li>
 <li class="toctree-l4"><a class="reference internal" href="mstar.model.nemotron_duplex.submodules.html">mstar.model.nemotron_duplex.submodules</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="mstar.model.omnilingual_asr.html">mstar.model.omnilingual_asr</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="mstar.model.omnilingual_asr.audio.html">mstar.model.omnilingual_asr.audio</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mstar.model.omnilingual_asr.components.html">mstar.model.omnilingual_asr.components</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mstar.model.omnilingual_asr.config.html">mstar.model.omnilingual_asr.config</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mstar.model.omnilingual_asr.tokenizer.html">mstar.model.omnilingual_asr.tokenizer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mstar.model.omnilingual_asr.weight_loader.html">mstar.model.omnilingual_asr.weight_loader</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="mstar.model.omnivoice.html">mstar.model.omnivoice</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -360,6 +374,10 @@
 <li class="toctree-l4"><a class="reference internal" href="mstar.model.z_image.components.html">mstar.model.z_image.components</a></li>
 </ul>
 </details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="mstar.observability.html">mstar.observability</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="mstar.observability.metrics.html">mstar.observability.metrics</a></li>
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="mstar.streaming.html">mstar.streaming</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -1269,16 +1287,25 @@ its own type back without restating this.</p>
 preprocess → forward(_batched) contract the engines drive.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="mstar.model.submodule_base.NodeSubmodule.batch_postprocess">
-<span class="sig-name descname"><span class="pre">batch_postprocess</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">outputs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">request_infos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inputs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mstar/model/submodule_base.html#NodeSubmodule.batch_postprocess"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mstar.model.submodule_base.NodeSubmodule.batch_postprocess" title="Link to this definition">#</a></dt>
-<dd><p><code class="docutils literal notranslate"><span class="pre">postprocess</span></code> for a rows-only step, which has no per-request
-outputs: works on the rows of <code class="docutils literal notranslate"><span class="pre">outputs</span></code> in place. Optional; only
+<span class="sig-name descname"><span class="pre">batch_postprocess</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">outputs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">request_infos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inputs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">piecewise_runners</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mstar/model/submodule_base.html#NodeSubmodule.batch_postprocess"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mstar.model.submodule_base.NodeSubmodule.batch_postprocess" title="Link to this definition">#</a></dt>
+<dd><p>Once per step, for work that batches across the step’s requests
+(e.g. watermarking the audio chunks <code class="docutils literal notranslate"><span class="pre">postprocess</span></code> trimmed). Works on
+<code class="docutils literal notranslate"><span class="pre">outputs</span></code> in place: its rows on a rows-only step, which has no
+per-request outputs, and otherwise the per-request outputs after
+every request’s <code class="docutils literal notranslate"><span class="pre">postprocess</span></code>, for the requests whose
+<code class="docutils literal notranslate"><span class="pre">postprocess</span></code> succeeded (<code class="docutils literal notranslate"><span class="pre">request_infos</span></code>’ keys, in the order of
+<code class="docutils literal notranslate"><span class="pre">inputs</span></code>); a raise then fails every one of them. Optional; only
 called when overridden.</p>
+<p><code class="docutils literal notranslate"><span class="pre">piecewise_runners</span></code> are this node’s captured regions
+(<code class="docutils literal notranslate"><span class="pre">get_piecewise_accelerator_graph_configs</span></code>), as <code class="docutils literal notranslate"><span class="pre">engine_inputs</span></code> hands
+them to the forward, so this work can replay a capture too.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>outputs</strong> (<a class="reference internal" href="#mstar.model.submodule_base.BatchedModelOutput" title="mstar.model.submodule_base.BatchedModelOutput"><em>BatchedModelOutput</em></a>)</p></li>
 <li><p><strong>request_infos</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#dict" title="(in Python v3.12)"><em>dict</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.12/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a><em>, </em><a class="reference internal" href="mstar.conductor.request_info.html#mstar.conductor.request_info.CurrentForwardPassInfo" title="mstar.conductor.request_info.CurrentForwardPassInfo"><em>CurrentForwardPassInfo</em></a><em>]</em>)</p></li>
 <li><p><strong>inputs</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#list" title="(in Python v3.12)"><em>list</em></a><em>[</em><a class="reference internal" href="#mstar.model.submodule_base.NodeInputs" title="mstar.model.submodule_base.NodeInputs"><em>NodeInputs</em></a><em>]</em>)</p></li>
+<li><p><strong>piecewise_runners</strong> (<em>Mapping</em><em>[</em><a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a><em>, </em><a class="reference internal" href="mstar.engine.accelerator_graph_runner.html#mstar.engine.accelerator_graph_runner.PiecewiseAcceleratorGraphRunner" title="mstar.engine.accelerator_graph_runner.PiecewiseAcceleratorGraphRunner"><em>PiecewiseAcceleratorGraphRunner</em></a><em>] </em><em>| </em><em>None</em>)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>

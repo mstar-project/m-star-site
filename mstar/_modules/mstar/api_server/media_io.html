@@ -622,6 +622,7 @@ window.runMermaid = runMermaid;</script>
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../_autosummary/mstar.model.html">mstar.model</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.model.audio_watermark.html">mstar.model.audio_watermark</a></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../_autosummary/mstar.model.chatterbox.html">mstar.model.chatterbox</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.chatterbox.config.html">mstar.model.chatterbox.config</a></li>
 </ul>
@@ -651,6 +652,11 @@ window.runMermaid = runMermaid;</script>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.kokoro.voices.html">mstar.model.kokoro.voices</a></li>
 </ul>
 </details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../_autosummary/mstar.model.lingbot_world.html">mstar.model.lingbot_world</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.lingbot_world.components.html">mstar.model.lingbot_world.components</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.lingbot_world.config.html">mstar.model.lingbot_world.config</a></li>
+</ul>
+</details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../_autosummary/mstar.model.ltx2_5.html">mstar.model.ltx2_5</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.ltx2_5.components.html">mstar.model.ltx2_5.components</a></li>
 </ul>
@@ -662,6 +668,14 @@ window.runMermaid = runMermaid;</script>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.nemotron_duplex.config.html">mstar.model.nemotron_duplex.config</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.nemotron_duplex.realtime_api.html">mstar.model.nemotron_duplex.realtime_api</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.nemotron_duplex.submodules.html">mstar.model.nemotron_duplex.submodules</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../_autosummary/mstar.model.omnilingual_asr.html">mstar.model.omnilingual_asr</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.omnilingual_asr.audio.html">mstar.model.omnilingual_asr.audio</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.omnilingual_asr.components.html">mstar.model.omnilingual_asr.components</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.omnilingual_asr.config.html">mstar.model.omnilingual_asr.config</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.omnilingual_asr.tokenizer.html">mstar.model.omnilingual_asr.tokenizer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.omnilingual_asr.weight_loader.html">mstar.model.omnilingual_asr.weight_loader</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../_autosummary/mstar.model.omnivoice.html">mstar.model.omnivoice</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -713,6 +727,10 @@ window.runMermaid = runMermaid;</script>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.z_image.components.html">mstar.model.z_image.components</a></li>
 </ul>
 </details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../_autosummary/mstar.observability.html">mstar.observability</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.observability.metrics.html">mstar.observability.metrics</a></li>
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../_autosummary/mstar.streaming.html">mstar.streaming</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -1174,9 +1192,16 @@ window.runMermaid = runMermaid;</script>
         <span class="k">else</span><span class="p">:</span>
             <span class="kn">import</span><span class="w"> </span><span class="nn">soundfile</span>
 
+            <span class="kn">from</span><span class="w"> </span><span class="nn">mstar.model.media_limits</span><span class="w"> </span><span class="kn">import</span> <span class="n">count_sound_file_seconds</span><span class="p">,</span> <span class="n">sound_file_seconds</span>
+
             <span class="n">info</span> <span class="o">=</span> <span class="n">soundfile</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
             <span class="n">_require_ref_audio_rate</span><span class="p">(</span><span class="n">info</span><span class="o">.</span><span class="n">samplerate</span><span class="p">)</span>
-            <span class="n">_require_ref_audio_seconds</span><span class="p">(</span><span class="n">info</span><span class="o">.</span><span class="n">frames</span> <span class="o">/</span> <span class="n">info</span><span class="o">.</span><span class="n">samplerate</span><span class="p">)</span>
+            <span class="n">seconds</span> <span class="o">=</span> <span class="n">sound_file_seconds</span><span class="p">(</span><span class="n">info</span><span class="o">.</span><span class="n">frames</span><span class="p">,</span> <span class="n">info</span><span class="o">.</span><span class="n">samplerate</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">seconds</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># no sample count in the header (a FLAC written to a pipe)</span>
+                <span class="k">with</span> <span class="n">_ref_audio_decodes</span><span class="p">:</span>
+                    <span class="n">seconds</span> <span class="o">=</span> <span class="n">count_sound_file_seconds</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">MAX_REF_AUDIO_SECONDS</span><span class="p">)</span>
+            <span class="n">_require_ref_audio_seconds</span><span class="p">(</span><span class="n">seconds</span><span class="p">)</span>
     <span class="k">except</span> <span class="n">RefAudioTooLongError</span><span class="p">:</span>
         <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">missing_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">raise</span>
@@ -1278,24 +1303,124 @@ window.runMermaid = runMermaid;</script>
 
 
 
+<span class="c1"># Longest request audio any decoder here produces (transcription uploads, chat</span>
+<span class="c1"># and /generate audio, reference clips): the transcription route's limit.</span>
+<span class="n">MAX_AUDIO_SECONDS</span> <span class="o">=</span> <span class="mi">30</span> <span class="o">*</span> <span class="mi">60</span>
+<span class="n">_SOUNDFILE_BLOCK_SECONDS</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="c1"># libsndfile's MP3 decoder is seamless across reads only at whole 1152-sample</span>
+<span class="c1"># MPEG frames; a read that splits a frame glitches the samples after it</span>
+<span class="n">_SOUNDFILE_BLOCK_ALIGN</span> <span class="o">=</span> <span class="mi">1152</span>
+
+
+<div class="viewcode-block" id="AudioRefusedError">
+<a class="viewcode-back" href="../../../_autosummary/mstar.api_server.media_io.html#mstar.api_server.media_io.AudioRefusedError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">AudioRefusedError</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Audio a decoder opened and refuses (too long, or an unsupported rate):</span>
+<span class="sd">    callers re-raise it rather than fall back to another decoder."""</span></div>
+
+
+
+<div class="viewcode-block" id="AudioTooLongError">
+<a class="viewcode-back" href="../../../_autosummary/mstar.api_server.media_io.html#mstar.api_server.media_io.AudioTooLongError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">AudioTooLongError</span><span class="p">(</span><span class="n">AudioRefusedError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Audio that decodes past the limit, whatever its header declares."""</span>
+
+    <span class="n">status_code</span> <span class="o">=</span> <span class="mi">413</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_seconds</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_seconds</span> <span class="o">=</span> <span class="n">max_seconds</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="sa">f</span><span class="s2">"audio is longer than the </span><span class="si">{</span><span class="n">max_seconds</span><span class="si">:</span><span class="s2">g</span><span class="si">}</span><span class="s2"> s limit"</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="read_soundfile_capped">
+<a class="viewcode-back" href="../../../_autosummary/mstar.api_server.media_io.html#mstar.api_server.media_io.read_soundfile_capped">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_soundfile_capped</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">max_seconds</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">MAX_AUDIO_SECONDS</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""libsndfile decode of ``path``: float32 mono at the file's own rate.</span>
+
+<span class="sd">    Reads in blocks and counts the frames it decodes, so a header that hides</span>
+<span class="sd">    or understates the length cannot make the read unbounded; past</span>
+<span class="sd">    ``max_seconds`` it raises :class:`AudioTooLongError`. A rate outside</span>
+<span class="sd">    ``1..MAX_SAMPLE_RATE`` is refused (:class:`AudioRefusedError`) before</span>
+<span class="sd">    any read. A container libsndfile cannot read raises soundfile's own error.</span>
+<span class="sd">    """</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">soundfile</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sf</span>
+
+    <span class="k">with</span> <span class="n">sf</span><span class="o">.</span><span class="n">SoundFile</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">rate</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">samplerate</span>
+        <span class="c1"># the frame cap scales with the rate; the range alone here, the</span>
+        <span class="c1"># kernel to the caller's target is checked after the decode</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">check_resample_rate</span><span class="p">(</span><span class="n">rate</span><span class="p">,</span> <span class="n">rate</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">AudioRefusedError</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">exc</span><span class="p">))</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
+        <span class="n">limit</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">max_seconds</span> <span class="o">*</span> <span class="n">rate</span><span class="p">)</span>
+        <span class="n">block</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">_SOUNDFILE_BLOCK_SECONDS</span> <span class="o">*</span> <span class="n">rate</span> <span class="o">//</span> <span class="n">_SOUNDFILE_BLOCK_ALIGN</span><span class="p">)</span> <span class="o">*</span> <span class="n">_SOUNDFILE_BLOCK_ALIGN</span>
+        <span class="n">parts</span><span class="p">,</span> <span class="n">frames</span> <span class="o">=</span> <span class="p">[],</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">block</span><span class="p">,</span> <span class="n">limit</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">frames</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">"float32"</span><span class="p">,</span> <span class="n">always_2d</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+                <span class="k">break</span>
+            <span class="n">frames</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">frames</span> <span class="o">&gt;</span> <span class="n">limit</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">AudioTooLongError</span><span class="p">(</span><span class="n">max_seconds</span><span class="p">)</span>
+            <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span> <span class="k">if</span> <span class="n">parts</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)),</span> <span class="n">rate</span></div>
+
+
+
+<div class="viewcode-block" id="decode_torchcodec_capped">
+<a class="viewcode-back" href="../../../_autosummary/mstar.api_server.media_io.html#mstar.api_server.media_io.decode_torchcodec_capped">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">decode_torchcodec_capped</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">max_seconds</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">MAX_AUDIO_SECONDS</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""FFmpeg (torchcodec) decode of ``path``: a float32 mono tensor at</span>
+<span class="sd">    ``sample_rate``, the same samples ``get_all_samples()`` returns.</span>
+
+<span class="sd">    The decode stops just past ``max_seconds`` of play time, and the audio is</span>
+<span class="sd">    refused with :class:`AudioTooLongError` when it plays longer or holds</span>
+<span class="sd">    more samples than that. The decoder resamples every frame to</span>
+<span class="sd">    ``sample_rate``, so what is counted is decoded output, not the rate or</span>
+<span class="sd">    duration the container declares.</span>
+<span class="sd">    """</span>
+    <span class="k">return</span> <span class="n">torchcodec_samples_capped</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">max_seconds</span><span class="p">,</span> <span class="n">sample_rate</span><span class="o">=</span><span class="n">sample_rate</span><span class="p">,</span> <span class="n">num_channels</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="torchcodec_samples_capped">
+<a class="viewcode-back" href="../../../_autosummary/mstar.api_server.media_io.html#mstar.api_server.media_io.torchcodec_samples_capped">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">torchcodec_samples_capped</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">max_seconds</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">MAX_AUDIO_SECONDS</span><span class="p">,</span> <span class="o">**</span><span class="n">decoder_args</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""``AudioDecoder(path, **decoder_args)``'s samples from the stream's first</span>
+<span class="sd">    frame, as ``get_all_samples()`` returns them, decoding just past</span>
+<span class="sd">    ``max_seconds`` of play time; refused with :class:`AudioTooLongError` when</span>
+<span class="sd">    the audio plays longer or holds more samples than that."""</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">torchcodec.decoders</span><span class="w"> </span><span class="kn">import</span> <span class="n">AudioDecoder</span>
+
+    <span class="n">decoder</span> <span class="o">=</span> <span class="n">AudioDecoder</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">decoder_args</span><span class="p">)</span>
+    <span class="c1"># play time counts from the stream's first timestamp, which need not be 0</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">decoder</span><span class="o">.</span><span class="n">metadata</span><span class="p">,</span> <span class="s2">"begin_stream_seconds_from_header"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="mf">0.0</span><span class="p">)</span>
+    <span class="n">samples</span> <span class="o">=</span> <span class="n">decoder</span><span class="o">.</span><span class="n">get_samples_played_in_range</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">start</span> <span class="o">+</span> <span class="n">max_seconds</span> <span class="o">+</span> <span class="mf">1.0</span><span class="p">)</span>
+    <span class="n">rate</span> <span class="o">=</span> <span class="n">decoder_args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"sample_rate"</span><span class="p">)</span> <span class="ow">or</span> <span class="n">samples</span><span class="o">.</span><span class="n">sample_rate</span>
+    <span class="n">played</span> <span class="o">=</span> <span class="n">samples</span><span class="o">.</span><span class="n">pts_seconds</span> <span class="o">-</span> <span class="n">start</span> <span class="o">+</span> <span class="n">samples</span><span class="o">.</span><span class="n">duration_seconds</span>
+    <span class="k">if</span> <span class="n">played</span> <span class="o">&gt;</span> <span class="n">max_seconds</span> <span class="ow">or</span> <span class="n">samples</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">max_seconds</span> <span class="o">*</span> <span class="n">rate</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">AudioTooLongError</span><span class="p">(</span><span class="n">max_seconds</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">samples</span></div>
+
+
+
 <div class="viewcode-block" id="decode_audio">
 <a class="viewcode-back" href="../../../_autosummary/mstar.api_server.media_io.html#mstar.api_server.media_io.decode_audio">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">decode_audio</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">16000</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""Decode an audio file to a float32 mono numpy waveform at ``sample_rate``.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">decode_audio</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">16000</span><span class="p">,</span> <span class="n">max_seconds</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">MAX_AUDIO_SECONDS</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Decode an audio file to a float32 mono numpy waveform at ``sample_rate``,</span>
+<span class="sd">    refused with :class:`AudioTooLongError` past ``max_seconds``.</span>
 
 <span class="sd">    libsndfile (``soundfile``) first — no FFmpeg needed for wav/flac/ogg/mp3 —</span>
 <span class="sd">    then torchcodec for the rest (m4a, webm, ...).</span>
 <span class="sd">    """</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="kn">import</span><span class="w"> </span><span class="nn">soundfile</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sf</span>
-
-        <span class="n">audio</span><span class="p">,</span> <span class="n">sr</span> <span class="o">=</span> <span class="n">sf</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">"float32"</span><span class="p">,</span> <span class="n">always_2d</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="n">audio</span> <span class="o">=</span> <span class="n">audio</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">audio</span><span class="p">,</span> <span class="n">sr</span> <span class="o">=</span> <span class="n">read_soundfile_capped</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">max_seconds</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">AudioRefusedError</span><span class="p">:</span>
+        <span class="k">raise</span>
     <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>  <span class="c1"># noqa: BLE001 — not a libsndfile container</span>
-        <span class="kn">from</span><span class="w"> </span><span class="nn">torchcodec.decoders</span><span class="w"> </span><span class="kn">import</span> <span class="n">AudioDecoder</span>
-
-        <span class="n">frames</span> <span class="o">=</span> <span class="n">AudioDecoder</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">sample_rate</span><span class="o">=</span><span class="n">sample_rate</span><span class="p">,</span> <span class="n">num_channels</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">get_all_samples</span><span class="p">()</span>
-        <span class="k">return</span> <span class="n">frames</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">decode_torchcodec_capped</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">max_seconds</span><span class="p">)</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
     <span class="n">check_resample_rate</span><span class="p">(</span><span class="n">sr</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">sr</span> <span class="o">!=</span> <span class="n">sample_rate</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>
@@ -1310,11 +1435,25 @@ window.runMermaid = runMermaid;</script>
 
 
 
+<div class="viewcode-block" id="window_stop">
+<a class="viewcode-back" href="../../../_autosummary/mstar.api_server.media_io.html#mstar.api_server.media_io.window_stop">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">window_stop</span><span class="p">(</span><span class="n">start</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">total</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">step</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">balanced</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Nominal end of the window starting at ``start``: ``step`` samples on,</span>
+<span class="sd">    or, ``balanced``, an equal share of what is left over the fewest windows</span>
+<span class="sd">    of at most ``step`` (so the last window is never a sliver)."""</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">balanced</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">min</span><span class="p">(</span><span class="n">total</span><span class="p">,</span> <span class="n">start</span> <span class="o">+</span> <span class="n">step</span><span class="p">)</span>
+    <span class="n">remaining</span> <span class="o">=</span> <span class="n">total</span> <span class="o">-</span> <span class="n">start</span>
+    <span class="n">windows</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="o">-</span><span class="n">remaining</span> <span class="o">//</span> <span class="n">step</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">start</span> <span class="o">+</span> <span class="o">-</span><span class="p">(</span><span class="o">-</span><span class="n">remaining</span> <span class="o">//</span> <span class="n">windows</span><span class="p">)</span></div>
+
+
+
 <div class="viewcode-block" id="split_windows">
 <a class="viewcode-back" href="../../../_autosummary/mstar.api_server.media_io.html#mstar.api_server.media_io.split_windows">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">split_windows</span><span class="p">(</span>
     <span class="n">audio</span><span class="p">,</span> <span class="n">window_seconds</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">16000</span><span class="p">,</span>
-    <span class="n">search_seconds</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">frame_seconds</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.02</span><span class="p">,</span>
+    <span class="n">search_seconds</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">frame_seconds</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.02</span><span class="p">,</span> <span class="n">balanced</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""Cut a waveform into consecutive windows of at most ``window_seconds``;</span>
 <span class="sd">    concatenating them gives the input back sample for sample.</span>
@@ -1322,7 +1461,8 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">    With ``search_seconds`` a cut is moved back from its nominal boundary to</span>
 <span class="sd">    the end of the quietest ``frame_seconds`` frame within that span (the</span>
 <span class="sd">    last such frame on a tie, so silence cuts at the boundary): the cut lands</span>
-<span class="sd">    in a pause rather than on a word when there is one to find.</span>
+<span class="sd">    in a pause rather than on a word when there is one to find. ``balanced``</span>
+<span class="sd">    places the nominal boundaries as :func:`window_stop` does.</span>
 <span class="sd">    """</span>
     <span class="n">audio</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">audio</span><span class="p">)</span>
     <span class="n">step</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">window_seconds</span> <span class="o">*</span> <span class="n">sample_rate</span><span class="p">))</span>
@@ -1330,7 +1470,7 @@ window.runMermaid = runMermaid;</script>
     <span class="n">frame</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">frame_seconds</span> <span class="o">*</span> <span class="n">sample_rate</span><span class="p">)))</span>
     <span class="n">pieces</span><span class="p">,</span> <span class="n">start</span> <span class="o">=</span> <span class="p">[],</span> <span class="mi">0</span>
     <span class="k">while</span> <span class="n">start</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">audio</span><span class="p">):</span>
-        <span class="n">stop</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">audio</span><span class="p">),</span> <span class="n">start</span> <span class="o">+</span> <span class="n">step</span><span class="p">)</span>
+        <span class="n">stop</span> <span class="o">=</span> <span class="n">window_stop</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">audio</span><span class="p">),</span> <span class="n">step</span><span class="p">,</span> <span class="n">balanced</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">stop</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">audio</span><span class="p">)</span> <span class="ow">and</span> <span class="n">search</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">num_frames</span> <span class="o">=</span> <span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">search</span><span class="p">,</span> <span class="n">stop</span> <span class="o">-</span> <span class="n">start</span> <span class="o">-</span> <span class="n">frame</span><span class="p">))</span> <span class="o">//</span> <span class="n">frame</span>
             <span class="k">if</span> <span class="n">num_frames</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
