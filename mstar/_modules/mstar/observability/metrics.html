@@ -730,7 +730,9 @@ window.runMermaid = runMermaid;</script>
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../_autosummary/mstar.observability.html">mstar.observability</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.observability.catalog.html">mstar.observability.catalog</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.observability.metrics.html">mstar.observability.metrics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.observability.recorders.html">mstar.observability.recorders</a></li>
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../_autosummary/mstar.streaming.html">mstar.streaming</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -761,6 +763,7 @@ window.runMermaid = runMermaid;</script>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../_autosummary/mstar.worker.html">mstar.worker</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.worker.batch_builder.html">mstar.worker.batch_builder</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.worker.rid_table.html">mstar.worker.rid_table</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.worker.worker_metrics.html">mstar.worker.worker_metrics</a></li>
 </ul>
 </details></li>
 </ul>
@@ -928,13 +931,18 @@ window.runMermaid = runMermaid;</script>
 
 <span class="sd">Requests are counted where they leave :class:`~mstar.api_server.entrypoint.APIServer`,</span>
 <span class="sd">which ``/generate``, ``/generate/ws``, the OpenAI routes, the Rust-frontend</span>
-<span class="sd">bridge and the Dynamo bridge all go through. Each family carries the</span>
-<span class="sd">deployment's ``model_name``; every other label takes values from a fixed set.</span>
+<span class="sd">bridge and the Dynamo bridge all go through. Requests the HTTP frontend</span>
+<span class="sd">refuses before that (a missing API key, a body over the limit, a bad form)</span>
+<span class="sd">are counted by route and status in ``mstar_http_refusals_total``. Each family</span>
+<span class="sd">carries the deployment's ``model_name``; every other label takes values from</span>
+<span class="sd">a fixed set.</span>
 
 <span class="sd">Only the API server process imports ``prometheus_client`` and renders</span>
 <span class="sd">``/metrics``. Other processes (data worker, conductor, workers) send plain</span>
-<span class="sd">numbers on messages they already send the API server, which records them</span>
-<span class="sd">here; no multiprocess directory, which would only aggregate one host.</span>
+<span class="sd">numbers on messages they already send the API server, plus the conductor's</span>
+<span class="sd">periodic status message, and the API server records them here; no</span>
+<span class="sd">multiprocess directory, which would only aggregate one host. Families whose</span>
+<span class="sd">values come from another process are defined in :mod:`.catalog`.</span>
 
 <span class="sd">``prometheus_client`` is optional (``pip install 'mstar[metrics]'``) and only</span>
 <span class="sd">needed when metrics are on.</span>
@@ -942,9 +950,12 @@ window.runMermaid = runMermaid;</script>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">threading</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Iterable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">contextvars</span><span class="w"> </span><span class="kn">import</span> <span class="n">ContextVar</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">NamedTuple</span>
 
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">prometheus_client</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
@@ -954,7 +965,12 @@ window.runMermaid = runMermaid;</script>
         <span class="n">Histogram</span><span class="p">,</span>
         <span class="n">generate_latest</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="kn">from</span><span class="w"> </span><span class="nn">prometheus_client.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">GaugeMetricFamily</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">prometheus_client.core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+        <span class="n">CounterMetricFamily</span><span class="p">,</span>
+        <span class="n">GaugeMetricFamily</span><span class="p">,</span>
+        <span class="n">HistogramMetricFamily</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">prometheus_client.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">floatToGoString</span>
 <span class="k">except</span> <span class="ne">ModuleNotFoundError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
     <span class="c1"># Only a missing package means "not installed"; a broken install must</span>
     <span class="c1"># still raise.</span>
@@ -964,8 +980,14 @@ window.runMermaid = runMermaid;</script>
 <span class="k">else</span><span class="p">:</span>
     <span class="n">MISSING_DEPENDENCY</span> <span class="o">=</span> <span class="kc">None</span>
 
+<span class="kn">from</span><span class="w"> </span><span class="nn">mstar.observability</span><span class="w"> </span><span class="kn">import</span> <span class="n">catalog</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mstar.observability.recorders</span><span class="w"> </span><span class="kn">import</span> <span class="n">MetricSnapshot</span>
+
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">mstar.api_server.entrypoint</span><span class="w"> </span><span class="kn">import</span> <span class="n">PendingRequest</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">mstar.api_server.request_types</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConductorStatus</span><span class="p">,</span> <span class="n">DataWorkerProfile</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 <span class="n">INSTALL_HINT</span> <span class="o">=</span> <span class="s2">"--enable-metrics needs prometheus_client: pip install 'mstar[metrics]'"</span>
 
@@ -985,6 +1007,22 @@ window.runMermaid = runMermaid;</script>
     <span class="mf">0.05</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.75</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">,</span> <span class="mf">7.5</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">,</span>
     <span class="mf">15.0</span><span class="p">,</span> <span class="mf">20.0</span><span class="p">,</span> <span class="mf">30.0</span><span class="p">,</span> <span class="mf">60.0</span><span class="p">,</span> <span class="mf">120.0</span><span class="p">,</span> <span class="mf">300.0</span><span class="p">,</span> <span class="mf">600.0</span><span class="p">,</span> <span class="mf">1200.0</span><span class="p">,</span>
 <span class="p">)</span>
+<span class="c1"># Preprocess and delivery: under a millisecond for a short text prompt, up to</span>
+<span class="c1"># seconds for a long video upload or a large final payload.</span>
+<span class="n">STAGE_BUCKETS</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="mf">0.0005</span><span class="p">,</span> <span class="mf">0.001</span><span class="p">,</span> <span class="mf">0.0025</span><span class="p">,</span> <span class="mf">0.005</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.025</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span>
+    <span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">,</span> <span class="mf">30.0</span><span class="p">,</span> <span class="mf">60.0</span><span class="p">,</span> <span class="mf">120.0</span><span class="p">,</span> <span class="mf">300.0</span><span class="p">,</span> <span class="mf">600.0</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="c1"># Input files: a few KiB for a small image to MSTAR_MAX_BODY_MB (128 MiB by</span>
+<span class="c1"># default) and the transcription route's larger cap.</span>
+<span class="n">_MiB</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">20</span>
+<span class="n">UPLOAD_SIZE_BUCKETS</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">4</span> <span class="o">&lt;&lt;</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">16</span> <span class="o">&lt;&lt;</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">32</span> <span class="o">&lt;&lt;</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">64</span> <span class="o">&lt;&lt;</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">128</span> <span class="o">&lt;&lt;</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">256</span> <span class="o">&lt;&lt;</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">512</span> <span class="o">&lt;&lt;</span> <span class="mi">10</span><span class="p">,</span>
+    <span class="n">_MiB</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">_MiB</span><span class="p">,</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">_MiB</span><span class="p">,</span> <span class="mi">8</span> <span class="o">*</span> <span class="n">_MiB</span><span class="p">,</span> <span class="mi">16</span> <span class="o">*</span> <span class="n">_MiB</span><span class="p">,</span> <span class="mi">32</span> <span class="o">*</span> <span class="n">_MiB</span><span class="p">,</span> <span class="mi">64</span> <span class="o">*</span> <span class="n">_MiB</span><span class="p">,</span> <span class="mi">128</span> <span class="o">*</span> <span class="n">_MiB</span><span class="p">,</span>
+    <span class="mi">256</span> <span class="o">*</span> <span class="n">_MiB</span><span class="p">,</span> <span class="mi">1024</span> <span class="o">*</span> <span class="n">_MiB</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="c1"># 16-bit PCM: the data worker emits audio as headerless s16le.</span>
+<span class="n">_AUDIO_BYTES_PER_SAMPLE</span> <span class="o">=</span> <span class="mi">2</span>
 
 
 <div class="viewcode-block" id="require_prometheus_client">
@@ -998,28 +1036,261 @@ window.runMermaid = runMermaid;</script>
 <div class="viewcode-block" id="modalities_label">
 <a class="viewcode-back" href="../../../_autosummary/mstar.observability.metrics.html#mstar.observability.metrics.modalities_label">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">modalities_label</span><span class="p">(</span><span class="n">modalities</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">"""One label value per set of output modalities, e.g. ``audio,text``."""</span>
+<span class="w">    </span><span class="sd">"""One label value per set of input or output modalities, e.g. ``audio,text``."""</span>
     <span class="k">return</span> <span class="s2">","</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">modalities</span><span class="p">)))</span></div>
 
 
 
-<span class="k">class</span><span class="w"> </span><span class="nc">_InFlight</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">"""``mstar_requests_in_flight``, read when scraped rather than counted up</span>
-<span class="sd">    and down, so a request that ends on an unusual path cannot leave it off."""</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_ScrapedGauge</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""A gauge read when scraped rather than counted up and down, so a request</span>
+<span class="sd">    that ends on an unusual path cannot leave it off."""</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">count</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="nb">int</span><span class="p">]):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">documentation</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">model_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">count</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="nb">int</span><span class="p">]):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">documentation</span> <span class="o">=</span> <span class="n">documentation</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model_name</span> <span class="o">=</span> <span class="n">model_name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">count</span> <span class="o">=</span> <span class="n">count</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">collect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">family</span> <span class="o">=</span> <span class="n">GaugeMetricFamily</span><span class="p">(</span>
-            <span class="s2">"mstar_requests_in_flight"</span><span class="p">,</span>
-            <span class="s2">"Requests the API server holds: submitted and not yet returned, "</span>
-            <span class="s2">"failed or aborted."</span><span class="p">,</span>
-            <span class="n">labels</span><span class="o">=</span><span class="p">[</span><span class="s2">"model_name"</span><span class="p">],</span>
-        <span class="p">)</span>
+        <span class="n">family</span> <span class="o">=</span> <span class="n">GaugeMetricFamily</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">documentation</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="p">[</span><span class="s2">"model_name"</span><span class="p">])</span>
         <span class="n">family</span><span class="o">.</span><span class="n">add_metric</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">model_name</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">count</span><span class="p">())</span>
         <span class="k">yield</span> <span class="n">family</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">_RequestSeries</span><span class="p">(</span><span class="n">NamedTuple</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""One output-modality set's labeled series, looked up once: a</span>
+<span class="sd">    ``labels()`` call costs about as much as the observation itself."""</span>
+    <span class="n">outcomes</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+    <span class="n">e2e</span><span class="p">:</span> <span class="n">Any</span>
+    <span class="n">first_output</span><span class="p">:</span> <span class="n">Any</span>
+    <span class="n">preprocess</span><span class="p">:</span> <span class="n">Any</span>
+    <span class="n">engine</span><span class="p">:</span> <span class="n">Any</span>
+    <span class="n">delivery</span><span class="p">:</span> <span class="n">Any</span>
+    <span class="n">queue</span><span class="p">:</span> <span class="n">Any</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_fits</span><span class="p">(</span><span class="n">family</span><span class="p">:</span> <span class="n">catalog</span><span class="o">.</span><span class="n">Family</span><span class="p">,</span> <span class="n">snap</span><span class="p">:</span> <span class="n">MetricSnapshot</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Whether ``snap`` has the shape ``family`` exports."""</span>
+    <span class="n">rows</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">snap</span><span class="o">.</span><span class="n">label_values</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">row</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">family</span><span class="o">.</span><span class="n">labels</span><span class="p">)</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">snap</span><span class="o">.</span><span class="n">label_values</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">if</span> <span class="n">family</span><span class="o">.</span><span class="n">kind</span> <span class="o">!=</span> <span class="n">catalog</span><span class="o">.</span><span class="n">HISTOGRAM</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">snap</span><span class="o">.</span><span class="n">values</span><span class="p">)</span> <span class="o">==</span> <span class="n">rows</span>
+    <span class="n">width</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">family</span><span class="o">.</span><span class="n">buckets</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">snap</span><span class="o">.</span><span class="n">sums</span><span class="p">)</span> <span class="o">==</span> <span class="n">rows</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">snap</span><span class="o">.</span><span class="n">bucket_counts</span><span class="p">)</span> <span class="o">==</span> <span class="n">rows</span>
+            <span class="ow">and</span> <span class="nb">all</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">counts</span><span class="p">)</span> <span class="o">==</span> <span class="n">width</span> <span class="k">for</span> <span class="n">counts</span> <span class="ow">in</span> <span class="n">snap</span><span class="o">.</span><span class="n">bucket_counts</span><span class="p">))</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">_ConductorStatus</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""The families in the conductor's latest status message</span>
+<span class="sd">    (``catalog.STATUS_FAMILIES``), and ``mstar_conductor_status_age_seconds``.</span>
+
+<span class="sd">    The message thread swaps in each message's snapshots whole and a scrape</span>
+<span class="sd">    reads them whole, so neither needs a lock.</span>
+<span class="sd">    """</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_name</span> <span class="o">=</span> <span class="n">model_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_snapshots</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">MetricSnapshot</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="c1"># Until the first message, the age counts from enabling metrics, so a</span>
+        <span class="c1"># conductor that never reports shows a growing age, not a missing one.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_received</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">monotonic</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_warned</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_le</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="p">[</span><span class="n">floatToGoString</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">f</span><span class="o">.</span><span class="n">buckets</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="s2">"+Inf"</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">catalog</span><span class="o">.</span><span class="n">STATUS_FAMILIES</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">kind</span> <span class="o">==</span> <span class="n">catalog</span><span class="o">.</span><span class="n">HISTOGRAM</span>
+        <span class="p">}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">status</span><span class="p">:</span> <span class="n">ConductorStatus</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">snapshots</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">snap</span> <span class="ow">in</span> <span class="n">status</span><span class="o">.</span><span class="n">metrics</span><span class="p">:</span>
+            <span class="n">family</span> <span class="o">=</span> <span class="n">catalog</span><span class="o">.</span><span class="n">STATUS_FAMILIES</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">snap</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="c1"># Only a sender bug gets here; dropping the snapshot keeps it from</span>
+            <span class="c1"># failing every scrape.</span>
+            <span class="k">if</span> <span class="n">family</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">_fits</span><span class="p">(</span><span class="n">family</span><span class="p">,</span> <span class="n">snap</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">snap</span><span class="o">.</span><span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_warned</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_warned</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">snap</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">"Dropping conductor status for unknown or malformed "</span>
+                                   <span class="s2">"family </span><span class="si">%r</span><span class="s2">"</span><span class="p">,</span> <span class="n">snap</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+                <span class="k">continue</span>
+            <span class="n">snapshots</span><span class="p">[</span><span class="n">snap</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">snap</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_snapshots</span> <span class="o">=</span> <span class="n">snapshots</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_received</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">monotonic</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">collect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">age</span> <span class="o">=</span> <span class="n">GaugeMetricFamily</span><span class="p">(</span>
+            <span class="s2">"mstar_conductor_status_age_seconds"</span><span class="p">,</span>
+            <span class="s2">"Seconds since the API server received the conductor's last status "</span>
+            <span class="s2">"message (since metrics were enabled, before the first one)."</span><span class="p">,</span>
+            <span class="n">labels</span><span class="o">=</span><span class="p">[</span><span class="s2">"model_name"</span><span class="p">],</span>
+        <span class="p">)</span>
+        <span class="n">age</span><span class="o">.</span><span class="n">add_metric</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">model_name</span><span class="p">],</span> <span class="n">time</span><span class="o">.</span><span class="n">monotonic</span><span class="p">()</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_received</span><span class="p">)</span>
+        <span class="k">yield</span> <span class="n">age</span>
+        <span class="n">snapshots</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_snapshots</span>
+        <span class="k">for</span> <span class="n">family</span> <span class="ow">in</span> <span class="n">catalog</span><span class="o">.</span><span class="n">STATUS_FAMILIES</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"model_name"</span><span class="p">,</span> <span class="o">*</span><span class="n">family</span><span class="o">.</span><span class="n">labels</span><span class="p">]</span>
+            <span class="n">snap</span> <span class="o">=</span> <span class="n">snapshots</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">family</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="ow">or</span> <span class="n">MetricSnapshot</span><span class="p">(</span><span class="n">family</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="p">[])</span>
+            <span class="k">if</span> <span class="n">family</span><span class="o">.</span><span class="n">kind</span> <span class="o">==</span> <span class="n">catalog</span><span class="o">.</span><span class="n">HISTOGRAM</span><span class="p">:</span>
+                <span class="n">out</span> <span class="o">=</span> <span class="n">HistogramMetricFamily</span><span class="p">(</span><span class="n">family</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">family</span><span class="o">.</span><span class="n">help</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">)</span>
+                <span class="n">le</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_le</span><span class="p">[</span><span class="n">family</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">row</span><span class="p">,</span> <span class="n">counts</span><span class="p">,</span> <span class="n">total</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+                        <span class="n">snap</span><span class="o">.</span><span class="n">label_values</span><span class="p">,</span> <span class="n">snap</span><span class="o">.</span><span class="n">bucket_counts</span><span class="p">,</span> <span class="n">snap</span><span class="o">.</span><span class="n">sums</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+                    <span class="n">out</span><span class="o">.</span><span class="n">add_metric</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">model_name</span><span class="p">,</span> <span class="o">*</span><span class="n">row</span><span class="p">],</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">le</span><span class="p">,</span> <span class="n">counts</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">)),</span>
+                                   <span class="n">sum_value</span><span class="o">=</span><span class="n">total</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">cls</span> <span class="o">=</span> <span class="n">CounterMetricFamily</span> <span class="k">if</span> <span class="n">family</span><span class="o">.</span><span class="n">kind</span> <span class="o">==</span> <span class="n">catalog</span><span class="o">.</span><span class="n">COUNTER</span> <span class="k">else</span> <span class="n">GaugeMetricFamily</span>
+                <span class="n">out</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">family</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">family</span><span class="o">.</span><span class="n">help</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">row</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">snap</span><span class="o">.</span><span class="n">label_values</span><span class="p">,</span> <span class="n">snap</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+                    <span class="n">out</span><span class="o">.</span><span class="n">add_metric</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">model_name</span><span class="p">,</span> <span class="o">*</span><span class="n">row</span><span class="p">],</span> <span class="n">value</span><span class="p">)</span>
+            <span class="k">yield</span> <span class="n">out</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">_Refusals</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""``mstar_http_refusals_total``: what the Python frontend counts here,</span>
+<span class="sd">    plus the latest cumulative counts the Rust frontend sends with each</span>
+<span class="sd">    ``/metrics`` request (``mstar-server`` keeps them; see ``rust/server/src/refusals.rs``).</span>
+<span class="sd">    Only one of the two frontends serves a deployment, so the sum is that</span>
+<span class="sd">    frontend's counts."""</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_name</span> <span class="o">=</span> <span class="n">model_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_lock</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Lock</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_python</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rust</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">inc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">route</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">status</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">route</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">status</span><span class="p">))</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lock</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_python</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_python</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_rust</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">routes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">statuses</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">counts</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Take the Rust frontend's cumulative counts (three parallel lists).</span>
+<span class="sd">        Two scrapes can cross on their way here, so a count only moves up:</span>
+<span class="sd">        an older snapshot never lowers what a newer one set."""</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lock</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">route</span><span class="p">,</span> <span class="n">status</span><span class="p">,</span> <span class="n">count</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">routes</span><span class="p">,</span> <span class="n">statuses</span><span class="p">,</span> <span class="n">counts</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+                <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">route</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">status</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_rust</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_rust</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">count</span><span class="p">))</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">collect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">family</span> <span class="o">=</span> <span class="n">CounterMetricFamily</span><span class="p">(</span>
+            <span class="s2">"mstar_http_refusals"</span><span class="p">,</span>
+            <span class="s2">"HTTP requests answered with an error before they reached the API server "</span>
+            <span class="s2">"(a 4xx, or the Rust frontend's admission cap 503), by route template and status."</span><span class="p">,</span>
+            <span class="n">labels</span><span class="o">=</span><span class="p">[</span><span class="s2">"model_name"</span><span class="p">,</span> <span class="s2">"route"</span><span class="p">,</span> <span class="s2">"status"</span><span class="p">],</span>
+        <span class="p">)</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lock</span><span class="p">:</span>
+            <span class="n">counts</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_python</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">n</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rust</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">counts</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">counts</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">n</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">route</span><span class="p">,</span> <span class="n">status</span><span class="p">),</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">counts</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+            <span class="n">family</span><span class="o">.</span><span class="n">add_metric</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">model_name</span><span class="p">,</span> <span class="n">route</span><span class="p">,</span> <span class="n">status</span><span class="p">],</span> <span class="n">n</span><span class="p">)</span>
+        <span class="k">yield</span> <span class="n">family</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">_Request</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""One HTTP request seen by :class:`RefusalMiddleware`."""</span>
+
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"submitted"</span><span class="p">,)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">submitted</span> <span class="o">=</span> <span class="kc">False</span>
+
+
+<span class="c1"># A mutable holder rather than a bool: run_in_threadpool and new tasks run in</span>
+<span class="c1"># a copy of the context, which still holds the same object.</span>
+<span class="n">_REQUEST</span><span class="p">:</span> <span class="n">ContextVar</span><span class="p">[</span><span class="n">_Request</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="n">ContextVar</span><span class="p">(</span><span class="s2">"mstar_http_request"</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="mark_submitted">
+<a class="viewcode-back" href="../../../_autosummary/mstar.observability.metrics.html#mstar.observability.metrics.mark_submitted">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">mark_submitted</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""The HTTP request being served reached ``APIServer``: it is counted in</span>
+<span class="sd">    ``mstar_requests_total`` when it ends, so it is never a refusal."""</span>
+    <span class="n">request</span> <span class="o">=</span> <span class="n">_REQUEST</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">request</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">request</span><span class="o">.</span><span class="n">submitted</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+
+
+<div class="viewcode-block" id="route_template">
+<a class="viewcode-back" href="../../../_autosummary/mstar.observability.metrics.html#mstar.observability.metrics.route_template">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">route_template</span><span class="p">(</span><span class="n">scope</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">routes</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""The route path the request matched (``/v1/chat/completions``), never</span>
+<span class="sd">    the raw URL; ``unmatched`` when no route matches. ``routes`` are the</span>
+<span class="sd">    app's routes, searched for a request refused before routing (the API</span>
+<span class="sd">    key, a declared body size) the way the router matches: a full match</span>
+<span class="sd">    before a method-only one."""</span>
+    <span class="n">route</span> <span class="o">=</span> <span class="n">scope</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"route"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">route</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">starlette.routing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Match</span>
+
+        <span class="n">partial</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">for</span> <span class="n">candidate</span> <span class="ow">in</span> <span class="n">routes</span><span class="p">:</span>
+            <span class="c1"># FastAPI 0.150+ lists an included router as one entry with no</span>
+            <span class="c1"># path, whose match names no route; its routes are listed too.</span>
+            <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">candidate</span><span class="p">,</span> <span class="s2">"path"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">match</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">candidate</span><span class="o">.</span><span class="n">matches</span><span class="p">(</span><span class="n">scope</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">match</span> <span class="ow">is</span> <span class="n">Match</span><span class="o">.</span><span class="n">FULL</span><span class="p">:</span>
+                <span class="n">route</span> <span class="o">=</span> <span class="n">candidate</span>
+                <span class="k">break</span>
+            <span class="k">if</span> <span class="n">match</span> <span class="ow">is</span> <span class="n">Match</span><span class="o">.</span><span class="n">PARTIAL</span> <span class="ow">and</span> <span class="n">partial</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">partial</span> <span class="o">=</span> <span class="n">candidate</span>
+        <span class="n">route</span> <span class="o">=</span> <span class="n">route</span> <span class="ow">or</span> <span class="n">partial</span>
+    <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">route</span><span class="p">,</span> <span class="s2">"path"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">"unmatched"</span></div>
+
+
+
+<div class="viewcode-block" id="RefusalMiddleware">
+<a class="viewcode-back" href="../../../_autosummary/mstar.observability.metrics.html#mstar.observability.metrics.RefusalMiddleware">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">RefusalMiddleware</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Counts ``mstar_http_refusals_total`` for the Python frontend: every</span>
+<span class="sd">    HTTP response with a 4xx status for a request that never reached</span>
+<span class="sd">    ``APIServer.submit_request`` (:func:`mark_submitted`). A request that was</span>
+<span class="sd">    submitted and then failed is counted by ``mstar_requests_total`` instead.</span>
+
+<span class="sd">    Sits outside the API key and body limit middlewares (their 401 and 413 are</span>
+<span class="sd">    sent before routing) and inside CORS (a preflight is not a request).</span>
+<span class="sd">    WebSocket handshakes are not counted. With metrics off it only checks</span>
+<span class="sd">    ``metrics()`` for None.</span>
+<span class="sd">    """</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">app</span><span class="p">,</span> <span class="n">metrics</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="n">ServingMetrics</span> <span class="o">|</span> <span class="kc">None</span><span class="p">],</span> <span class="n">routes</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="n">Iterable</span><span class="p">],</span>
+    <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">app</span> <span class="o">=</span> <span class="n">app</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span> <span class="o">=</span> <span class="n">metrics</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">routes</span> <span class="o">=</span> <span class="n">routes</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scope</span><span class="p">,</span> <span class="n">receive</span><span class="p">,</span> <span class="n">send</span><span class="p">):</span>
+        <span class="n">metrics</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="p">()</span> <span class="k">if</span> <span class="n">scope</span><span class="p">[</span><span class="s2">"type"</span><span class="p">]</span> <span class="o">==</span> <span class="s2">"http"</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">metrics</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="p">(</span><span class="n">scope</span><span class="p">,</span> <span class="n">receive</span><span class="p">,</span> <span class="n">send</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="n">request</span> <span class="o">=</span> <span class="n">_Request</span><span class="p">()</span>
+        <span class="n">status</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">send_and_note_status</span><span class="p">(</span><span class="n">message</span><span class="p">):</span>
+            <span class="k">nonlocal</span> <span class="n">status</span>
+            <span class="k">if</span> <span class="n">message</span><span class="p">[</span><span class="s2">"type"</span><span class="p">]</span> <span class="o">==</span> <span class="s2">"http.response.start"</span><span class="p">:</span>
+                <span class="n">status</span> <span class="o">=</span> <span class="n">message</span><span class="p">[</span><span class="s2">"status"</span><span class="p">]</span>
+            <span class="k">await</span> <span class="n">send</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+
+        <span class="n">token</span> <span class="o">=</span> <span class="n">_REQUEST</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="p">(</span><span class="n">scope</span><span class="p">,</span> <span class="n">receive</span><span class="p">,</span> <span class="n">send_and_note_status</span><span class="p">)</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="n">_REQUEST</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
+            <span class="k">if</span> <span class="mi">400</span> <span class="o">&lt;=</span> <span class="n">status</span> <span class="o">&lt;</span> <span class="mi">500</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">request</span><span class="o">.</span><span class="n">submitted</span><span class="p">:</span>
+                <span class="n">metrics</span><span class="o">.</span><span class="n">refusals</span><span class="o">.</span><span class="n">inc</span><span class="p">(</span><span class="n">route_template</span><span class="p">(</span><span class="n">scope</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">routes</span><span class="p">()),</span> <span class="n">status</span><span class="p">)</span></div>
+
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">_DataWorkerSeries</span><span class="p">(</span><span class="n">NamedTuple</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""One input-modality set's data worker series."""</span>
+    <span class="n">seconds</span><span class="p">:</span> <span class="n">Any</span>
+    <span class="n">failures</span><span class="p">:</span> <span class="n">Any</span>
 
 
 <div class="viewcode-block" id="ServingMetrics">
@@ -1027,7 +1298,10 @@ window.runMermaid = runMermaid;</script>
 <span class="k">class</span><span class="w"> </span><span class="nc">ServingMetrics</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""The API server's registry and its request metrics."""</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">in_flight</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="nb">int</span><span class="p">]):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">model_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">in_flight</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="nb">int</span><span class="p">],</span>
+        <span class="n">data_worker_queue_depth</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="nb">int</span><span class="p">],</span>
+    <span class="p">):</span>
         <span class="n">require_prometheus_client</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model_name</span> <span class="o">=</span> <span class="n">model_name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">content_type</span> <span class="o">=</span> <span class="n">CONTENT_TYPE_LATEST</span>
@@ -1053,30 +1327,208 @@ window.runMermaid = runMermaid;</script>
             <span class="n">buckets</span><span class="o">=</span><span class="n">FIRST_OUTPUT_BUCKETS</span><span class="p">,</span>
             <span class="n">registry</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">registry</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">registry</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">_InFlight</span><span class="p">(</span><span class="n">model_name</span><span class="p">,</span> <span class="n">in_flight</span><span class="p">))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_seen_modalities</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="n">queue</span> <span class="o">=</span> <span class="n">catalog</span><span class="o">.</span><span class="n">REQUEST_QUEUE_SECONDS</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">queue_time</span> <span class="o">=</span> <span class="n">Histogram</span><span class="p">(</span>
+            <span class="n">queue</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">queue</span><span class="o">.</span><span class="n">help</span><span class="p">,</span> <span class="p">[</span><span class="s2">"model_name"</span><span class="p">,</span> <span class="o">*</span><span class="n">queue</span><span class="o">.</span><span class="n">labels</span><span class="p">],</span>
+            <span class="n">buckets</span><span class="o">=</span><span class="n">queue</span><span class="o">.</span><span class="n">buckets</span><span class="p">,</span> <span class="n">registry</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">registry</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">registry</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">_ScrapedGauge</span><span class="p">(</span>
+            <span class="s2">"mstar_requests_in_flight"</span><span class="p">,</span>
+            <span class="s2">"Requests the API server holds: submitted and not yet returned, "</span>
+            <span class="s2">"failed or aborted."</span><span class="p">,</span>
+            <span class="n">model_name</span><span class="p">,</span> <span class="n">in_flight</span><span class="p">,</span>
+        <span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">refusals</span> <span class="o">=</span> <span class="n">_Refusals</span><span class="p">(</span><span class="n">model_name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">registry</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">refusals</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_conductor</span> <span class="o">=</span> <span class="n">_ConductorStatus</span><span class="p">(</span><span class="n">model_name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">registry</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_conductor</span><span class="p">)</span>
+
+        <span class="c1"># Where a successful request's time went, from the timestamps it</span>
+        <span class="c1"># carries. The conductor's perf_counter is compared with this</span>
+        <span class="c1"># process's: both read the host's monotonic clock.</span>
+        <span class="n">stages</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"model_name"</span><span class="p">,</span> <span class="s2">"output_modalities"</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">preprocess_latency</span> <span class="o">=</span> <span class="n">Histogram</span><span class="p">(</span>
+            <span class="s2">"mstar_request_preprocess_seconds"</span><span class="p">,</span>
+            <span class="s2">"Successful requests: submission to the data worker handing the "</span>
+            <span class="s2">"request to the conductor, including its wait in the data worker's queue."</span><span class="p">,</span>
+            <span class="n">stages</span><span class="p">,</span> <span class="n">buckets</span><span class="o">=</span><span class="n">STAGE_BUCKETS</span><span class="p">,</span> <span class="n">registry</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">registry</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">engine_latency</span> <span class="o">=</span> <span class="n">Histogram</span><span class="p">(</span>
+            <span class="s2">"mstar_request_engine_seconds"</span><span class="p">,</span>
+            <span class="s2">"Successful requests: conductor ingest to conductor finish."</span><span class="p">,</span>
+            <span class="n">stages</span><span class="p">,</span> <span class="n">buckets</span><span class="o">=</span><span class="n">E2E_BUCKETS</span><span class="p">,</span> <span class="n">registry</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">registry</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">delivery_latency</span> <span class="o">=</span> <span class="n">Histogram</span><span class="p">(</span>
+            <span class="s2">"mstar_request_delivery_seconds"</span><span class="p">,</span>
+            <span class="s2">"Successful requests: conductor finish to the result leaving the API server."</span><span class="p">,</span>
+            <span class="n">stages</span><span class="p">,</span> <span class="n">buckets</span><span class="o">=</span><span class="n">STAGE_BUCKETS</span><span class="p">,</span> <span class="n">registry</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">registry</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Output volume, counted per chunk as it reaches the API server, for</span>
+        <span class="c1"># every request; modality names come from the model's graph.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output_chunks</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">(</span>
+            <span class="s2">"mstar_output_chunks"</span><span class="p">,</span>
+            <span class="s2">"Result chunks that reached the API server, by modality."</span><span class="p">,</span>
+            <span class="p">[</span><span class="s2">"model_name"</span><span class="p">,</span> <span class="s2">"modality"</span><span class="p">],</span> <span class="n">registry</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">registry</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output_bytes</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">(</span>
+            <span class="s2">"mstar_output_bytes"</span><span class="p">,</span>
+            <span class="s2">"Bytes of result chunks that reached the API server, by modality."</span><span class="p">,</span>
+            <span class="p">[</span><span class="s2">"model_name"</span><span class="p">,</span> <span class="s2">"modality"</span><span class="p">],</span> <span class="n">registry</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">registry</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output_audio_seconds</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">(</span>
+            <span class="s2">"mstar_output_audio_seconds"</span><span class="p">,</span>
+            <span class="s2">"Seconds of audio in the result chunks that reached the API server."</span><span class="p">,</span>
+            <span class="p">[</span><span class="s2">"model_name"</span><span class="p">],</span> <span class="n">registry</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">registry</span><span class="p">,</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">labels</span><span class="p">(</span><span class="n">model_name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">time_to_first_chunk</span> <span class="o">=</span> <span class="n">Histogram</span><span class="p">(</span>
+            <span class="s2">"mstar_time_to_first_chunk_seconds"</span><span class="p">,</span>
+            <span class="s2">"Successful requests: submission to the first result chunk of each "</span>
+            <span class="s2">"output modality reaching the API server."</span><span class="p">,</span>
+            <span class="p">[</span><span class="s2">"model_name"</span><span class="p">,</span> <span class="s2">"modality"</span><span class="p">],</span> <span class="n">buckets</span><span class="o">=</span><span class="n">FIRST_OUTPUT_BUCKETS</span><span class="p">,</span> <span class="n">registry</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">registry</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="c1"># The data worker's own work, from the profile it reports per request</span>
+        <span class="c1"># it took off its queue; perf_counter is shared, it is a thread here.</span>
+        <span class="n">data_worker</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"model_name"</span><span class="p">,</span> <span class="s2">"input_modalities"</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_worker_seconds</span> <span class="o">=</span> <span class="n">Histogram</span><span class="p">(</span>
+            <span class="s2">"mstar_data_worker_preprocess_seconds"</span><span class="p">,</span>
+            <span class="s2">"Requests the data worker preprocessed: from taking the request off "</span>
+            <span class="s2">"its queue to handing it to the conductor."</span><span class="p">,</span>
+            <span class="n">data_worker</span><span class="p">,</span> <span class="n">buckets</span><span class="o">=</span><span class="n">STAGE_BUCKETS</span><span class="p">,</span> <span class="n">registry</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">registry</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_worker_failures</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">(</span>
+            <span class="s2">"mstar_data_worker_preprocess_failures"</span><span class="p">,</span>
+            <span class="s2">"Requests whose preprocessing failed in the data worker (media "</span>
+            <span class="s2">"limits, undecodable media, the model's prompt processing, any other error)."</span><span class="p">,</span>
+            <span class="n">data_worker</span><span class="p">,</span> <span class="n">registry</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">registry</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">upload_size</span> <span class="o">=</span> <span class="n">Histogram</span><span class="p">(</span>
+            <span class="s2">"mstar_upload_size_bytes"</span><span class="p">,</span>
+            <span class="s2">"Size of each image, audio or video file a request carried to the "</span>
+            <span class="s2">"data worker, uploaded or inline."</span><span class="p">,</span>
+            <span class="p">[</span><span class="s2">"model_name"</span><span class="p">,</span> <span class="s2">"modality"</span><span class="p">],</span> <span class="n">buckets</span><span class="o">=</span><span class="n">UPLOAD_SIZE_BUCKETS</span><span class="p">,</span> <span class="n">registry</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">registry</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">registry</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">_ScrapedGauge</span><span class="p">(</span>
+            <span class="s2">"mstar_data_worker_queue_depth"</span><span class="p">,</span>
+            <span class="s2">"Requests submitted and waiting for the data worker to take them up."</span><span class="p">,</span>
+            <span class="n">model_name</span><span class="p">,</span> <span class="n">data_worker_queue_depth</span><span class="p">,</span>
+        <span class="p">))</span>
+
+        <span class="c1"># Label lookups resolved once per modality set or modality. Two</span>
+        <span class="c1"># threads may resolve the same key at once; labels() returns the same</span>
+        <span class="c1"># series to both, so the race is harmless.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_request_series</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">_RequestSeries</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_first_chunk_series</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_chunk_series</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_data_worker_series</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">_DataWorkerSeries</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_upload_series</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_series</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">modalities</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_RequestSeries</span><span class="p">:</span>
+        <span class="n">series</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_request_series</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">modalities</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">series</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">labels</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_name</span><span class="p">,</span> <span class="n">modalities</span><span class="p">)</span>
+            <span class="n">series</span> <span class="o">=</span> <span class="n">_RequestSeries</span><span class="p">(</span>
+                <span class="c1"># Exported at 0 from here on: rate() and increase() miss the</span>
+                <span class="c1"># first increment of a series that appears at 1.</span>
+                <span class="n">outcomes</span><span class="o">=</span><span class="p">{</span><span class="n">o</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">requests</span><span class="o">.</span><span class="n">labels</span><span class="p">(</span><span class="o">*</span><span class="n">labels</span><span class="p">,</span> <span class="n">o</span><span class="p">)</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">OUTCOMES</span><span class="p">},</span>
+                <span class="n">e2e</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">e2e_latency</span><span class="o">.</span><span class="n">labels</span><span class="p">(</span><span class="o">*</span><span class="n">labels</span><span class="p">),</span>
+                <span class="n">first_output</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">time_to_first_output</span><span class="o">.</span><span class="n">labels</span><span class="p">(</span><span class="o">*</span><span class="n">labels</span><span class="p">),</span>
+                <span class="n">preprocess</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">preprocess_latency</span><span class="o">.</span><span class="n">labels</span><span class="p">(</span><span class="o">*</span><span class="n">labels</span><span class="p">),</span>
+                <span class="n">engine</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">engine_latency</span><span class="o">.</span><span class="n">labels</span><span class="p">(</span><span class="o">*</span><span class="n">labels</span><span class="p">),</span>
+                <span class="n">delivery</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">delivery_latency</span><span class="o">.</span><span class="n">labels</span><span class="p">(</span><span class="o">*</span><span class="n">labels</span><span class="p">),</span>
+                <span class="n">queue</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">queue_time</span><span class="o">.</span><span class="n">labels</span><span class="p">(</span><span class="o">*</span><span class="n">labels</span><span class="p">),</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_request_series</span><span class="p">[</span><span class="n">modalities</span><span class="p">]</span> <span class="o">=</span> <span class="n">series</span>
+        <span class="k">return</span> <span class="n">series</span>
+
+<div class="viewcode-block" id="ServingMetrics.conductor_status">
+<a class="viewcode-back" href="../../../_autosummary/mstar.observability.metrics.html#mstar.observability.metrics.ServingMetrics.conductor_status">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">conductor_status</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">status</span><span class="p">:</span> <span class="n">ConductorStatus</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Export the conductor's latest status message."""</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_conductor</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">status</span><span class="p">)</span></div>
+
 
 <div class="viewcode-block" id="ServingMetrics.record">
 <a class="viewcode-back" href="../../../_autosummary/mstar.observability.metrics.html#mstar.observability.metrics.ServingMetrics.record">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">record</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">req</span><span class="p">:</span> <span class="n">PendingRequest</span><span class="p">,</span> <span class="n">outcome</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""Count one request that left the API server's table."""</span>
         <span class="n">now</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
-        <span class="n">modalities</span> <span class="o">=</span> <span class="n">modalities_label</span><span class="p">(</span><span class="n">req</span><span class="o">.</span><span class="n">output_modalities</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">modalities</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_seen_modalities</span><span class="p">:</span>
-            <span class="c1"># rate() and increase() miss the first increment of a series that</span>
-            <span class="c1"># appears at 1, so every outcome is exported at 0 from here on.</span>
-            <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">OUTCOMES</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">requests</span><span class="o">.</span><span class="n">labels</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_name</span><span class="p">,</span> <span class="n">modalities</span><span class="p">,</span> <span class="n">o</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_seen_modalities</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">modalities</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">requests</span><span class="o">.</span><span class="n">labels</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_name</span><span class="p">,</span> <span class="n">modalities</span><span class="p">,</span> <span class="n">outcome</span><span class="p">)</span><span class="o">.</span><span class="n">inc</span><span class="p">()</span>
+        <span class="n">series</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_series</span><span class="p">(</span><span class="n">modalities_label</span><span class="p">(</span><span class="n">req</span><span class="o">.</span><span class="n">output_modalities</span><span class="p">))</span>
+        <span class="n">series</span><span class="o">.</span><span class="n">outcomes</span><span class="p">[</span><span class="n">outcome</span><span class="p">]</span><span class="o">.</span><span class="n">inc</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">outcome</span> <span class="o">!=</span> <span class="s2">"success"</span><span class="p">:</span>
             <span class="k">return</span>
         <span class="n">timing</span> <span class="o">=</span> <span class="n">req</span><span class="o">.</span><span class="n">profile</span><span class="o">.</span><span class="n">timing</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">e2e_latency</span><span class="o">.</span><span class="n">labels</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_name</span><span class="p">,</span> <span class="n">modalities</span><span class="p">)</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span>
-            <span class="n">now</span> <span class="o">-</span> <span class="n">timing</span><span class="o">.</span><span class="n">recv_time</span><span class="p">)</span>
+        <span class="n">series</span><span class="o">.</span><span class="n">e2e</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">now</span> <span class="o">-</span> <span class="n">timing</span><span class="o">.</span><span class="n">recv_time</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">timing</span><span class="o">.</span><span class="n">first_chunk_time</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">time_to_first_output</span><span class="o">.</span><span class="n">labels</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_name</span><span class="p">,</span> <span class="n">modalities</span><span class="p">)</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span>
-                <span class="n">timing</span><span class="o">.</span><span class="n">first_chunk_time</span> <span class="o">-</span> <span class="n">timing</span><span class="o">.</span><span class="n">recv_time</span><span class="p">)</span></div>
+            <span class="n">series</span><span class="o">.</span><span class="n">first_output</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">timing</span><span class="o">.</span><span class="n">first_chunk_time</span> <span class="o">-</span> <span class="n">timing</span><span class="o">.</span><span class="n">recv_time</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">timing</span><span class="o">.</span><span class="n">preprocess_finish_time</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">series</span><span class="o">.</span><span class="n">preprocess</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">timing</span><span class="o">.</span><span class="n">preprocess_finish_time</span> <span class="o">-</span> <span class="n">timing</span><span class="o">.</span><span class="n">recv_time</span><span class="p">)</span>
+        <span class="c1"># Every successful request got its RequestComplete, which carries</span>
+        <span class="c1"># both; a value from another host's clock would come out negative.</span>
+        <span class="k">if</span> <span class="n">timing</span><span class="o">.</span><span class="n">conductor_finish_time</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">now</span> <span class="o">&gt;=</span> <span class="n">timing</span><span class="o">.</span><span class="n">conductor_finish_time</span><span class="p">:</span>
+            <span class="n">series</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">timing</span><span class="o">.</span><span class="n">conductor_finish_time</span> <span class="o">-</span> <span class="n">timing</span><span class="o">.</span><span class="n">conductor_ingest_time</span><span class="p">)</span>
+            <span class="n">series</span><span class="o">.</span><span class="n">delivery</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">now</span> <span class="o">-</span> <span class="n">timing</span><span class="o">.</span><span class="n">conductor_finish_time</span><span class="p">)</span>
+        <span class="c1"># Both come on the conductor's RequestComplete; only a conductor spawned</span>
+        <span class="c1"># with metrics on stamps the arrival.</span>
+        <span class="k">if</span> <span class="n">timing</span><span class="o">.</span><span class="n">conductor_arrival_time</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">series</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">timing</span><span class="o">.</span><span class="n">conductor_ingest_time</span> <span class="o">-</span> <span class="n">timing</span><span class="o">.</span><span class="n">conductor_arrival_time</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">modality</span><span class="p">,</span> <span class="n">first</span> <span class="ow">in</span> <span class="n">req</span><span class="o">.</span><span class="n">first_chunk_times</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">first_chunk</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_first_chunk_series</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">modality</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">first_chunk</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">first_chunk</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_to_first_chunk</span><span class="o">.</span><span class="n">labels</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_name</span><span class="p">,</span> <span class="n">modality</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_first_chunk_series</span><span class="p">[</span><span class="n">modality</span><span class="p">]</span> <span class="o">=</span> <span class="n">first_chunk</span>
+            <span class="n">first_chunk</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">first</span> <span class="o">-</span> <span class="n">timing</span><span class="o">.</span><span class="n">recv_time</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ServingMetrics.record_chunk">
+<a class="viewcode-back" href="../../../_autosummary/mstar.observability.metrics.html#mstar.observability.metrics.ServingMetrics.record_chunk">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">record_chunk</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">modality</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span> <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Count one result chunk that reached the API server (not an error chunk)."""</span>
+        <span class="n">series</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_chunk_series</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">modality</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">series</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">series</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_chunks</span><span class="o">.</span><span class="n">labels</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_name</span><span class="p">,</span> <span class="n">modality</span><span class="p">),</span>
+                      <span class="bp">self</span><span class="o">.</span><span class="n">output_bytes</span><span class="o">.</span><span class="n">labels</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_name</span><span class="p">,</span> <span class="n">modality</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_chunk_series</span><span class="p">[</span><span class="n">modality</span><span class="p">]</span> <span class="o">=</span> <span class="n">series</span>
+        <span class="n">chunks</span><span class="p">,</span> <span class="n">nbytes</span> <span class="o">=</span> <span class="n">series</span>
+        <span class="n">chunks</span><span class="o">.</span><span class="n">inc</span><span class="p">()</span>
+        <span class="n">nbytes</span><span class="o">.</span><span class="n">inc</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">modality</span> <span class="o">==</span> <span class="s2">"audio"</span> <span class="ow">and</span> <span class="n">metadata</span><span class="p">:</span>
+            <span class="c1"># Chunks from the result-token path carry no sample rate.</span>
+            <span class="n">rate</span> <span class="o">=</span> <span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"sample_rate"</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">rate</span><span class="p">:</span>
+                <span class="n">channels</span> <span class="o">=</span> <span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"num_channels"</span><span class="p">)</span> <span class="ow">or</span> <span class="mi">1</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">output_audio_seconds</span><span class="o">.</span><span class="n">inc</span><span class="p">(</span>
+                    <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">_AUDIO_BYTES_PER_SAMPLE</span> <span class="o">*</span> <span class="n">channels</span> <span class="o">*</span> <span class="n">rate</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="ServingMetrics.record_preprocess">
+<a class="viewcode-back" href="../../../_autosummary/mstar.observability.metrics.html#mstar.observability.metrics.ServingMetrics.record_preprocess">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">record_preprocess</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">profile</span><span class="p">:</span> <span class="n">DataWorkerProfile</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Record the data worker's numbers for one request it took off its</span>
+<span class="sd">        queue: its time if preprocessing finished, else a failure, and the size</span>
+<span class="sd">        of each input file either way."""</span>
+        <span class="n">modalities</span> <span class="o">=</span> <span class="n">modalities_label</span><span class="p">(</span><span class="n">profile</span><span class="o">.</span><span class="n">input_modalities</span><span class="p">)</span>
+        <span class="n">series</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_worker_series</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">modalities</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">series</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">labels</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_name</span><span class="p">,</span> <span class="n">modalities</span><span class="p">)</span>
+            <span class="c1"># Both from the first request of a modality set, so the first</span>
+            <span class="c1"># failure is not lost to rate().</span>
+            <span class="n">series</span> <span class="o">=</span> <span class="n">_DataWorkerSeries</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">data_worker_seconds</span><span class="o">.</span><span class="n">labels</span><span class="p">(</span><span class="o">*</span><span class="n">labels</span><span class="p">),</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">data_worker_failures</span><span class="o">.</span><span class="n">labels</span><span class="p">(</span><span class="o">*</span><span class="n">labels</span><span class="p">),</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_data_worker_series</span><span class="p">[</span><span class="n">modalities</span><span class="p">]</span> <span class="o">=</span> <span class="n">series</span>
+        <span class="k">if</span> <span class="n">profile</span><span class="o">.</span><span class="n">failed</span><span class="p">:</span>
+            <span class="n">series</span><span class="o">.</span><span class="n">failures</span><span class="o">.</span><span class="n">inc</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">series</span><span class="o">.</span><span class="n">seconds</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">profile</span><span class="o">.</span><span class="n">preprocess_finish_time</span> <span class="o">-</span> <span class="n">profile</span><span class="o">.</span><span class="n">dequeue_time</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">modality</span><span class="p">,</span> <span class="n">sizes</span> <span class="ow">in</span> <span class="n">profile</span><span class="o">.</span><span class="n">upload_sizes</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">upload</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_upload_series</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">modality</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">upload</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">upload</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">upload_size</span><span class="o">.</span><span class="n">labels</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_name</span><span class="p">,</span> <span class="n">modality</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_upload_series</span><span class="p">[</span><span class="n">modality</span><span class="p">]</span> <span class="o">=</span> <span class="n">upload</span>
+            <span class="k">for</span> <span class="n">size</span> <span class="ow">in</span> <span class="n">sizes</span><span class="p">:</span>
+                <span class="n">upload</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">size</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="ServingMetrics.render">

@@ -377,7 +377,9 @@
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="_autosummary/mstar.observability.html">mstar.observability</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.observability.catalog.html">mstar.observability.catalog</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.observability.metrics.html">mstar.observability.metrics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.observability.recorders.html">mstar.observability.recorders</a></li>
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="_autosummary/mstar.streaming.html">mstar.streaming</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -408,6 +410,7 @@
 <li class="toctree-l2 has-children"><a class="reference internal" href="_autosummary/mstar.worker.html">mstar.worker</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.batch_builder.html">mstar.worker.batch_builder</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.rid_table.html">mstar.worker.rid_table</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.worker_metrics.html">mstar.worker.worker_metrics</a></li>
 </ul>
 </details></li>
 </ul>
@@ -1187,8 +1190,10 @@ Prometheus metrics at <code class="docutils literal notranslate"><span class="pr
 hint. Off by default, and <code class="docutils literal notranslate"><span class="pre">/metrics</span></code> answers 404 then. Like <code class="docutils literal notranslate"><span class="pre">/health</span></code>, it needs no
 API key even when one is set, the usual convention for scrape endpoints. It exposes
 request counts, latencies and the model name (never prompts or outputs); if that
-matters for a deployment, keep the port on an internal network. The Rust frontend does
-not serve it yet, so <code class="docutils literal notranslate"><span class="pre">--enable-metrics</span> <span class="pre">--rust-frontend</span></code> is refused at startup.</p>
+matters for a deployment, keep the port on an internal network. With
+<code class="docutils literal notranslate"><span class="pre">--rust-frontend</span></code>, <code class="docutils literal notranslate"><span class="pre">mstar-server</span></code> serves the same text: it asks the API server for
+it over the bridge, so both frontends show the same names, and it answers <code class="docutils literal notranslate"><span class="pre">503</span></code> if the
+bridge does not reply within two seconds, as <code class="docutils literal notranslate"><span class="pre">/health</span></code> does.</p>
 <p>Requests are counted when they leave the API server, from the first request after the
 warmup requests. Every family has a <code class="docutils literal notranslate"><span class="pre">model_name</span></code> label (the config’s <code class="docutils literal notranslate"><span class="pre">model</span></code>);
 <code class="docutils literal notranslate"><span class="pre">output_modalities</span></code> is the request’s output modalities, sorted and comma-joined
@@ -1199,7 +1204,8 @@ warmup requests. Every family has a <code class="docutils literal notranslate"><
 request failed in the engine, preprocessing or result delivery), <code class="docutils literal notranslate"><span class="pre">abort</span></code> (the client
 went away, or its finished result was dropped unread) or <code class="docutils literal notranslate"><span class="pre">timeout</span></code> (<code class="docutils literal notranslate"><span class="pre">--timeout</span></code>
 expired). Requests refused before they were submitted (a 400 for a bad form, a 409
-for a <code class="docutils literal notranslate"><span class="pre">request_id</span></code> in flight) are not counted.</p></li>
+for a <code class="docutils literal notranslate"><span class="pre">request_id</span></code> in flight) are not counted here but in
+<code class="docutils literal notranslate"><span class="pre">mstar_http_refusals_total</span></code>.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">mstar_requests_in_flight{model_name}</span></code>: gauge, requests the API server holds
 (submitted and not yet returned, failed or aborted).</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">mstar_e2e_request_latency_seconds{model_name,</span> <span class="pre">output_modalities}</span></code>: histogram over
@@ -1209,6 +1215,129 @@ leaving the API server.</p></li>
 successful requests, from submission to the first result chunk of any modality
 reaching the API server. It is measured on the server, so it does not include the
 network to the client, and a non-streaming client sees nothing until the end.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mstar_http_refusals_total{model_name,</span> <span class="pre">route,</span> <span class="pre">status}</span></code>: counter, HTTP requests the
+frontend answered with a 4xx status without submitting them to the API server: <code class="docutils literal notranslate"><span class="pre">401</span></code>
+(missing or wrong API key), <code class="docutils literal notranslate"><span class="pre">413</span></code> (body over <code class="docutils literal notranslate"><span class="pre">MSTAR_MAX_BODY_MB</span></code>), <code class="docutils literal notranslate"><span class="pre">422</span></code> (body
+that fails validation), <code class="docutils literal notranslate"><span class="pre">400</span></code> (a bad form field or request), <code class="docutils literal notranslate"><span class="pre">409</span></code> (a
+<code class="docutils literal notranslate"><span class="pre">request_id</span></code> in flight), <code class="docutils literal notranslate"><span class="pre">404</span></code> (unknown route, or a model without the endpoint),
+<code class="docutils literal notranslate"><span class="pre">405</span></code> (wrong method), plus <code class="docutils literal notranslate"><span class="pre">503</span></code> when the Rust frontend’s
+<code class="docutils literal notranslate"><span class="pre">MSTAR_MAX_CONCURRENT_REQUESTS</span></code> cap turns a request away. <code class="docutils literal notranslate"><span class="pre">route</span></code> is the route’s
+path as declared (<code class="docutils literal notranslate"><span class="pre">/v1/chat/completions</span></code>), <code class="docutils literal notranslate"><span class="pre">unmatched</span></code> when no route matches.
+A request that was submitted and then failed counts once, as an <code class="docutils literal notranslate"><span class="pre">error</span></code> in
+<code class="docutils literal notranslate"><span class="pre">mstar_requests_total</span></code>, never here. WebSocket handshakes are not counted. With
+<code class="docutils literal notranslate"><span class="pre">--rust-frontend</span></code>, <code class="docutils literal notranslate"><span class="pre">mstar-server</span></code> keeps these counts and sends them with each
+<code class="docutils literal notranslate"><span class="pre">/metrics</span></code> request, so the API server exports them under the same name.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mstar_request_queue_seconds{model_name,</span> <span class="pre">output_modalities}</span></code>: histogram over
+successful requests, from the conductor taking the request in to admitting it for
+dispatch. Zero unless the request queued at <code class="docutils literal notranslate"><span class="pre">max_concurrent_requests</span></code>.</p></li>
+</ul>
+<p>While metrics are on, the conductor sends the API server a status message every second
+(nothing when they are off). These gauges show its latest one, so they can be up to a
+second old:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">mstar_conductor_requests{model_name,</span> <span class="pre">state}</span></code>: requests the conductor holds.
+<code class="docutils literal notranslate"><span class="pre">state</span></code> is <code class="docutils literal notranslate"><span class="pre">waiting</span></code> (queued at <code class="docutils literal notranslate"><span class="pre">max_concurrent_requests</span></code>, not dispatched yet),
+<code class="docutils literal notranslate"><span class="pre">running</span></code> (dispatched to workers, not finished) or <code class="docutils literal notranslate"><span class="pre">draining</span></code> (completed, aborted
+or failed, and waiting for every reader to release its outputs before the workers free
+its state; it still counts toward <code class="docutils literal notranslate"><span class="pre">max_concurrent_requests</span></code>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mstar_component_in_flight{model_name,</span> <span class="pre">component}</span></code>: per graph node (the
+<code class="docutils literal notranslate"><span class="pre">node_names</span></code> of the config’s <code class="docutils literal notranslate"><span class="pre">node_groups</span></code>), running requests with a pass on that
+node that the conductor dispatched and has not heard back from. The conductor sees
+whole passes, so a node running a request’s decode loop counts it once for the loop.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mstar_conductor_status_age_seconds{model_name}</span></code>: seconds since the API server
+received the last status message, or since metrics were enabled before the first one.
+More than a few seconds means the conductor stopped reporting.</p></li>
+</ul>
+<p>The engine workers also send the conductor their own metrics every second, which it
+adds to its status message, so these can be up to two seconds old. <code class="docutils literal notranslate"><span class="pre">component</span></code> is the
+graph node; a node with replicas on several workers shows their sum, and the ranks of a
+tensor or sequence parallel instance count once (the instance’s first rank reports).
+The histograms and counters count from worker start, warmup requests included, so read
+them with <code class="docutils literal notranslate"><span class="pre">rate()</span></code> or <code class="docutils literal notranslate"><span class="pre">increase()</span></code>.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">mstar_kv_pages_used{model_name,</span> <span class="pre">component,</span> <span class="pre">resource}</span></code>,
+<code class="docutils literal notranslate"><span class="pre">mstar_kv_pages_total{model_name,</span> <span class="pre">component,</span> <span class="pre">resource}</span></code>: pages of each paged KV
+cache (<code class="docutils literal notranslate"><span class="pre">resource</span></code> is its key in the model, since a node can have several, e.g.
+Whisper’s decoder self and cross attention caches). Used counts every page off the
+free list, including the pages the prefix cache keeps; a cache two nodes of one
+worker share shows under each node.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mstar_kv_pages_cached{model_name,</span> <span class="pre">component,</span> <span class="pre">resource}</span></code>: pages the prefix cache
+names. Some may also be in use by running requests; the cache frees the others when a
+request needs the room.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mstar_step_seconds{model_name,</span> <span class="pre">component,</span> <span class="pre">graph_walk}</span></code>: histogram over engine
+steps that ran a forward. A step counts from when the worker hands it to its GPU
+thread, or from the end of the previous step if that was later, to the end of its
+postprocess (outputs on the host, stop check, routing). Overlapping steps are not
+counted twice: in steady state this is the interval between step completions, and
+<code class="docutils literal notranslate"><span class="pre">rate(..._sum)</span></code> is the share of time the worker had a step running.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mstar_batch_size{model_name,</span> <span class="pre">component,</span> <span class="pre">graph_walk}</span></code>: histogram, rows the step’s
+forward ran.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mstar_prefix_cache_query_tokens_total{model_name,</span> <span class="pre">component}</span></code>,
+<code class="docutils literal notranslate"><span class="pre">mstar_prefix_cache_hit_tokens_total{model_name,</span> <span class="pre">component}</span></code>: counters, prompt
+tokens looked up in the prefix cache (once per request, its whole keyed prompt) and
+tokens found there. Only models that key their prompts for prefix reuse (BAGEL and
+Orpheus) count; the cache is off under tensor parallelism.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mstar_component_pending_steps{model_name,</span> <span class="pre">component}</span></code>: gauge, requests whose next
+step on the node is ready (its inputs arrived) and not running: waiting for room in a
+step or for the worker to pick the node.</p></li>
+</ul>
+<p>Where a successful request’s time went, from the timestamps every request already
+carries (same <code class="docutils literal notranslate"><span class="pre">model_name</span></code> and <code class="docutils literal notranslate"><span class="pre">output_modalities</span></code> labels; the conductor’s
+timestamps are compared with the API server’s, which assumes both run on one host, as
+they do today):</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">mstar_request_preprocess_seconds</span></code>: histogram, from submission to the data worker
+handing the preprocessed request to the conductor, including its wait in the data
+worker’s queue.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mstar_request_engine_seconds</span></code>: histogram, from the conductor taking the request in
+to the conductor finishing it.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mstar_request_delivery_seconds</span></code>: histogram, from the conductor finishing the
+request to the result leaving the API server (the last chunks’ postprocessing and
+transfer, and the client handler picking it up).</p></li>
+</ul>
+<p>Output, per output modality (<code class="docutils literal notranslate"><span class="pre">modality</span></code> is the chunk’s modality, e.g. <code class="docutils literal notranslate"><span class="pre">audio</span></code>):</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">mstar_output_chunks_total{model_name,</span> <span class="pre">modality}</span></code> and
+<code class="docutils literal notranslate"><span class="pre">mstar_output_bytes_total{model_name,</span> <span class="pre">modality}</span></code>: counters of the result chunks (and
+their bytes) that reached the API server, for every request whatever its outcome;
+error chunks are not counted.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mstar_output_audio_seconds_total{model_name}</span></code>: counter, seconds of audio in those
+chunks (16-bit PCM at the chunk’s sample rate and channel count).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mstar_time_to_first_chunk_seconds{model_name,</span> <span class="pre">modality}</span></code>: histogram over
+successful requests, from submission to the first chunk of each output modality
+reaching the API server (time to first audio, first image, first video frame).</p></li>
+</ul>
+<p>The data worker (a thread in the API server that loads each request’s media and runs
+the model’s prompt processing, preprocessing one request at a time) reports its own
+work.
+<code class="docutils literal notranslate"><span class="pre">input_modalities</span></code> is the request’s input modalities, sorted and comma-joined like
+<code class="docutils literal notranslate"><span class="pre">output_modalities</span></code>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">mstar_data_worker_preprocess_seconds{model_name,</span> <span class="pre">input_modalities}</span></code>: histogram over
+requests whose preprocessing finished, from the data worker taking the request off its
+queue to handing it to the conductor. Unlike <code class="docutils literal notranslate"><span class="pre">mstar_request_preprocess_seconds</span></code> it
+leaves out the wait in the queue, and it counts requests whatever their outcome later.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mstar_data_worker_preprocess_failures_total{model_name,</span> <span class="pre">input_modalities}</span></code>:
+counter, requests whose preprocessing failed in the data worker, each once, whatever
+raised: a file count or media length over its limit, a file that cannot be decoded,
+the model’s prompt processing, or handing the inputs on. The client gets the error
+(a 400 for a bad input), so the request also ends as <code class="docutils literal notranslate"><span class="pre">outcome=&quot;error&quot;</span></code> in
+<code class="docutils literal notranslate"><span class="pre">mstar_requests_total</span></code> unless its client had already gone. That counter counts
+failures from every stage by output modalities; this one only the data worker’s
+preprocessing, by input modalities (failures turning results into output chunks are
+not counted here).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mstar_upload_size_bytes{model_name,</span> <span class="pre">modality}</span></code>: histogram, the size on disk of
+each image, audio or video file a request carried to the data worker (<code class="docutils literal notranslate"><span class="pre">modality</span></code> is
+<code class="docutils literal notranslate"><span class="pre">image</span></code>, <code class="docutils literal notranslate"><span class="pre">audio</span></code> or <code class="docutils literal notranslate"><span class="pre">video</span></code>), whether the request succeeded or failed. Every
+route writes its media to a file first: an upload as received, inline media (a
+<code class="docutils literal notranslate"><span class="pre">data:</span></code> URL, base64 files on <code class="docutils literal notranslate"><span class="pre">/generate/ws</span></code>) after base64 decoding. The realtime
+route and long transcriptions send WAV files they write from the decoded audio, so
+those count the WAV sizes. Requests refused before they were submitted (an oversized
+body, a bad form) are not counted.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mstar_data_worker_queue_depth{model_name}</span></code>: gauge, read at scrape time, requests
+submitted and not yet taken up by the data worker (the one it is working on is not
+counted). A request whose client went away still counts until the data worker takes
+it up.</p></li>
 </ul>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mstar<span class="w"> </span>serve<span class="w"> </span>kokoro<span class="w"> </span>--enable-metrics
 curl<span class="w"> </span>-s<span class="w"> </span>localhost:8000/metrics<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span><span class="s1">'^mstar_'</span>

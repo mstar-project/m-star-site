@@ -377,7 +377,9 @@
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="_autosummary/mstar.observability.html">mstar.observability</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.observability.catalog.html">mstar.observability.catalog</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.observability.metrics.html">mstar.observability.metrics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.observability.recorders.html">mstar.observability.recorders</a></li>
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="_autosummary/mstar.streaming.html">mstar.streaming</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -408,6 +410,7 @@
 <li class="toctree-l2 has-children"><a class="reference internal" href="_autosummary/mstar.worker.html">mstar.worker</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.batch_builder.html">mstar.worker.batch_builder</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.rid_table.html">mstar.worker.rid_table</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.worker_metrics.html">mstar.worker.worker_metrics</a></li>
 </ul>
 </details></li>
 </ul>
@@ -859,8 +862,20 @@ run ends (<code class="docutils literal notranslate"><span class="pre">benchmark
 <p>The models and cases are <code class="docutils literal notranslate"><span class="pre">benchmark/eval/e2e/cases.yaml</span></code>: TTS, voice clone, ASR, duplex, text, image, audio
 and video in, speech out, image and video generation, streamed frames, VLA actions, and with <code class="docutils literal notranslate"><span class="pre">--rp</span></code> request-path
 cases and served invariants. Speech cases use the <code class="docutils literal notranslate"><span class="pre">tts</span></code>, <code class="docutils literal notranslate"><span class="pre">asr</span></code> and <code class="docutils literal notranslate"><span class="pre">duplex</span></code> suites; the rest use the <code class="docutils literal notranslate"><span class="pre">e2e</span></code>
-suite (<code class="docutils literal notranslate"><span class="pre">run</span> <span class="pre">e2e</span> <span class="pre">--kind</span> <span class="pre">chat_image|image|video|pi05|frames|...</span></code>). Inputs are built once into <code class="docutils literal notranslate"><span class="pre">--data-dir</span></code>
-(<code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">benchmark.eval</span> <span class="pre">data</span> <span class="pre">e2e</span> <span class="pre">--out</span> <span class="pre">DIR</span></code>: Seed-TTS and LibriSpeech sets plus generated media).</p>
+suite (<code class="docutils literal notranslate"><span class="pre">run</span> <span class="pre">e2e</span> <span class="pre">--kind</span> <span class="pre">chat_image|image|video|pi05|frames|world|...</span></code>). Models whose PRs are not on <code class="docutils literal notranslate"><span class="pre">main</span></code> yet
+(CosyVoice3, VoxCPM2, Omnilingual ASR, LingBot-World) have optional entries, out of <code class="docutils literal notranslate"><span class="pre">all</span></code>: select them with
+<code class="docutils literal notranslate"><span class="pre">--models</span> <span class="pre">tag:new-model</span></code> or by name, against a base that serves them (<code class="docutils literal notranslate"><span class="pre">--base</span> <span class="pre">515</span></code>). Inputs are built once into
+<code class="docutils literal notranslate"><span class="pre">--data-dir</span></code> (<code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">benchmark.eval</span> <span class="pre">data</span> <span class="pre">e2e</span> <span class="pre">--out</span> <span class="pre">DIR</span></code>: Seed-TTS and LibriSpeech sets plus generated media).</p>
+<p><strong>Multi-GPU configs.</strong> Tensor parallel, sequence parallel, split and disaggregated deployments
+(<code class="docutils literal notranslate"><span class="pre">whisper_large_tp2</span></code>, <code class="docutils literal notranslate"><span class="pre">qwen3omni_thinker_tp2</span></code>, <code class="docutils literal notranslate"><span class="pre">cosmos3_nano_sp2</span></code>, <code class="docutils literal notranslate"><span class="pre">qwen3tts_1p7b_split</span></code>,
+<code class="docutils literal notranslate"><span class="pre">orpheus_pd_disaggregated</span></code>, <code class="docutils literal notranslate"><span class="pre">qwen3omni_pd_disaggregated</span></code>) are optional entries with <code class="docutils literal notranslate"><span class="pre">gpus:</span> <span class="pre">N</span></code>: select them with
+<code class="docutils literal notranslate"><span class="pre">--models</span> <span class="pre">tag:multi-gpu</span></code>. Such a model runs on N GPU slots of one host at once (<code class="docutils literal notranslate"><span class="pre">--hosts</span> <span class="pre">user&#64;gpu8:0-7</span></code>), and
+a host with fewer slots never takes it. Each case has a wall cap (<code class="docutils literal notranslate"><span class="pre">case_timeout_s</span></code>; 3600 s by default, 900 s on
+these entries), which has to sit well above the slowest normal case on the host: a case still running then has
+hung, its server’s Python stacks are saved (<code class="docutils literal notranslate"><span class="pre">py-spy</span> <span class="pre">dump</span></code> when installed) to <code class="docutils literal notranslate"><span class="pre">stacks.txt</span></code>, a hung head fails the
+row and a hung base reports it broken. py-spy shows threads, not coroutines, so a hang at an <code class="docutils literal notranslate"><span class="pre">await</span></code> in the API
+server shows an idle event loop. Where ptrace is restricted, <code class="docutils literal notranslate"><span class="pre">--stacks-sudo</span></code> retries the dump with <code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">-n</span></code>; it
+is off by default because a refused <code class="docutils literal notranslate"><span class="pre">sudo</span></code> is logged, and often mailed, on shared clusters.</p>
 <p>The run directory holds every results file and <code class="docutils literal notranslate"><span class="pre">report/report.md</span></code> (a table for a PR body, details in toggles),
 <code class="docutils literal notranslate"><span class="pre">report/chart.png</span></code> and <code class="docutils literal notranslate"><span class="pre">report/summary.json</span></code>. <code class="docutils literal notranslate"><span class="pre">compare</span></code> exits with 1 when any row is flagged, else with 2
 when any row has no verdict (its job failed or was interrupted, the model was skipped or never got a GPU, base
@@ -890,6 +905,24 @@ type, run <code class="docutils literal notranslate"><span class="pre">compare</
 <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">benchmark.eval</span> <span class="pre">calibrate</span> <span class="pre">&lt;run</span> <span class="pre">dir&gt;</span></code>; rows without a floor on the run’s GPU are named in the report
 and judged on the passes’ spread alone. A calibrated swing only widens a <code class="docutils literal notranslate"><span class="pre">cases.yaml</span></code> limit, never tightens it.
 Rows of the A/A run that failed or had request errors stay out of the floors; <code class="docutils literal notranslate"><span class="pre">calibrate</span></code> prints how many per model.</p>
+<p><strong>Stress.</strong> <code class="docutils literal notranslate"><span class="pre">--stress</span></code> replaces the cases with a workload for load-dependent races, on the models whose
+<code class="docutils literal notranslate"><span class="pre">cases.yaml</span></code> entry has a <code class="docutils literal notranslate"><span class="pre">stress:</span></code> block (<code class="docutils literal notranslate"><span class="pre">qwen3_5_2b</span></code>):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">benchmark</span><span class="o">.</span><span class="n">eval</span> <span class="n">compare</span> <span class="o">--</span><span class="n">base</span> <span class="n">main</span> <span class="o">--</span><span class="n">head</span> <span class="mi">548</span> <span class="o">--</span><span class="n">stress</span>                  <span class="c1"># 20 runs per arm of 60 s</span>
+<span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">benchmark</span><span class="o">.</span><span class="n">eval</span> <span class="n">compare</span> <span class="o">--</span><span class="n">base</span> <span class="n">main</span> <span class="o">--</span><span class="n">head</span> <span class="mi">548</span> <span class="o">--</span><span class="n">stress</span> <span class="o">--</span><span class="n">stress</span><span class="o">-</span><span class="n">runs</span> <span class="mi">60</span> <span class="o">--</span><span class="n">stress</span><span class="o">-</span><span class="n">clients</span> <span class="mi">32</span>
+</pre></div>
+</div>
+<p>Each run has <code class="docutils literal notranslate"><span class="pre">--stress-clients</span></code> clients (32), each holding one pinned <code class="docutils literal notranslate"><span class="pre">request_id</span></code> on streamed <code class="docutils literal notranslate"><span class="pre">/generate</span></code>
+and mixing five patterns: close at a random chunk, close before reading, close then retry at once under the same
+id, reuse after a full read, and a second request while the first streams (one of the pair should get a 409).
+A run fails on a hang (no progress for <code class="docutils literal notranslate"><span class="pre">--stress-hang-s</span></code>, 30 s), a 5xx, unexpected 4xx, empty reply or
+in-band error, cross-talk (a reply holding another prompt’s answer), the server’s own M* tensor files left in
+<code class="docutils literal notranslate"><span class="pre">/dev/shm</span></code> 30 s after the run (other servers on the host use another deployment token or pid, so theirs are not
+counted), or a server process that exits. Every 5 runs get a fresh server, arms alternated. Head is flagged
+when it crashes or shows cross-talk and base never does, or when its failed-run count beats base’s at one-sided
+Fisher exact p &lt; 0.05; the report states N and the smallest gap N can detect (<code class="docutils literal notranslate"><span class="pre">--stress-runs</span> <span class="pre">20</span></code>: 0 against 5
+failed runs). When base fails every run, no head count can beat it, so read the per-pattern request outcomes in
+the report’s toggle instead. <code class="docutils literal notranslate"><span class="pre">--stress-patterns</span></code> picks a subset
+(<code class="docutils literal notranslate"><span class="pre">barge_in,drop,retry,reuse,overlap</span></code>). The code is <code class="docutils literal notranslate"><span class="pre">benchmark/eval/e2e/stress.py</span></code>.</p>
 </section>
 <section id="adding-a-suite">
 <h2>Adding a suite<a class="headerlink" href="#adding-a-suite" title="Link to this heading">#</a></h2>
