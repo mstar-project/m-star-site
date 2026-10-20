@@ -553,6 +553,7 @@ window.runMermaid = runMermaid;</script>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">User Guide</span></p>
 <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="../../../serving.html">Serving</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../metrics.html">Metrics reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../clients.html">Using a Server</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../evaluation.html">Evaluation and Benchmarks</a></li>
 </ul>
@@ -566,6 +567,7 @@ window.runMermaid = runMermaid;</script>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.api_server.media_io.html">mstar.api_server.media_io</a></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../_autosummary/mstar.api_server.openai.html">mstar.api_server.openai</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.api_server.openai.protocol.html">mstar.api_server.openai.protocol</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.api_server.openai.realtime_vad.html">mstar.api_server.openai.realtime_vad</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.api_server.openai.serving_chat.html">mstar.api_server.openai.serving_chat</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.api_server.openai.serving_images.html">mstar.api_server.openai.serving_images</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.api_server.openai.serving_realtime.html">mstar.api_server.openai.serving_realtime</a></li>
@@ -982,7 +984,8 @@ window.runMermaid = runMermaid;</script>
     <span class="n">TENSOR_RECEIVED</span> <span class="o">=</span> <span class="s2">"tensor_received"</span>
     <span class="n">SCHEDULE_TP</span> <span class="o">=</span> <span class="s2">"schedule_tp"</span>
     <span class="n">STOP_LOOPS</span> <span class="o">=</span> <span class="s2">"stop_loops"</span>
-    <span class="n">TP_NO_SPEC</span> <span class="o">=</span> <span class="s2">"tp_no_spec"</span></div>
+    <span class="n">TP_NO_SPEC</span> <span class="o">=</span> <span class="s2">"tp_no_spec"</span>
+    <span class="n">ENABLE_METRICS</span> <span class="o">=</span> <span class="s2">"enable_metrics"</span></div>
 
 
 
@@ -1223,7 +1226,8 @@ window.runMermaid = runMermaid;</script>
     <span class="n">ABORT_REQUEST</span> <span class="o">=</span> <span class="s2">"abort_request"</span>
     <span class="n">FAIL_REQUESTS</span> <span class="o">=</span> <span class="s2">"fail_requests"</span>
     <span class="n">READS_DONE</span> <span class="o">=</span> <span class="s2">"reads_done"</span>
-    <span class="n">WORKER_STATUS</span> <span class="o">=</span> <span class="s2">"worker_status"</span></div>
+    <span class="n">WORKER_STATUS</span> <span class="o">=</span> <span class="s2">"worker_status"</span>
+    <span class="n">ENABLE_METRICS</span> <span class="o">=</span> <span class="s2">"enable_metrics"</span></div>
 
 
 
@@ -1314,10 +1318,20 @@ window.runMermaid = runMermaid;</script>
 <span class="nd">@dataclass</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">WorkerStatus</span><span class="p">(</span><span class="n">MessageBody</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""A worker's engine metrics, sent once per status interval only while</span>
-<span class="sd">    metrics are on: cumulative or current values per graph node, never</span>
-<span class="sd">    per-request data."""</span>
+<span class="sd">    metrics are on: cumulative or current values per graph node or tensor</span>
+<span class="sd">    edge, never per-request data."""</span>
     <span class="n">worker_id</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">metrics</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">MetricSnapshot</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="EnableMetrics">
+<a class="viewcode-back" href="../../../_autosummary/mstar.utils.ipc_format.html#mstar.utils.ipc_format.EnableMetrics">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">EnableMetrics</span><span class="p">(</span><span class="n">MessageBody</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Start the workers' histograms and counters. The API server sends it to</span>
+<span class="sd">    the conductor after its warmup requests; the conductor forwards it to</span>
+<span class="sd">    every worker (``WorkerMetrics.start_counting``)."""</span></div>
 
 
 

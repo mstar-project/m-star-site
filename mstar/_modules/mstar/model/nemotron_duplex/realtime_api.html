@@ -553,6 +553,7 @@ window.runMermaid = runMermaid;</script>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">User Guide</span></p>
 <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="../../../../serving.html">Serving</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../metrics.html">Metrics reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../clients.html">Using a Server</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../evaluation.html">Evaluation and Benchmarks</a></li>
 </ul>
@@ -566,6 +567,7 @@ window.runMermaid = runMermaid;</script>
 <li class="toctree-l3"><a class="reference internal" href="../../../../_autosummary/mstar.api_server.media_io.html">mstar.api_server.media_io</a></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../../_autosummary/mstar.api_server.openai.html">mstar.api_server.openai</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../../_autosummary/mstar.api_server.openai.protocol.html">mstar.api_server.openai.protocol</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../_autosummary/mstar.api_server.openai.realtime_vad.html">mstar.api_server.openai.realtime_vad</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../_autosummary/mstar.api_server.openai.serving_chat.html">mstar.api_server.openai.serving_chat</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../_autosummary/mstar.api_server.openai.serving_images.html">mstar.api_server.openai.serving_images</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../_autosummary/mstar.api_server.openai.serving_realtime.html">mstar.api_server.openai.serving_realtime</a></li>
@@ -999,6 +1001,7 @@ window.runMermaid = runMermaid;</script>
         <span class="bp">self</span><span class="o">.</span><span class="n">stream</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_response_open</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_consumed_audio</span> <span class="o">=</span> <span class="kc">False</span>           <span class="c1"># any user audio fed yet?</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_odd_byte</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">""</span>                   <span class="c1"># first byte of a sample split across appends</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_open_stream</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">"""(Re)create the duplex stream, priming the current system prompt."""</span>
@@ -1036,7 +1039,19 @@ window.runMermaid = runMermaid;</script>
                         <span class="s2">"started is applied on the next input_audio_buffer.clear"</span><span class="p">}})</span>
             <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_json</span><span class="p">({</span><span class="s2">"type"</span><span class="p">:</span> <span class="s2">"session.updated"</span><span class="p">,</span> <span class="s2">"session"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="p">})</span>
         <span class="k">elif</span> <span class="n">et</span> <span class="o">==</span> <span class="s2">"input_audio_buffer.append"</span><span class="p">:</span>
-            <span class="n">pcm</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64decode</span><span class="p">(</span><span class="n">event</span><span class="p">[</span><span class="s2">"audio"</span><span class="p">])</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="c1"># whitespace is allowed (base64.encodebytes wraps lines), as on the API server</span>
+                <span class="n">audio</span> <span class="o">=</span> <span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"audio"</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">""</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">"ascii"</span><span class="p">)</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="sa">b</span><span class="s2">" </span><span class="se">\t\n\r\v\f</span><span class="s2">"</span><span class="p">)</span>
+                <span class="n">pcm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_odd_byte</span> <span class="o">+</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64decode</span><span class="p">(</span><span class="n">audio</span><span class="p">,</span> <span class="n">validate</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">,</span> <span class="ne">AttributeError</span><span class="p">):</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_json</span><span class="p">({</span><span class="s2">"type"</span><span class="p">:</span> <span class="s2">"error"</span><span class="p">,</span> <span class="s2">"error"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"message"</span><span class="p">:</span> <span class="s2">"audio is not base64"</span><span class="p">}})</span>
+                <span class="k">return</span>
+            <span class="c1"># the stream takes whole int16 samples; an odd trailing byte waits</span>
+            <span class="c1"># for the rest of its sample in the next append</span>
+            <span class="n">whole</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">pcm</span><span class="p">)</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">pcm</span><span class="p">)</span> <span class="o">%</span> <span class="mi">2</span>
+            <span class="n">pcm</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_odd_byte</span> <span class="o">=</span> <span class="n">pcm</span><span class="p">[:</span><span class="n">whole</span><span class="p">],</span> <span class="n">pcm</span><span class="p">[</span><span class="n">whole</span><span class="p">:]</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">pcm</span><span class="p">:</span>
+                <span class="k">return</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_consumed_audio</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_consume</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stream</span><span class="o">.</span><span class="n">append_audio</span><span class="p">(</span><span class="n">pcm</span><span class="p">))</span>
         <span class="k">elif</span> <span class="n">et</span> <span class="o">==</span> <span class="s2">"input_audio_buffer.commit"</span><span class="p">:</span>
@@ -1044,6 +1059,7 @@ window.runMermaid = runMermaid;</script>
             <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_finish_response</span><span class="p">()</span>
         <span class="k">elif</span> <span class="n">et</span> <span class="o">==</span> <span class="s2">"input_audio_buffer.clear"</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_open_stream</span><span class="p">()</span>  <span class="c1"># fresh turn — re-prime the current system prompt</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_odd_byte</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">""</span>  <span class="c1"># only clear drops it: a cancel or update does not end the byte stream</span>
         <span class="k">elif</span> <span class="n">et</span> <span class="o">==</span> <span class="s2">"response.cancel"</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_open_stream</span><span class="p">()</span>
             <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_finish_response</span><span class="p">()</span>

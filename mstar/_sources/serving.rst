@@ -512,6 +512,8 @@ matters for a deployment, keep the port on an internal network. With
 it over the bridge, so both frontends show the same names, and it answers ``503`` if the
 bridge does not reply within two seconds, as ``/health`` does.
 
+:doc:`metrics` documents every family in one place, with a Prometheus and Grafana setup.
+
 Requests are counted when they leave the API server, from the first request after the
 warmup requests. Every family has a ``model_name`` label (the config's ``model``);
 ``output_modalities`` is the request's output modalities, sorted and comma-joined
@@ -570,8 +572,9 @@ The engine workers also send the conductor their own metrics every second, which
 adds to its status message, so these can be up to two seconds old. ``component`` is the
 graph node; a node with replicas on several workers shows their sum, and the ranks of a
 tensor or sequence parallel instance count once (the instance's first rank reports).
-The histograms and counters count from worker start, warmup requests included, so read
-them with ``rate()`` or ``increase()``.
+The histograms and counters count from the first request after the warmup requests, as
+the API server's do (the gauges show the current state), so read them with ``rate()``
+or ``increase()``.
 
 - ``mstar_kv_pages_used{model_name, component, resource}``,
   ``mstar_kv_pages_total{model_name, component, resource}``: pages of each paged KV
@@ -599,6 +602,37 @@ them with ``rate()`` or ``increase()``.
   step on the node is ready (its inputs arrived) and not running: waiting for room in a
   step or for the worker to pick the node.
 
+Tensor transfers between graph nodes (:ref:`tensor transport <tensor-transport>`) are
+counted by the reader, once per edge read: the tensors of one graph edge that one worker
+read from one producer. The workers send them with the engine metrics above, and the
+API server adds the results its data worker read:
+
+- ``mstar_transfer_bytes_total{model_name, src, dst, transport}``: counter, tensor bytes
+  read over the edge.
+- ``mstar_transfers_total{model_name, src, dst, transport}``: counter, tensors read over
+  the edge.
+- ``mstar_transfer_seconds{model_name, src, dst, transport}``: histogram, one observation
+  per edge read: the reader's time to read that edge's tensors, which is the SHM file
+  read and copy, the copy out of the SHM arena, or the RDMA or TCP read. A GPU reader of
+  the arena only issues its host-to-device copies in that time; they finish
+  asynchronously. The producer's own work (serializing, staging into the arena,
+  registering memory) is not included; it is the ``tx`` time of
+  :ref:`request profiling <request-profiling>`.
+
+``src`` is the graph node that produced the tensors and ``dst`` the node that reads them.
+An edge the conductor joined from several producers (one input name produced in several
+walks or nodes) is one read per producing node, with its read time split between them by
+bytes.
+``api_server`` stands for the request's inputs (as ``src``) and its results (as ``dst``),
+which the API server's data worker sends and reads. ``transport`` is the protocol:
+``SHM`` (per-tensor files or the arena, see ``MSTAR_SHM_ARENA``), ``TCP`` or ``RDMA``. The
+Python and Rust runtimes and communicators (``MSTAR_RUST_GRAPH``, ``MSTAR_RUST_ZMQ``)
+report the same series. A tensor already on the reader (one it made, or one it read once
+for two of its nodes) moves nothing and is not counted. With tensor parallelism every
+rank counts its own read, of its slice or of the whole tensor when the edge is
+replicated, so an edge two ranks read is two reads. Like the data worker, the workers
+count from the first request after the warmup requests.
+
 Where a successful request's time went, from the timestamps every request already
 carries (same ``model_name`` and ``output_modalities`` labels; the conductor's
 timestamps are compared with the API server's, which assumes both run on one host, as
@@ -607,8 +641,8 @@ they do today):
 - ``mstar_request_preprocess_seconds``: histogram, from submission to the data worker
   handing the preprocessed request to the conductor, including its wait in the data
   worker's queue.
-- ``mstar_request_engine_seconds``: histogram, from the conductor taking the request in
-  to the conductor finishing it.
+- ``mstar_request_engine_seconds``: histogram, from the conductor dispatching the
+  request to the workers (after any admission wait) to the conductor finishing it.
 - ``mstar_request_delivery_seconds``: histogram, from the conductor finishing the
   request to the result leaving the API server (the last chunks' postprocessing and
   transfer, and the client handler picking it up).
