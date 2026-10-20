@@ -55,7 +55,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="0.2.1" />
-    <meta name="docbuild:last-update" content="Oct 19, 2026"/>
+    <meta name="docbuild:last-update" content="Oct 20, 2026"/>
   
     
     <script src="_static/searchtools.js"></script>
@@ -731,7 +731,12 @@ the same filesystem.</p></td>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_SHM_ARENA_SEGMENT_MB</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">256</span></code></p></td>
 <td><p>Size of each arena segment. The arena grows segment by segment;
-existing segments never move (registrations stay valid).</p></td>
+existing segments never move (registrations stay valid). A
+segment’s /dev/shm pages are committed when it is created (pinned
+segments always were, by <code class="docutils literal notranslate"><span class="pre">cudaHostRegister</span></code>), so the whole
+segment counts against /dev/shm, as do spill files, which land in
+/dev/shm by default. A segment /dev/shm cannot hold counts as arena
+full (sends spill, see <code class="docutils literal notranslate"><span class="pre">MSTAR_SHM_ARENA_SPILL</span></code>).</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_SHM_ARENA_MAX_SEGMENTS</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">32</span></code></p></td>
@@ -1385,7 +1390,7 @@ By M* Team
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Oct 19, 2026.
+  Last updated on Oct 20, 2026.
   <br/>
 </p>
   </div>
