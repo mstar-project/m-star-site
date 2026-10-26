@@ -247,6 +247,7 @@
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.engine.accelerator_graph_backend.html">mstar.engine.accelerator_graph_backend</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.engine.accelerator_graph_config.html">mstar.engine.accelerator_graph_config</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.engine.accelerator_graph_runner.html">mstar.engine.accelerator_graph_runner</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.engine.fp32_precision.html">mstar.engine.fp32_precision</a></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="_autosummary/mstar.engine.resources.html">mstar.engine.resources</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.engine.resources.attn.html">mstar.engine.resources.attn</a></li>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.engine.resources.base.html">mstar.engine.resources.base</a></li>
@@ -660,6 +661,7 @@
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#nemotron-voicechat-nemotron-duplex-notes">Nemotron VoiceChat (<code class="docutils literal notranslate"><span class="pre">nemotron_duplex</span></code>) notes</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#chatterbox-notes">Chatterbox notes</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cosmos3-environment-requirements">Cosmos3 environment requirements</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cosmos3-image-to-video-conditioning">Cosmos3 image-to-video conditioning</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cosmos3-edge-reasoner-and-action-loop">Cosmos3-Edge reasoner and action loop</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cosmos3-streaming-rollout-windowed-video">Cosmos3 streaming rollout (windowed video)</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#wan2-2-wan22">Wan2.2 (<code class="docutils literal notranslate"><span class="pre">wan22</span></code>)</a></li>
@@ -1367,9 +1369,10 @@ warning when a package is missing, as the reference does.</p></li>
 <li><p>Requests: <code class="docutils literal notranslate"><span class="pre">/v1/audio/speech</span></code> with <code class="docutils literal notranslate"><span class="pre">input</span></code>, <code class="docutils literal notranslate"><span class="pre">voice</span></code> (<code class="docutils literal notranslate"><span class="pre">default</span></code> = the
 voice shipped in the checkpoint, or a preset name resolved under the
 deployment’s <code class="docutils literal notranslate"><span class="pre">model_kwargs:</span> <span class="pre">voices_dir</span></code>), and in <code class="docutils literal notranslate"><span class="pre">extra_body</span></code>
-<code class="docutils literal notranslate"><span class="pre">ref_audio</span></code> (data URL of a reference clip, 5-30 s, cloning; an http(s)
-URL only when the server sets <code class="docutils literal notranslate"><span class="pre">MSTAR_ALLOW_REMOTE=1</span></code>; paths on the
-server are refused), <code class="docutils literal notranslate"><span class="pre">exaggeration</span></code> (0-2, emotion intensity, default 0.5),
+<code class="docutils literal notranslate"><span class="pre">ref_audio</span></code> (data URL or bare base64 of a reference clip, 5-30 s,
+cloning; an http(s) URL only when the server sets <code class="docutils literal notranslate"><span class="pre">MSTAR_ALLOW_REMOTE=1</span></code>;
+paths on the server, clips over 60 s and clips below 8 kHz are refused),
+<code class="docutils literal notranslate"><span class="pre">exaggeration</span></code> (0-2, emotion intensity, default 0.5),
 <code class="docutils literal notranslate"><span class="pre">cfg_weight</span></code> (0-1, default 0.5; 0 disables guidance and halves the T3 work),
 <code class="docutils literal notranslate"><span class="pre">temperature</span></code> (up to 5; under 1e-5 is greedy)/<code class="docutils literal notranslate"><span class="pre">top_p</span></code>/<code class="docutils literal notranslate"><span class="pre">top_k</span></code> (the
 whole vocab or more is no filter)/<code class="docutils literal notranslate"><span class="pre">min_p</span></code>/<code class="docutils literal notranslate"><span class="pre">repetition_penalty</span></code> (up to 2;
@@ -1494,6 +1497,15 @@ pip-installable).</p></li>
 9.16 (fast Hopper bf16 conv3d); older cuDNN serves the decode in fp32/TF32
 automatically.</p></li>
 </ul>
+</section>
+<section id="cosmos3-image-to-video-conditioning">
+<h2>Cosmos3 image-to-video conditioning<a class="headerlink" href="#cosmos3-image-to-video-conditioning" title="Link to this heading">#</a></h2>
+<p>An image-to-video request’s conditioning image is scaled to cover the output
+size with its aspect ratio kept, center-cropped and rounded to 8 bits, as in
+NVIDIA’s cosmos-framework and diffusers 0.40 and later. Setting
+<code class="docutils literal notranslate"><span class="pre">conditioning_resize:</span> <span class="pre">stretch</span></code> under the config YAML’s <code class="docutils literal notranslate"><span class="pre">model_kwargs</span></code>
+resizes it to the output size instead (antialiased bilinear, aspect ratio not
+kept), as diffusers 0.39 did. Action requests ignore the setting.</p>
 </section>
 <section id="cosmos3-edge-reasoner-and-action-loop">
 <h2>Cosmos3-Edge reasoner and action loop<a class="headerlink" href="#cosmos3-edge-reasoner-and-action-loop" title="Link to this heading">#</a></h2>
@@ -1997,6 +2009,7 @@ fused result — M* merges in fp32 with one rounding, PEFT fuses in bf16).</p>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#nemotron-voicechat-nemotron-duplex-notes">Nemotron VoiceChat (<code class="docutils literal notranslate"><span class="pre">nemotron_duplex</span></code>) notes</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#chatterbox-notes">Chatterbox notes</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cosmos3-environment-requirements">Cosmos3 environment requirements</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cosmos3-image-to-video-conditioning">Cosmos3 image-to-video conditioning</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cosmos3-edge-reasoner-and-action-loop">Cosmos3-Edge reasoner and action loop</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cosmos3-streaming-rollout-windowed-video">Cosmos3 streaming rollout (windowed video)</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#wan2-2-wan22">Wan2.2 (<code class="docutils literal notranslate"><span class="pre">wan22</span></code>)</a></li>
