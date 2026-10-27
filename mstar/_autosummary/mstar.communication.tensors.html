@@ -55,7 +55,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="0.2.1" />
-    <meta name="docbuild:last-update" content="Oct 26, 2026"/>
+    <meta name="docbuild:last-update" content="Oct 27, 2026"/>
   
     
     <script src="../_static/searchtools.js"></script>
@@ -273,6 +273,8 @@
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="mstar.model.html">mstar.model</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="mstar.model.audio_watermark.html">mstar.model.audio_watermark</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mstar.model.canary.html">mstar.model.canary</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mstar.model.canary_qwen.html">mstar.model.canary_qwen</a></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="mstar.model.chatterbox.html">mstar.model.chatterbox</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="mstar.model.chatterbox.config.html">mstar.model.chatterbox.config</a></li>
 </ul>
@@ -401,6 +403,7 @@
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="mstar.utils.html">mstar.utils</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="mstar.utils.adarms_norm.html">mstar.utils.adarms_norm</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mstar.utils.client_errors.html">mstar.utils.client_errors</a></li>
 <li class="toctree-l3"><a class="reference internal" href="mstar.utils.containers.html">mstar.utils.containers</a></li>
 <li class="toctree-l3"><a class="reference internal" href="mstar.utils.device.html">mstar.utils.device</a></li>
 <li class="toctree-l3"><a class="reference internal" href="mstar.utils.exitcode.html">mstar.utils.exitcode</a></li>
@@ -416,6 +419,7 @@
 <li class="toctree-l3"><a class="reference internal" href="mstar.utils.profiler.html">mstar.utils.profiler</a></li>
 <li class="toctree-l3"><a class="reference internal" href="mstar.utils.socket_prefix.html">mstar.utils.socket_prefix</a></li>
 <li class="toctree-l3"><a class="reference internal" href="mstar.utils.streams.html">mstar.utils.streams</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mstar.utils.utf8_stream.html">mstar.utils.utf8_stream</a></li>
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="mstar.worker.html">mstar.worker</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -689,6 +693,7 @@
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.communication.tensors.MOONCAKE_PATCHED_VERSION"><code class="docutils literal notranslate"><span class="pre">MOONCAKE_PATCHED_VERSION</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.communication.tensors.MemoryRegistrationError"><code class="docutils literal notranslate"><span class="pre">MemoryRegistrationError</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.communication.tensors.MooncakeCommunicationManager"><code class="docutils literal notranslate"><span class="pre">MooncakeCommunicationManager</span></code></a><ul class="pst-show_toc_level nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.communication.tensors.MooncakeCommunicationManager.register_for_send"><code class="docutils literal notranslate"><span class="pre">MooncakeCommunicationManager.register_for_send()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.communication.tensors.MooncakeCommunicationManager.register_for_send_uuids"><code class="docutils literal notranslate"><span class="pre">MooncakeCommunicationManager.register_for_send_uuids()</span></code></a></li>
@@ -871,6 +876,9 @@
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#mstar.communication.tensors.AsyncReadError" title="mstar.communication.tensors.AsyncReadError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AsyncReadError</span></code></a>(message, running, unknown)</p></td>
 <td><p>A Mooncake read that failed.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#mstar.communication.tensors.MemoryRegistrationError" title="mstar.communication.tensors.MemoryRegistrationError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MemoryRegistrationError</span></code></a></p></td>
+<td><p>The transfer engine refused to register a tensor for remote reads, or a buffer for a read into it.</p></td>
 </tr>
 </tbody>
 </table>
@@ -1165,6 +1173,14 @@ reads failed. <code class="docutils literal notranslate"><span class="pre">error
 or write arbitrary process memory (CVE-2026-103764). NVD lists “before
 0.3.13” because it points at a later refactor; the fix (Mooncake #2314)
 shipped in 0.3.12.post1, see <a class="github reference external" href="https://github.com/kvcache-ai/Mooncake/issues/4626">kvcache-ai/Mooncake#4626</a>.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="mstar.communication.tensors.MemoryRegistrationError">
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">mstar.communication.tensors.</span></span><span class="sig-name descname"><span class="pre">MemoryRegistrationError</span></span><a class="reference internal" href="../_modules/mstar/communication/tensors.html#MemoryRegistrationError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mstar.communication.tensors.MemoryRegistrationError" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.12/library/exceptions.html#RuntimeError" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">RuntimeError</span></code></a></p>
+<p>The transfer engine refused to register a tensor for remote reads, or a
+buffer for a read into it.</p>
 </dd></dl>
 
 <dl class="py class">
@@ -1820,6 +1836,9 @@ and takes the tensor itself from the store. Under the Rust bookkeeper,
 rebuilding a descriptor so the callee can read its uuid costs ~2.2us
 each (15 attribute crossings plus the dataclass), and the caller
 already has the uuids. <code class="docutils literal notranslate"><span class="pre">skip_cuda_sync</span></code> as for <code class="docutils literal notranslate"><span class="pre">register_for_send</span></code>.</p>
+<p>Returns <code class="docutils literal notranslate"><span class="pre">{request_id:</span> <span class="pre">error}</span></code> for the requests whose tensors the
+transfer engine refused to register, or None if there were none; the
+other requests’ tensors are registered all the same.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -2362,6 +2381,7 @@ worker of the old one may still unlink.</p>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.communication.tensors.MOONCAKE_PATCHED_VERSION"><code class="docutils literal notranslate"><span class="pre">MOONCAKE_PATCHED_VERSION</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.communication.tensors.MemoryRegistrationError"><code class="docutils literal notranslate"><span class="pre">MemoryRegistrationError</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.communication.tensors.MooncakeCommunicationManager"><code class="docutils literal notranslate"><span class="pre">MooncakeCommunicationManager</span></code></a><ul class="pst-show_toc_level nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.communication.tensors.MooncakeCommunicationManager.register_for_send"><code class="docutils literal notranslate"><span class="pre">MooncakeCommunicationManager.register_for_send()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.communication.tensors.MooncakeCommunicationManager.register_for_send_uuids"><code class="docutils literal notranslate"><span class="pre">MooncakeCommunicationManager.register_for_send_uuids()</span></code></a></li>
@@ -2493,7 +2513,7 @@ By M* Team
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Oct 26, 2026.
+  Last updated on Oct 27, 2026.
   <br/>
 </p>
   </div>

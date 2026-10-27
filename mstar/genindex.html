@@ -410,7 +410,7 @@ window.runMermaid = runMermaid;</script>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="0.2.1" />
-    <meta name="docbuild:last-update" content="Oct 26, 2026"/>
+    <meta name="docbuild:last-update" content="Oct 27, 2026"/>
   
     
     <script src="_static/searchtools.js"></script>
@@ -626,6 +626,8 @@ window.runMermaid = runMermaid;</script>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="_autosummary/mstar.model.html">mstar.model</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.model.audio_watermark.html">mstar.model.audio_watermark</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.model.canary.html">mstar.model.canary</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.model.canary_qwen.html">mstar.model.canary_qwen</a></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="_autosummary/mstar.model.chatterbox.html">mstar.model.chatterbox</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.model.chatterbox.config.html">mstar.model.chatterbox.config</a></li>
 </ul>
@@ -754,6 +756,7 @@ window.runMermaid = runMermaid;</script>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="_autosummary/mstar.utils.html">mstar.utils</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.utils.adarms_norm.html">mstar.utils.adarms_norm</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.utils.client_errors.html">mstar.utils.client_errors</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.utils.containers.html">mstar.utils.containers</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.utils.device.html">mstar.utils.device</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.utils.exitcode.html">mstar.utils.exitcode</a></li>
@@ -769,6 +772,7 @@ window.runMermaid = runMermaid;</script>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.utils.profiler.html">mstar.utils.profiler</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.utils.socket_prefix.html">mstar.utils.socket_prefix</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.utils.streams.html">mstar.utils.streams</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.utils.utf8_stream.html">mstar.utils.utf8_stream</a></li>
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="_autosummary/mstar.worker.html">mstar.worker</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -2168,6 +2172,8 @@ window.runMermaid = runMermaid;</script>
       </ul></li>
       <li><a href="_autosummary/mstar.graph.graph_io.html#mstar.graph.graph_io.WorkerGraphIO.clear_speculative_inputs">clear_speculative_inputs() (mstar.graph.graph_io.WorkerGraphIO method)</a>
 </li>
+      <li><a href="_autosummary/mstar.utils.client_errors.html#mstar.utils.client_errors.client_error_text">client_error_text() (in module mstar.utils.client_errors)</a>
+</li>
       <li><a href="_autosummary/mstar.api_server.request_types.html#mstar.api_server.request_types.PreprocessInput.client_request_id">client_request_id (mstar.api_server.request_types.PreprocessInput attribute)</a>
 
       <ul>
@@ -2844,6 +2850,8 @@ window.runMermaid = runMermaid;</script>
 </li>
       <li><a href="_autosummary/mstar.model.omnilingual_asr.audio.html#mstar.model.omnilingual_asr.audio.decode_file">decode_file() (in module mstar.model.omnilingual_asr.audio)</a>
 </li>
+      <li><a href="_autosummary/mstar.utils.utf8_stream.html#mstar.utils.utf8_stream.decode_joined">decode_joined() (in module mstar.utils.utf8_stream)</a>
+</li>
       <li><a href="_autosummary/mstar.model.nemotron_duplex.submodules.html#mstar.model.nemotron_duplex.submodules.EarTTSTalkerSubmodule.DECODE_KEY">DECODE_KEY (mstar.model.nemotron_duplex.submodules.EarTTSTalkerSubmodule attribute)</a>
 
       <ul>
@@ -2931,7 +2939,11 @@ window.runMermaid = runMermaid;</script>
       <li><a href="_autosummary/mstar.engine.resources.attn.config.html#mstar.engine.resources.attn.config.AttnBackend.DENSE">DENSE (mstar.engine.resources.attn.config.AttnBackend attribute)</a>
 
       <ul>
+        <li><a href="_autosummary/mstar.engine.resources.attn.ragged.config.html#mstar.engine.resources.attn.ragged.config.RaggedAttnBackend.DENSE">(mstar.engine.resources.attn.ragged.config.RaggedAttnBackend attribute)</a>
+</li>
         <li><a href="_autosummary/mstar.engine.resources.html#mstar.engine.resources.AttnBackend.DENSE">(mstar.engine.resources.AttnBackend attribute)</a>
+</li>
+        <li><a href="_autosummary/mstar.engine.resources.html#mstar.engine.resources.RaggedAttnBackend.DENSE">(mstar.engine.resources.RaggedAttnBackend attribute)</a>
 </li>
       </ul></li>
       <li><a href="_autosummary/mstar.engine.resources.attn.dense.html#mstar.engine.resources.attn.dense.DenseAttentionManager">DenseAttentionManager (class in mstar.engine.resources.attn.dense)</a>
@@ -3563,7 +3575,11 @@ window.runMermaid = runMermaid;</script>
       <li><a href="_autosummary/mstar.model.omnilingual_asr.components.wav2vec2.html#mstar.model.omnilingual_asr.components.wav2vec2.FeatureExtractor">FeatureExtractor (class in mstar.model.omnilingual_asr.components.wav2vec2)</a>
 </li>
       <li><a href="_autosummary/mstar.api_server.openai.realtime_vad.html#mstar.api_server.openai.realtime_vad.TurnSegmenter.feed">feed() (mstar.api_server.openai.realtime_vad.TurnSegmenter method)</a>
+
+      <ul>
+        <li><a href="_autosummary/mstar.utils.utf8_stream.html#mstar.utils.utf8_stream.Utf8Stream.feed">(mstar.utils.utf8_stream.Utf8Stream method)</a>
 </li>
+      </ul></li>
       <li><a href="_autosummary/mstar.model.omnilingual_asr.components.wav2vec2.html#mstar.model.omnilingual_asr.components.wav2vec2.FeedForward">FeedForward (class in mstar.model.omnilingual_asr.components.wav2vec2)</a>
 </li>
       <li><a href="_autosummary/mstar.model.omnilingual_asr.weight_loader.html#mstar.model.omnilingual_asr.weight_loader.fetch_cdn">fetch_cdn() (in module mstar.model.omnilingual_asr.weight_loader)</a>
@@ -3694,7 +3710,11 @@ window.runMermaid = runMermaid;</script>
 </li>
       <li><a href="_autosummary/mstar.engine.resources.attn.ragged.flashinfer.html#mstar.engine.resources.attn.ragged.flashinfer.FlashInferRaggedCrossManager">FlashInferRaggedCrossManager (class in mstar.engine.resources.attn.ragged.flashinfer)</a>
 </li>
+      <li><a href="_autosummary/mstar.engine.resources.attn.ragged.wrappers.html#mstar.engine.resources.attn.ragged.wrappers.FlashInferRaggedCrossPrefillWrapper">FlashInferRaggedCrossPrefillWrapper (class in mstar.engine.resources.attn.ragged.wrappers)</a>
+</li>
       <li><a href="_autosummary/mstar.engine.resources.attn.ragged.flashinfer.html#mstar.engine.resources.attn.ragged.flashinfer.FlashInferRaggedManager">FlashInferRaggedManager (class in mstar.engine.resources.attn.ragged.flashinfer)</a>
+</li>
+      <li><a href="_autosummary/mstar.engine.resources.attn.ragged.wrappers.html#mstar.engine.resources.attn.ragged.wrappers.FlashInferRaggedPrefillWrapper">FlashInferRaggedPrefillWrapper (class in mstar.engine.resources.attn.ragged.wrappers)</a>
 </li>
       <li><a href="_autosummary/mstar.communication.tensors.html#mstar.communication.tensors.StoredOutputs.flat_rids">flat_rids (mstar.communication.tensors.StoredOutputs attribute)</a>
 </li>
@@ -3756,6 +3776,8 @@ window.runMermaid = runMermaid;</script>
 
       <ul>
         <li><a href="_autosummary/mstar.api_server.openai.serving_realtime.html#mstar.api_server.openai.serving_realtime.RealtimeSession.flush">(mstar.api_server.openai.serving_realtime.RealtimeSession method)</a>
+</li>
+        <li><a href="_autosummary/mstar.utils.utf8_stream.html#mstar.utils.utf8_stream.Utf8Stream.flush">(mstar.utils.utf8_stream.Utf8Stream method)</a>
 </li>
       </ul></li>
       <li><a href="_autosummary/mstar.model.chatterbox.config.html#mstar.model.chatterbox.config.S3GenMelConfig.fmax">fmax (mstar.model.chatterbox.config.S3GenMelConfig attribute)</a>
@@ -4206,6 +4228,12 @@ window.runMermaid = runMermaid;</script>
         <li><a href="_autosummary/mstar.model.cosmos3.html#mstar.model.cosmos3.Cosmos3Config.gated_mlp">(mstar.model.cosmos3.Cosmos3Config property)</a>
 </li>
       </ul></li>
+      <li><a href="_autosummary/mstar.engine.resources.recurrent.pool.html#mstar.engine.resources.recurrent.pool.RecurrentStatePool.gather">gather() (mstar.engine.resources.recurrent.pool.RecurrentStatePool method)</a>
+
+      <ul>
+        <li><a href="_autosummary/mstar.engine.resources.recurrent.html#mstar.engine.resources.recurrent.RecurrentStatePool.gather">(mstar.engine.resources.recurrent.RecurrentStatePool method)</a>
+</li>
+      </ul></li>
       <li><a href="_autosummary/mstar.observability.recorders.html#mstar.observability.recorders.Gauge">Gauge (class in mstar.observability.recorders)</a>
 </li>
       <li><a href="_autosummary/mstar.utils.knobs.html#mstar.utils.knobs.gc_gen0_threshold">gc_gen0_threshold() (in module mstar.utils.knobs)</a>
@@ -4390,10 +4418,10 @@ window.runMermaid = runMermaid;</script>
         <li><a href="_autosummary/mstar.graph.base.html#mstar.graph.base.Sequential.get_loops">(mstar.graph.base.Sequential method)</a>
 </li>
       </ul></li>
-      <li><a href="_autosummary/mstar.graph.graph_io.html#mstar.graph.graph_io.WorkerGraphIO.get_nested_loop_idxs">get_nested_loop_idxs() (mstar.graph.graph_io.WorkerGraphIO method)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="_autosummary/mstar.graph.graph_io.html#mstar.graph.graph_io.WorkerGraphIO.get_nested_loop_idxs">get_nested_loop_idxs() (mstar.graph.graph_io.WorkerGraphIO method)</a>
+</li>
       <li><a href="_autosummary/mstar.graph.graph_io.html#mstar.graph.graph_io.WorkerGraphIO.get_nested_loop_idxs_for_node">get_nested_loop_idxs_for_node() (mstar.graph.graph_io.WorkerGraphIO method)</a>
 </li>
       <li><a href="_autosummary/mstar.graph.graph_io.html#mstar.graph.graph_io.WorkerGraphIO.get_node">get_node() (mstar.graph.graph_io.WorkerGraphIO method)</a>
@@ -6080,6 +6108,8 @@ window.runMermaid = runMermaid;</script>
         <li><a href="_autosummary/mstar.engine.resources.kv.ring.html#mstar.engine.resources.kv.ring.RingKVManager.memory_bytes">(mstar.engine.resources.kv.ring.RingKVManager method)</a>
 </li>
       </ul></li>
+      <li><a href="_autosummary/mstar.communication.tensors.html#mstar.communication.tensors.MemoryRegistrationError">MemoryRegistrationError</a>
+</li>
       <li><a href="_autosummary/mstar.observability.recorders.html#mstar.observability.recorders.merge">merge() (in module mstar.observability.recorders)</a>
 </li>
       <li><a href="_autosummary/mstar.conductor.request_info.html#mstar.conductor.request_info.merge_publish_info">merge_publish_info() (in module mstar.conductor.request_info)</a>
@@ -6438,6 +6468,10 @@ window.runMermaid = runMermaid;</script>
 </li>
         <li><a href="_autosummary/mstar.model.audio_watermark.html#module-mstar.model.audio_watermark">mstar.model.audio_watermark</a>
 </li>
+        <li><a href="_autosummary/mstar.model.canary.html#module-mstar.model.canary">mstar.model.canary</a>
+</li>
+        <li><a href="_autosummary/mstar.model.canary_qwen.html#module-mstar.model.canary_qwen">mstar.model.canary_qwen</a>
+</li>
         <li><a href="_autosummary/mstar.model.chatterbox.html#module-mstar.model.chatterbox">mstar.model.chatterbox</a>
 </li>
         <li><a href="_autosummary/mstar.model.chatterbox.config.html#module-mstar.model.chatterbox.config">mstar.model.chatterbox.config</a>
@@ -6676,6 +6710,8 @@ window.runMermaid = runMermaid;</script>
 </li>
         <li><a href="_autosummary/mstar.utils.adarms_norm.html#module-mstar.utils.adarms_norm">mstar.utils.adarms_norm</a>
 </li>
+        <li><a href="_autosummary/mstar.utils.client_errors.html#module-mstar.utils.client_errors">mstar.utils.client_errors</a>
+</li>
         <li><a href="_autosummary/mstar.utils.containers.html#module-mstar.utils.containers">mstar.utils.containers</a>
 </li>
         <li><a href="_autosummary/mstar.utils.device.html#module-mstar.utils.device">mstar.utils.device</a>
@@ -6706,6 +6742,8 @@ window.runMermaid = runMermaid;</script>
 </li>
         <li><a href="_autosummary/mstar.utils.streams.html#module-mstar.utils.streams">mstar.utils.streams</a>
 </li>
+        <li><a href="_autosummary/mstar.utils.utf8_stream.html#module-mstar.utils.utf8_stream">mstar.utils.utf8_stream</a>
+</li>
         <li><a href="_autosummary/mstar.worker.html#module-mstar.worker">mstar.worker</a>
 </li>
         <li><a href="_autosummary/mstar.worker.batch_builder.html#module-mstar.worker.batch_builder">mstar.worker.batch_builder</a>
@@ -6735,12 +6773,12 @@ window.runMermaid = runMermaid;</script>
 </li>
       <li><a href="_autosummary/mstar.communication.tensors.html#mstar.communication.tensors.MooncakeCommunicationManager">MooncakeCommunicationManager (class in mstar.communication.tensors)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="_autosummary/mstar.communication.tensors.html#mstar.communication.tensors.MooncakeTransferEngine">MooncakeTransferEngine (class in mstar.communication.tensors)</a>
 </li>
       <li><a href="_autosummary/mstar.model.vjepa2.config.html#mstar.model.vjepa2.config.VJepa2Config.mpc_cost_fn">mpc_cost_fn (mstar.model.vjepa2.config.VJepa2Config attribute)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="_autosummary/mstar.model.cosmos3.config.html#mstar.model.cosmos3.config.Cosmos3Config.mrope_interleaved">mrope_interleaved (mstar.model.cosmos3.config.Cosmos3Config attribute)</a>
 
       <ul>
@@ -7341,6 +7379,20 @@ window.runMermaid = runMermaid;</script>
 
       <ul>
         <li><a href="_autosummary/mstar.model.audio_watermark.html#module-mstar.model.audio_watermark">module</a>
+</li>
+      </ul></li>
+      <li>
+    mstar.model.canary
+
+      <ul>
+        <li><a href="_autosummary/mstar.model.canary.html#module-mstar.model.canary">module</a>
+</li>
+      </ul></li>
+      <li>
+    mstar.model.canary_qwen
+
+      <ul>
+        <li><a href="_autosummary/mstar.model.canary_qwen.html#module-mstar.model.canary_qwen">module</a>
 </li>
       </ul></li>
       <li>
@@ -8177,6 +8229,13 @@ window.runMermaid = runMermaid;</script>
 </li>
       </ul></li>
       <li>
+    mstar.utils.client_errors
+
+      <ul>
+        <li><a href="_autosummary/mstar.utils.client_errors.html#module-mstar.utils.client_errors">module</a>
+</li>
+      </ul></li>
+      <li>
     mstar.utils.containers
 
       <ul>
@@ -8279,6 +8338,13 @@ window.runMermaid = runMermaid;</script>
 
       <ul>
         <li><a href="_autosummary/mstar.utils.streams.html#module-mstar.utils.streams">module</a>
+</li>
+      </ul></li>
+      <li>
+    mstar.utils.utf8_stream
+
+      <ul>
+        <li><a href="_autosummary/mstar.utils.utf8_stream.html#module-mstar.utils.utf8_stream">module</a>
 </li>
       </ul></li>
       <li>
@@ -9473,8 +9539,6 @@ window.runMermaid = runMermaid;</script>
         <li><a href="_autosummary/mstar.engine.resources.attn.ragged.block_causal.html#mstar.engine.resources.attn.ragged.block_causal.RaggedBlockCausalWrapper.plan">(mstar.engine.resources.attn.ragged.block_causal.RaggedBlockCausalWrapper method)</a>
 </li>
         <li><a href="_autosummary/mstar.engine.resources.attn.ragged.flashinfer.html#mstar.engine.resources.attn.ragged.flashinfer.FlashInferRaggedBlockCausalManager.plan">(mstar.engine.resources.attn.ragged.flashinfer.FlashInferRaggedBlockCausalManager method)</a>
-</li>
-        <li><a href="_autosummary/mstar.engine.resources.attn.ragged.flashinfer.html#mstar.engine.resources.attn.ragged.flashinfer.FlashInferRaggedManager.plan">(mstar.engine.resources.attn.ragged.flashinfer.FlashInferRaggedManager method)</a>
 </li>
         <li><a href="_autosummary/mstar.engine.resources.attn.ragged.wrappers.html#mstar.engine.resources.attn.ragged.wrappers.RaggedCrossPrefillWrapper.plan">(mstar.engine.resources.attn.ragged.wrappers.RaggedCrossPrefillWrapper method)</a>
 </li>
@@ -11453,6 +11517,18 @@ window.runMermaid = runMermaid;</script>
         <li><a href="_autosummary/mstar.model.cosmos3.html#mstar.model.cosmos3.Cosmos3VAEConfig.scale_factor_temporal">(mstar.model.cosmos3.Cosmos3VAEConfig attribute)</a>
 </li>
       </ul></li>
+      <li><a href="_autosummary/mstar.engine.resources.recurrent.pool.html#mstar.engine.resources.recurrent.pool.RecurrentStatePool.scatter_">scatter_() (mstar.engine.resources.recurrent.pool.RecurrentStatePool method)</a>
+
+      <ul>
+        <li><a href="_autosummary/mstar.engine.resources.recurrent.html#mstar.engine.resources.recurrent.RecurrentStatePool.scatter_">(mstar.engine.resources.recurrent.RecurrentStatePool method)</a>
+</li>
+      </ul></li>
+      <li><a href="_autosummary/mstar.engine.resources.recurrent.pool.html#mstar.engine.resources.recurrent.pool.RecurrentAddressing.scatter_index">scatter_index (mstar.engine.resources.recurrent.pool.RecurrentAddressing attribute)</a>
+
+      <ul>
+        <li><a href="_autosummary/mstar.engine.resources.recurrent.html#mstar.engine.resources.recurrent.RecurrentAddressing.scatter_index">(mstar.engine.resources.recurrent.RecurrentAddressing attribute)</a>
+</li>
+      </ul></li>
       <li><a href="_autosummary/mstar.utils.ipc_format.html#mstar.utils.ipc_format.WorkerMessageType.SCHEDULE_TP">SCHEDULE_TP (mstar.utils.ipc_format.WorkerMessageType attribute)</a>
 </li>
       <li><a href="_autosummary/mstar.api_server.media_io.html#mstar.api_server.media_io.schedule_upload_cleanup">schedule_upload_cleanup() (in module mstar.api_server.media_io)</a>
@@ -11495,6 +11571,8 @@ window.runMermaid = runMermaid;</script>
         <li><a href="_autosummary/mstar.engine.resources.kv.config.html#mstar.engine.resources.kv.config.StreamLayout.scratch">(mstar.engine.resources.kv.config.StreamLayout attribute)</a>
 </li>
       </ul></li>
+      <li><a href="_autosummary/mstar.utils.client_errors.html#mstar.utils.client_errors.scrub_paths">scrub_paths() (in module mstar.utils.client_errors)</a>
+</li>
       <li><a href="_autosummary/mstar.model.omnivoice.config.html#mstar.model.omnivoice.config.OmniVoiceConfig.seconds_for_target_tokens">seconds_for_target_tokens() (mstar.model.omnivoice.config.OmniVoiceConfig method)</a>
 </li>
       <li><a href="_autosummary/mstar.graph.base.html#mstar.graph.base.Loop.section">section (mstar.graph.base.Loop attribute)</a>
@@ -11901,14 +11979,14 @@ window.runMermaid = runMermaid;</script>
         <li><a href="_autosummary/mstar.engine.resources.html#mstar.engine.resources.StepContext.slot">(mstar.engine.resources.StepContext attribute)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="_autosummary/mstar.engine.resources.recurrent.config.html#mstar.engine.resources.recurrent.config.RecurrentStateConfig.slot_bytes">slot_bytes (mstar.engine.resources.recurrent.config.RecurrentStateConfig property)</a>
 
       <ul>
         <li><a href="_autosummary/mstar.engine.resources.recurrent.html#mstar.engine.resources.recurrent.RecurrentStateConfig.slot_bytes">(mstar.engine.resources.recurrent.RecurrentStateConfig property)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="_autosummary/mstar.engine.accelerator_graph_runner.html#mstar.engine.accelerator_graph_runner.AcceleratorGraphRunner.slot_for">slot_for() (mstar.engine.accelerator_graph_runner.AcceleratorGraphRunner method)</a>
 </li>
       <li><a href="_autosummary/mstar.engine.resources.recurrent.pool.html#mstar.engine.resources.recurrent.pool.RecurrentAddressing.slot_indices">slot_indices (mstar.engine.resources.recurrent.pool.RecurrentAddressing attribute)</a>
@@ -12773,6 +12851,8 @@ window.runMermaid = runMermaid;</script>
 </li>
       <li><a href="_autosummary/mstar.engine.resources.kv.plan.html#mstar.engine.resources.kv.plan.PagedIndptrs.to_device">to_device() (mstar.engine.resources.kv.plan.PagedIndptrs method)</a>
 </li>
+      <li><a href="_autosummary/mstar.utils.h2d.html#mstar.utils.h2d.to_device_nonblocking">to_device_nonblocking() (in module mstar.utils.h2d)</a>
+</li>
       <li><a href="_autosummary/mstar.utils.ipc_format.html#mstar.utils.ipc_format.MessageBody.to_dict">to_dict() (mstar.utils.ipc_format.MessageBody method)</a>
 </li>
       <li><a href="_autosummary/mstar.engine.resources.kv.plan.html#mstar.engine.resources.kv.plan.PagedIndptrs.to_kwargs_dict">to_kwargs_dict() (mstar.engine.resources.kv.plan.PagedIndptrs method)</a>
@@ -13122,6 +13202,8 @@ window.runMermaid = runMermaid;</script>
       <li><a href="_autosummary/mstar.model.nemotron_duplex.config.html#mstar.model.nemotron_duplex.config.NemotronDuplexConfig.user_audio_weight">user_audio_weight (mstar.model.nemotron_duplex.config.NemotronDuplexConfig attribute)</a>
 </li>
       <li><a href="_autosummary/mstar.engine.resources.attn.flashinfer_mla.html#mstar.engine.resources.attn.flashinfer_mla.FlashInferMLAManager.uses_kernel">uses_kernel (mstar.engine.resources.attn.flashinfer_mla.FlashInferMLAManager property)</a>
+</li>
+      <li><a href="_autosummary/mstar.utils.utf8_stream.html#mstar.utils.utf8_stream.Utf8Stream">Utf8Stream (class in mstar.utils.utf8_stream)</a>
 </li>
       <li><a href="_autosummary/mstar.graph.base.html#mstar.graph.base.TensorPointerInfo.uuid">uuid (mstar.graph.base.TensorPointerInfo attribute)</a>
 </li>
@@ -13771,7 +13853,7 @@ By M* Team
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Oct 26, 2026.
+  Last updated on Oct 27, 2026.
   <br/>
 </p>
   </div>

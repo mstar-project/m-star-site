@@ -54,7 +54,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="0.2.1" />
-    <meta name="docbuild:last-update" content="Oct 26, 2026"/>
+    <meta name="docbuild:last-update" content="Oct 27, 2026"/>
   
     
     <script src="_static/searchtools.js"></script>
@@ -272,6 +272,8 @@
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="_autosummary/mstar.model.html">mstar.model</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.model.audio_watermark.html">mstar.model.audio_watermark</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.model.canary.html">mstar.model.canary</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.model.canary_qwen.html">mstar.model.canary_qwen</a></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="_autosummary/mstar.model.chatterbox.html">mstar.model.chatterbox</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.model.chatterbox.config.html">mstar.model.chatterbox.config</a></li>
 </ul>
@@ -400,6 +402,7 @@
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="_autosummary/mstar.utils.html">mstar.utils</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.utils.adarms_norm.html">mstar.utils.adarms_norm</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.utils.client_errors.html">mstar.utils.client_errors</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.utils.containers.html">mstar.utils.containers</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.utils.device.html">mstar.utils.device</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.utils.exitcode.html">mstar.utils.exitcode</a></li>
@@ -415,6 +418,7 @@
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.utils.profiler.html">mstar.utils.profiler</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.utils.socket_prefix.html">mstar.utils.socket_prefix</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.utils.streams.html">mstar.utils.streams</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.utils.utf8_stream.html">mstar.utils.utf8_stream</a></li>
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="_autosummary/mstar.worker.html">mstar.worker</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -1213,9 +1217,11 @@ forward. Nothing is paged, and nothing carries to the next step.
 <code class="docutils literal notranslate"><span class="pre">RaggedAttentionConfig</span></code> holds <code class="docutils literal notranslate"><span class="pre">num_qo_heads</span></code>, <code class="docutils literal notranslate"><span class="pre">num_kv_heads</span></code> and
 <code class="docutils literal notranslate"><span class="pre">head_dim</span></code> (all pre-sharding, as in <code class="docutils literal notranslate"><span class="pre">KVConfig</span></code>), an <code class="docutils literal notranslate"><span class="pre">sm_scale</span></code> that
 defaults to <code class="docutils literal notranslate"><span class="pre">head_dim</span> <span class="pre">**</span> <span class="pre">-0.5</span></code>, <code class="docutils literal notranslate"><span class="pre">backend</span></code> (<code class="docutils literal notranslate"><span class="pre">RaggedAttnBackend.AUTO</span></code>, the
-default, or <code class="docutils literal notranslate"><span class="pre">RaggedAttnBackend.FLASHINFER</span></code>), <code class="docutils literal notranslate"><span class="pre">flashinfer_backend</span></code>, and the
+default, <code class="docutils literal notranslate"><span class="pre">RaggedAttnBackend.FLASHINFER</span></code>, or <code class="docutils literal notranslate"><span class="pre">RaggedAttnBackend.DENSE</span></code>),
+<code class="docutils literal notranslate"><span class="pre">flashinfer_backend</span></code>, and the
 two CUDA-graph ceilings <code class="docutils literal notranslate"><span class="pre">max_segments_per_request</span></code> and
-<code class="docutils literal notranslate"><span class="pre">max_tokens_per_request</span></code>. See <a class="reference internal" href="#cacheless-attention-encoder-towers">Cacheless attention (encoder towers)</a>.</p></td>
+<code class="docutils literal notranslate"><span class="pre">max_tokens_per_request</span></code>. <code class="docutils literal notranslate"><span class="pre">DENSE</span></code> runs FA3 <code class="docutils literal notranslate"><span class="pre">flash_attn_varlen</span></code> (AITER on ROCm)
+and falls back to FlashInfer if that kernel is missing. See <a class="reference internal" href="#cacheless-attention-encoder-towers">Cacheless attention (encoder towers)</a>.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">RaggedCrossAttentionSpec(config=RaggedAttentionConfig(...))</span></code></p></td>
 <td><p>The cross-attention counterpart: one span of each request attends another
@@ -1244,6 +1250,19 @@ Whether the penalty runs on a given step is decided from the
 <code class="docutils literal notranslate"><span class="pre">enable_min_p</span></code>, <code class="docutils literal notranslate"><span class="pre">max_repetition_window</span></code>, <code class="docutils literal notranslate"><span class="pre">min_tokens_stop_ids</span></code> and
 <code class="docutils literal notranslate"><span class="pre">enable_top_p_first</span></code> are capabilities of the same kind. See
 <code class="docutils literal notranslate"><span class="pre">SamplingReqConfig</span></code> above.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">RecurrentStateSpec(config=RecurrentStateConfig(...))</span></code></p></td>
+<td><p>Fixed-size per-request state that carries between steps (an LSTM’s <code class="docutils literal notranslate"><span class="pre">h</span></code> and
+<code class="docutils literal notranslate"><span class="pre">c</span></code>, a cursor, a conv tail): one slot per request, <code class="docutils literal notranslate"><span class="pre">blocks</span></code> naming a shape and
+dtype for each piece, <code class="docutils literal notranslate"><span class="pre">num_layers</span></code> copies of each, <code class="docutils literal notranslate"><span class="pre">max_slots</span></code> slots with slot 0
+the sink that padding rows address. <code class="docutils literal notranslate"><span class="pre">declare_step</span></code> gives each row a
+<code class="docutils literal notranslate"><span class="pre">RecurrentStep</span></code> segment with span &gt;= 1. The forward reads its rows with
+<code class="docutils literal notranslate"><span class="pre">pool.gather(name,</span> <span class="pre">start=...)</span></code> and writes them back with
+<code class="docutils literal notranslate"><span class="pre">pool.scatter_(name,</span> <span class="pre">value)</span></code>; both follow the step’s plan, so there is no
+addressing to fetch, and eager and captured steps reach the same slots. A row with
+no saved state (a request’s first step, or a padding row) reads <code class="docutils literal notranslate"><span class="pre">start</span></code>, zeros
+when none is given. <code class="docutils literal notranslate"><span class="pre">gather</span></code> / <code class="docutils literal notranslate"><span class="pre">scatter_</span></code> need the sink, so leave
+<code class="docutils literal notranslate"><span class="pre">disable_sink_slot</span></code> unset. Parakeet’s transducer decode is the example.</p></td>
 </tr>
 </tbody>
 </table>
@@ -1307,16 +1326,20 @@ node samples.</p></td>
 <td><p>The three or four specs above, plus a second <code class="docutils literal notranslate"><span class="pre">KVSpec</span></code> for the encoder context
 and a <code class="docutils literal notranslate"><span class="pre">CrossAttentionSpec</span></code> over that second cache.</p></td>
 </tr>
-<tr class="row-even"><td><p>A node that samples with two different sets of parameters</p></td>
+<tr class="row-even"><td><p>A node that carries per-request state between steps of a loop (an RNN-T
+decoder, recurrent attention)</p></td>
+<td><p>A <code class="docutils literal notranslate"><span class="pre">RecurrentStateSpec</span></code>, read and written with <code class="docutils literal notranslate"><span class="pre">gather</span></code> / <code class="docutils literal notranslate"><span class="pre">scatter_</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p>A node that samples with two different sets of parameters</p></td>
 <td><p>Two <code class="docutils literal notranslate"><span class="pre">SamplerSpec</span></code> objects that both name the node, under different keys.</p></td>
 </tr>
-<tr class="row-odd"><td><p>An encoder tower that attends within the segments of one packed forward</p></td>
+<tr class="row-even"><td><p>An encoder tower that attends within the segments of one packed forward</p></td>
 <td><p>A <code class="docutils literal notranslate"><span class="pre">RaggedAttentionSpec</span></code>, and nothing else. No <code class="docutils literal notranslate"><span class="pre">KVSpec</span></code> and no
 <code class="docutils literal notranslate"><span class="pre">PositionSpec</span></code>: there is no cache to page and no counter to advance. Needed
 only if the tower’s attention must run inside a CUDA graph; see
 <a class="reference internal" href="#cacheless-attention-encoder-towers">Cacheless attention (encoder towers)</a>.</p></td>
 </tr>
-<tr class="row-even"><td><p>ViT, VAE or audio encoder, codec decoder, projection stage, combine stage</p></td>
+<tr class="row-odd"><td><p>ViT, VAE or audio encoder, codec decoder, projection stage, combine stage</p></td>
 <td><p>Usually nothing. Declare no spec that names the node, unless the node needs the
 row above.</p></td>
 </tr>
@@ -1406,6 +1429,14 @@ inside a CUDA graph. The plan is what makes that possible: the engine plans the 
 outside the graph, into buffers whose addresses do not change, and the captured region
 attends through them. A kernel that reads <code class="docutils literal notranslate"><span class="pre">cu_seqlens</span></code> as an argument, or builds its
 mask from it, cannot be captured this way.</p>
+<p><code class="docutils literal notranslate"><span class="pre">RaggedAttnBackend.AUTO</span></code> (and an explicit <code class="docutils literal notranslate"><span class="pre">FLASHINFER</span></code>) plan through FlashInfer’s
+ragged prefill wrapper. <code class="docutils literal notranslate"><span class="pre">RaggedAttnBackend.DENSE</span></code> plans the same layouts into static
+<code class="docutils literal notranslate"><span class="pre">cu_seqlens</span></code> buffers and runs FA3 <code class="docutils literal notranslate"><span class="pre">flash_attn_varlen</span></code> (AITER on ROCm) instead, with
+no page scatter. If that kernel is not importable, or the spec is a
+<code class="docutils literal notranslate"><span class="pre">RaggedBlockCausalAttentionSpec</span></code> (whose overlapping prefixes varlen cannot express),
+the factory logs a warning and builds FlashInfer. The fallback does not cover a GPU or
+dtype the kernel lacks: <code class="docutils literal notranslate"><span class="pre">fa3-fwd</span></code> 0.0.3 is built for Hopper (<code class="docutils literal notranslate"><span class="pre">sm_90a</span></code>) and runs bf16
+but not fp16.</p>
 <p>BAGEL’s SigLIP2 tower is the reference implementation. The spec stands alone, over the
 encoder node only, and names no cache:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">RaggedAttentionSpec</span><span class="p">(</span>
@@ -2616,8 +2647,11 @@ Sizing the caches is only half of it: <code class="docutils literal notranslate"
 <code class="docutils literal notranslate"><span class="pre">max_concurrent_requests:</span> <span class="pre">64</span></code>, so the conductor queues further requests instead of the
 worker offloading decoding requests to admit them. <code class="docutils literal notranslate"><span class="pre">WhisperModel.validate_config_yaml</span></code>
 refuses at startup a cap that either cache cannot hold after the YAML’s <code class="docutils literal notranslate"><span class="pre">resources:</span></code>
-overrides.</p>
-<p>Whisper’s <code class="docutils literal notranslate"><span class="pre">declare_step</span></code> shows how a write-once context is expressed with spans. The
+overrides, through <code class="docutils literal notranslate"><span class="pre">mstar.model.utils.check_kv_pools_fit</span></code>, which any model with KV caches
+can call the same way.</p>
+<p>The decoder node’s <code class="docutils literal notranslate"><span class="pre">declare_step</span></code> shows how a write-once context is expressed with spans.
+It lives in <code class="docutils literal notranslate"><span class="pre">EncoderDecoderNode</span></code> (<code class="docutils literal notranslate"><span class="pre">mstar/model/components/encoder_decoder.py</span></code>), which
+Whisper’s and Canary’s decoder nodes share; Whisper adds only its token suppression. The
 context segments have a non-zero span in the prefill step that writes them, and a span of
 0 in every later step. The <code class="docutils literal notranslate"><span class="pre">commit</span></code> in the prefill step converts the reservation into
 resident pages that the later steps read.</p>
@@ -2911,7 +2945,7 @@ By M* Team
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Oct 26, 2026.
+  Last updated on Oct 27, 2026.
   <br/>
 </p>
   </div>

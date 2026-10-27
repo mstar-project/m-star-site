@@ -538,9 +538,11 @@ The spec types are:
        ``RaggedAttentionConfig`` holds ``num_qo_heads``, ``num_kv_heads`` and
        ``head_dim`` (all pre-sharding, as in ``KVConfig``), an ``sm_scale`` that
        defaults to ``head_dim ** -0.5``, ``backend`` (``RaggedAttnBackend.AUTO``, the
-       default, or ``RaggedAttnBackend.FLASHINFER``), ``flashinfer_backend``, and the
+       default, ``RaggedAttnBackend.FLASHINFER``, or ``RaggedAttnBackend.DENSE``),
+       ``flashinfer_backend``, and the
        two CUDA-graph ceilings ``max_segments_per_request`` and
-       ``max_tokens_per_request``. See `Cacheless attention (encoder towers)`_.
+       ``max_tokens_per_request``. ``DENSE`` runs FA3 ``flash_attn_varlen`` (AITER on ROCm)
+       and falls back to FlashInfer if that kernel is missing. See `Cacheless attention (encoder towers)`_.
    * - ``RaggedCrossAttentionSpec(config=RaggedAttentionConfig(...))``
      - The cross-attention counterpart: one span of each request attends another
        (``RaggedCrossAttentionStep(pairs=...)``). Same config. See `Cross-attention
@@ -565,6 +567,18 @@ The spec types are:
        ``enable_min_p``, ``max_repetition_window``, ``min_tokens_stop_ids`` and
        ``enable_top_p_first`` are capabilities of the same kind. See
        ``SamplingReqConfig`` above.
+   * - ``RecurrentStateSpec(config=RecurrentStateConfig(...))``
+     - Fixed-size per-request state that carries between steps (an LSTM's ``h`` and
+       ``c``, a cursor, a conv tail): one slot per request, ``blocks`` naming a shape and
+       dtype for each piece, ``num_layers`` copies of each, ``max_slots`` slots with slot 0
+       the sink that padding rows address. ``declare_step`` gives each row a
+       ``RecurrentStep`` segment with span >= 1. The forward reads its rows with
+       ``pool.gather(name, start=...)`` and writes them back with
+       ``pool.scatter_(name, value)``; both follow the step's plan, so there is no
+       addressing to fetch, and eager and captured steps reach the same slots. A row with
+       no saved state (a request's first step, or a padding row) reads ``start``, zeros
+       when none is given. ``gather`` / ``scatter_`` need the sink, so leave
+       ``disable_sink_slot`` unset. Parakeet's transducer decode is the example.
 
 Orpheus declares four specs for its one autoregressive node. Its ``snac_decoder`` node
 appears in no spec, so it receives no resources:
@@ -621,6 +635,9 @@ appears in no spec, so it receives no resources:
    * - Decoder of an encoder-decoder model
      - The three or four specs above, plus a second ``KVSpec`` for the encoder context
        and a ``CrossAttentionSpec`` over that second cache.
+   * - A node that carries per-request state between steps of a loop (an RNN-T
+       decoder, recurrent attention)
+     - A ``RecurrentStateSpec``, read and written with ``gather`` / ``scatter_``.
    * - A node that samples with two different sets of parameters
      - Two ``SamplerSpec`` objects that both name the node, under different keys.
    * - An encoder tower that attends within the segments of one packed forward
@@ -730,6 +747,15 @@ inside a CUDA graph. The plan is what makes that possible: the engine plans the 
 outside the graph, into buffers whose addresses do not change, and the captured region
 attends through them. A kernel that reads ``cu_seqlens`` as an argument, or builds its
 mask from it, cannot be captured this way.
+
+``RaggedAttnBackend.AUTO`` (and an explicit ``FLASHINFER``) plan through FlashInfer's
+ragged prefill wrapper. ``RaggedAttnBackend.DENSE`` plans the same layouts into static
+``cu_seqlens`` buffers and runs FA3 ``flash_attn_varlen`` (AITER on ROCm) instead, with
+no page scatter. If that kernel is not importable, or the spec is a
+``RaggedBlockCausalAttentionSpec`` (whose overlapping prefixes varlen cannot express),
+the factory logs a warning and builds FlashInfer. The fallback does not cover a GPU or
+dtype the kernel lacks: ``fa3-fwd`` 0.0.3 is built for Hopper (``sm_90a``) and runs bf16
+but not fp16.
 
 BAGEL's SigLIP2 tower is the reference implementation. The spec stands alone, over the
 encoder node only, and names no cache:
@@ -2025,9 +2051,12 @@ Sizing the caches is only half of it: ``configs/whisper_large.yaml`` also sets
 ``max_concurrent_requests: 64``, so the conductor queues further requests instead of the
 worker offloading decoding requests to admit them. ``WhisperModel.validate_config_yaml``
 refuses at startup a cap that either cache cannot hold after the YAML's ``resources:``
-overrides.
+overrides, through ``mstar.model.utils.check_kv_pools_fit``, which any model with KV caches
+can call the same way.
 
-Whisper's ``declare_step`` shows how a write-once context is expressed with spans. The
+The decoder node's ``declare_step`` shows how a write-once context is expressed with spans.
+It lives in ``EncoderDecoderNode`` (``mstar/model/components/encoder_decoder.py``), which
+Whisper's and Canary's decoder nodes share; Whisper adds only its token suppression. The
 context segments have a non-zero span in the prefill step that writes them, and a span of
 0 in every later step. The ``commit`` in the prefill step converts the reservation into
 resident pages that the later steps read.

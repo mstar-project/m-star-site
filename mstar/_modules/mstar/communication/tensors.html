@@ -410,7 +410,7 @@ window.runMermaid = runMermaid;</script>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="0.2.1" />
-    <meta name="docbuild:last-update" content="Oct 26, 2026"/>
+    <meta name="docbuild:last-update" content="Oct 27, 2026"/>
   
     
     <script src="../../../_static/searchtools.js"></script>
@@ -626,6 +626,8 @@ window.runMermaid = runMermaid;</script>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../_autosummary/mstar.model.html">mstar.model</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.model.audio_watermark.html">mstar.model.audio_watermark</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.model.canary.html">mstar.model.canary</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.model.canary_qwen.html">mstar.model.canary_qwen</a></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../_autosummary/mstar.model.chatterbox.html">mstar.model.chatterbox</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.chatterbox.config.html">mstar.model.chatterbox.config</a></li>
 </ul>
@@ -754,6 +756,7 @@ window.runMermaid = runMermaid;</script>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../_autosummary/mstar.utils.html">mstar.utils</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.utils.adarms_norm.html">mstar.utils.adarms_norm</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.utils.client_errors.html">mstar.utils.client_errors</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.utils.containers.html">mstar.utils.containers</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.utils.device.html">mstar.utils.device</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.utils.exitcode.html">mstar.utils.exitcode</a></li>
@@ -769,6 +772,7 @@ window.runMermaid = runMermaid;</script>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.utils.profiler.html">mstar.utils.profiler</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.utils.socket_prefix.html">mstar.utils.socket_prefix</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.utils.streams.html">mstar.utils.streams</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.utils.utf8_stream.html">mstar.utils.utf8_stream</a></li>
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../_autosummary/mstar.worker.html">mstar.worker</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -1192,6 +1196,14 @@ window.runMermaid = runMermaid;</script>
         <span class="p">)</span>
 
 
+<div class="viewcode-block" id="MemoryRegistrationError">
+<a class="viewcode-back" href="../../../_autosummary/mstar.communication.tensors.html#mstar.communication.tensors.MemoryRegistrationError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">MemoryRegistrationError</span><span class="p">(</span><span class="ne">RuntimeError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""The transfer engine refused to register a tensor for remote reads, or a</span>
+<span class="sd">    buffer for a read into it."""</span></div>
+
+
+
 <span class="c1"># ---------------------------------------------------------------------------</span>
 <span class="c1"># TensorTransferEngine abstraction</span>
 <span class="c1"># ---------------------------------------------------------------------------</span>
@@ -1283,7 +1295,8 @@ window.runMermaid = runMermaid;</script>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">future</span><span class="o">.</span><span class="n">done</span><span class="p">():</span>
         <span class="k">return</span> <span class="kc">True</span>
     <span class="n">error</span> <span class="o">=</span> <span class="n">_read_error</span><span class="p">(</span><span class="n">future</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">error</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">error</span><span class="p">,</span> <span class="n">CancelledError</span><span class="p">)</span>
+    <span class="c1"># a refused registration fails the read before it starts</span>
+    <span class="k">return</span> <span class="n">error</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">error</span><span class="p">,</span> <span class="p">(</span><span class="n">CancelledError</span><span class="p">,</span> <span class="n">MemoryRegistrationError</span><span class="p">))</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_submit_failed</span><span class="p">(</span><span class="n">batch_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
@@ -2478,6 +2491,10 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">        rebuilding a descriptor so the callee can read its uuid costs ~2.2us</span>
 <span class="sd">        each (15 attribute crossings plus the dataclass), and the caller</span>
 <span class="sd">        already has the uuids. ``skip_cuda_sync`` as for ``register_for_send``.</span>
+
+<span class="sd">        Returns ``{request_id: error}`` for the requests whose tensors the</span>
+<span class="sd">        transfer engine refused to register, or None if there were none; the</span>
+<span class="sd">        other requests' tensors are registered all the same.</span>
 <span class="sd">        """</span>
         <span class="o">...</span></div>
 
@@ -2754,7 +2771,7 @@ window.runMermaid = runMermaid;</script>
 <span class="w">        </span><span class="sd">"""Adopt the batch ids a finished read handed over for ``kept``. False</span>
 <span class="sd">        if whether its transfers stopped cannot be learned: then its buffers</span>
 <span class="sd">        are never freed."""</span>
-        <span class="k">if</span> <span class="n">error</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">error</span><span class="p">,</span> <span class="n">CancelledError</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">error</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">error</span><span class="p">,</span> <span class="p">(</span><span class="n">CancelledError</span><span class="p">,</span> <span class="n">MemoryRegistrationError</span><span class="p">)):</span>
             <span class="k">return</span> <span class="kc">True</span>  <span class="c1"># completed after all, or never started</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_transfer_status</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">error</span><span class="p">,</span> <span class="n">AsyncReadError</span><span class="p">):</span>
             <span class="n">why</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"its </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">error</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> does not say whether the transfer stopped"</span>
@@ -3263,9 +3280,14 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">        uuids avoids rebuilding one per tensor."""</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">skip_cuda_sync</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_on_cuda</span><span class="p">:</span>
             <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">default_stream</span><span class="p">()</span><span class="o">.</span><span class="n">synchronize</span><span class="p">()</span>
+        <span class="n">failed</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Rid</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">request_id</span><span class="p">,</span> <span class="n">uuids</span> <span class="ow">in</span> <span class="n">per_request</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">uuid</span> <span class="ow">in</span> <span class="n">uuids</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_register_one</span><span class="p">(</span><span class="n">request_id</span><span class="p">,</span> <span class="n">uuid</span><span class="p">)</span></div>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">uuid</span> <span class="ow">in</span> <span class="n">uuids</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_register_one</span><span class="p">(</span><span class="n">request_id</span><span class="p">,</span> <span class="n">uuid</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">MemoryRegistrationError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+                <span class="n">failed</span><span class="p">[</span><span class="n">request_id</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">failed</span> <span class="ow">or</span> <span class="kc">None</span></div>
 
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_register_one</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request_id</span><span class="p">:</span> <span class="n">Rid</span><span class="p">,</span> <span class="n">uuid</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -3288,9 +3310,9 @@ window.runMermaid = runMermaid;</script>
                     <span class="s2">"tensors.register_memory"</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span> <span class="o">-</span> <span class="n">t0</span><span class="p">,</span>
                 <span class="p">)</span>
             <span class="k">if</span> <span class="n">ret_value</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                <span class="k">raise</span> <span class="n">MemoryRegistrationError</span><span class="p">(</span>
                     <span class="sa">f</span><span class="s2">"Mooncake memory registration failed for request id "</span>
-                    <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">request_id</span><span class="si">}</span><span class="s2">, uuid </span><span class="si">{</span><span class="n">uuid</span><span class="si">}</span><span class="s2">."</span>
+                    <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">rid_to_str</span><span class="p">(</span><span class="n">request_id</span><span class="p">)</span><span class="si">}</span><span class="s2">, uuid </span><span class="si">{</span><span class="n">uuid</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">ret_value</span><span class="si">}</span><span class="s2">"</span>
                 <span class="p">)</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">enable_prof</span><span class="p">:</span>
                 <span class="c1"># RDMA: the receiver does the actual read, so the sender-side</span>
@@ -3317,7 +3339,19 @@ window.runMermaid = runMermaid;</script>
             <span class="k">if</span> <span class="n">tensor</span><span class="o">.</span><span class="n">nbytes</span><span class="p">:</span>
                 <span class="n">ret_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transfer_engine</span><span class="o">.</span><span class="n">unregister_memory</span><span class="p">(</span><span class="n">tensor</span><span class="o">.</span><span class="n">data_ptr</span><span class="p">())</span>
                 <span class="k">if</span> <span class="n">ret_value</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">"Mooncake memory unregistration failed."</span><span class="p">)</span>
+                    <span class="c1"># Logged, not raised: a raise would abort the rest of a</span>
+                    <span class="c1"># request's teardown (from REMOVE_REQUEST, in the worker's</span>
+                    <span class="c1"># main loop). The engine may still hold the region, so the</span>
+                    <span class="c1"># tensor is kept for the life of the process: freed, its</span>
+                    <span class="c1"># address goes back to the allocator, and a later request's</span>
+                    <span class="c1"># tensor there is refused as an overlap (-7).</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_unreleasable_buffers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tensor</span><span class="p">)</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                        <span class="s2">"Mooncake memory unregistration failed for uuid </span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2">; "</span>
+                        <span class="s2">"keeping its </span><span class="si">%d</span><span class="s2"> bytes allocated so the address is not "</span>
+                        <span class="s2">"reused while it may still be registered"</span><span class="p">,</span>
+                        <span class="n">uuid</span><span class="p">,</span> <span class="n">ret_value</span><span class="p">,</span> <span class="n">tensor</span><span class="o">.</span><span class="n">nbytes</span><span class="p">,</span>
+                    <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tensor_store</span><span class="o">.</span><span class="n">remove_tensor</span><span class="p">(</span><span class="n">uuid</span><span class="p">)</span>
 
 <div class="viewcode-block" id="MooncakeCommunicationManager.start_read_tensors">
@@ -3347,6 +3381,8 @@ window.runMermaid = runMermaid;</script>
                 <span class="n">future</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">graph_edges</span><span class="o">=</span><span class="p">[</span><span class="n">graph_edge</span><span class="p">],</span> <span class="n">request_id</span><span class="o">=</span><span class="n">request_id</span><span class="p">,</span>
                 <span class="n">transfer_uuids</span><span class="o">=</span><span class="n">transfer_uuids</span><span class="p">,</span>
             <span class="p">)</span>
+            <span class="c1"># why the engine refused to pin a buffer of this edge, if it did</span>
+            <span class="n">refused</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="k">for</span> <span class="n">info</span> <span class="ow">in</span> <span class="n">graph_edge</span><span class="o">.</span><span class="n">tensor_info</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">info</span><span class="o">.</span><span class="n">source_entity</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">my_entity_id</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_slice_existing_tensor</span><span class="p">(</span>
@@ -3364,8 +3400,6 @@ window.runMermaid = runMermaid;</script>
                 <span class="bp">self</span><span class="o">.</span><span class="n">tensor_store</span><span class="o">.</span><span class="n">put_tensor</span><span class="p">(</span>
                     <span class="n">request_id</span><span class="o">=</span><span class="n">request_id</span><span class="p">,</span> <span class="n">uuid</span><span class="o">=</span><span class="n">info</span><span class="o">.</span><span class="n">uuid</span><span class="p">,</span> <span class="n">tensor</span><span class="o">=</span><span class="n">buffer</span><span class="p">,</span> <span class="n">info</span><span class="o">=</span><span class="n">info</span><span class="p">,</span>
                 <span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">tensor_store</span><span class="o">.</span><span class="n">set_metadata</span><span class="p">(</span><span class="n">info</span><span class="o">.</span><span class="n">uuid</span><span class="p">,</span> <span class="n">mem_registered</span><span class="o">=</span><span class="kc">True</span>
-                <span class="p">)</span>
                 <span class="c1"># +1 for transit (released by get_ready_tensors)</span>
                 <span class="c1"># +1 for graph-node usage (released by _cleanup_consumed_inputs)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">tensor_store</span><span class="o">.</span><span class="n">increment_ref</span><span class="p">(</span><span class="n">info</span><span class="o">.</span><span class="n">uuid</span><span class="p">,</span> <span class="mi">2</span>
@@ -3378,8 +3412,28 @@ window.runMermaid = runMermaid;</script>
                 <span class="k">if</span> <span class="n">info</span><span class="o">.</span><span class="n">nbytes</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="k">continue</span>
 
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">protocol</span> <span class="ow">in</span> <span class="p">(</span><span class="n">CommProtocol</span><span class="o">.</span><span class="n">RDMA</span><span class="p">,</span> <span class="n">CommProtocol</span><span class="o">.</span><span class="n">TCP</span><span class="p">):</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">transfer_engine</span><span class="o">.</span><span class="n">register_memory</span><span class="p">(</span><span class="n">buffer</span><span class="o">.</span><span class="n">data_ptr</span><span class="p">(),</span> <span class="n">info</span><span class="o">.</span><span class="n">nbytes</span><span class="p">)</span>
+                <span class="c1"># the edge's buffers go with the read, so teardown waits for it</span>
+                <span class="n">transfer_uuids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">info</span><span class="o">.</span><span class="n">uuid</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">refused</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">continue</span>  <span class="c1"># the read will not run: nothing more to pin</span>
+
+                <span class="c1"># Marked only once registered: teardown unregisters what is</span>
+                <span class="c1"># marked.</span>
+                <span class="n">ret_value</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">transfer_engine</span><span class="o">.</span><span class="n">register_memory</span><span class="p">(</span>
+                        <span class="n">buffer</span><span class="o">.</span><span class="n">data_ptr</span><span class="p">(),</span> <span class="n">info</span><span class="o">.</span><span class="n">nbytes</span><span class="p">,</span>
+                    <span class="p">)</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">protocol</span> <span class="ow">in</span> <span class="p">(</span><span class="n">CommProtocol</span><span class="o">.</span><span class="n">RDMA</span><span class="p">,</span> <span class="n">CommProtocol</span><span class="o">.</span><span class="n">TCP</span><span class="p">)</span>
+                    <span class="k">else</span> <span class="mi">0</span>
+                <span class="p">)</span>
+                <span class="k">if</span> <span class="n">ret_value</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">refused</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="s2">"Mooncake refused to register the read buffer for "</span>
+                        <span class="sa">f</span><span class="s2">"request </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">rid_to_str</span><span class="p">(</span><span class="n">request_id</span><span class="p">)</span><span class="si">}</span><span class="s2">, uuid "</span>
+                        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">info</span><span class="o">.</span><span class="n">uuid</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">ret_value</span><span class="si">}</span><span class="s2">"</span>
+                    <span class="p">)</span>
+                    <span class="k">continue</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">tensor_store</span><span class="o">.</span><span class="n">set_metadata</span><span class="p">(</span><span class="n">info</span><span class="o">.</span><span class="n">uuid</span><span class="p">,</span> <span class="n">mem_registered</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
                 <span class="n">read_info</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">TransferReadInfo</span><span class="p">(</span>
                     <span class="n">source_session_id</span><span class="o">=</span><span class="n">info</span><span class="o">.</span><span class="n">source_session_id</span><span class="p">,</span>
@@ -3387,12 +3441,18 @@ window.runMermaid = runMermaid;</script>
                     <span class="n">remote_ptr</span><span class="o">=</span><span class="n">info</span><span class="o">.</span><span class="n">address</span> <span class="o">+</span> <span class="n">info</span><span class="o">.</span><span class="n">offset</span><span class="p">,</span>
                     <span class="n">nbytes</span><span class="o">=</span><span class="n">info</span><span class="o">.</span><span class="n">nbytes</span><span class="p">,</span>
                 <span class="p">))</span>
-                <span class="n">transfer_uuids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">info</span><span class="o">.</span><span class="n">uuid</span><span class="p">)</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"Started transfer read for uuid </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="n">info</span><span class="o">.</span><span class="n">uuid</span><span class="p">)</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">enable_prof</span> <span class="ow">or</span> <span class="n">fp</span><span class="o">.</span><span class="n">read_src</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">for</span> <span class="n">ri</span> <span class="ow">in</span> <span class="n">read_info</span><span class="p">:</span>
                     <span class="n">ri</span><span class="o">.</span><span class="n">fp</span> <span class="o">=</span> <span class="n">fp</span>
-            <span class="n">fut</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_async_reader</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="n">read_info</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">refused</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># Reading into an unpinned buffer fails or lands nowhere, so the</span>
+                <span class="c1"># request fails here, as on a failed read: get_ready_tensors</span>
+                <span class="c1"># drops the edge and take_failed_reads names the request.</span>
+                <span class="n">fut</span> <span class="o">=</span> <span class="n">Future</span><span class="p">()</span>
+                <span class="n">fut</span><span class="o">.</span><span class="n">set_exception</span><span class="p">(</span><span class="n">MemoryRegistrationError</span><span class="p">(</span><span class="n">refused</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">fut</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_async_reader</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="n">read_info</span><span class="p">)</span>
             <span class="n">fp</span><span class="o">.</span><span class="n">future</span> <span class="o">=</span> <span class="n">fut</span>
             <span class="k">if</span> <span class="n">fut</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">futures</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fut</span><span class="p">)</span>
@@ -4027,7 +4087,7 @@ By M* Team
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Oct 26, 2026.
+  Last updated on Oct 27, 2026.
   <br/>
 </p>
   </div>
