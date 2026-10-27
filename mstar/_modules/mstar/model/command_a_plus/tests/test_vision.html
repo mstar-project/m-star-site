@@ -561,6 +561,7 @@ window.runMermaid = runMermaid;</script>
 <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="../../../../../architecture.html">Architecture</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../models.html">Supported Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../asr.html">Speech recognition: Whisper and Qwen3-ASR</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../../../../api.html">API Reference</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../../../_autosummary/mstar.api_server.html">mstar.api_server</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../../../_autosummary/mstar.api_server.auth.html">mstar.api_server.auth</a></li>
@@ -593,6 +594,7 @@ window.runMermaid = runMermaid;</script>
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../../../_autosummary/mstar.conductor.html">mstar.conductor</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../../_autosummary/mstar.conductor.mps.html">mstar.conductor.mps</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../../_autosummary/mstar.conductor.request_info.html">mstar.conductor.request_info</a></li>
 </ul>
 </details></li>
@@ -711,6 +713,11 @@ window.runMermaid = runMermaid;</script>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../_autosummary/mstar.model.qwen3_5.components.html">mstar.model.qwen3_5.components</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../_autosummary/mstar.model.qwen3_5.config.html">mstar.model.qwen3_5.config</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../_autosummary/mstar.model.qwen3_5.video.html">mstar.model.qwen3_5.video</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../../_autosummary/mstar.model.qwen3_asr.html">mstar.model.qwen3_asr</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../_autosummary/mstar.model.qwen3_asr.constants.html">mstar.model.qwen3_asr.constants</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../_autosummary/mstar.model.qwen3_asr.repetition.html">mstar.model.qwen3_asr.repetition</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../../_autosummary/mstar.model.submodule_base.html">mstar.model.submodule_base</a></li>
@@ -994,6 +1001,16 @@ window.runMermaid = runMermaid;</script>
             <span class="n">torch</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_close</span><span class="p">(</span><span class="n">parameter</span><span class="p">,</span> <span class="n">weights</span><span class="p">[</span><span class="n">checkpoint_name</span><span class="p">(</span><span class="n">name</span><span class="p">)],</span> <span class="n">rtol</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">assertRaisesRegex</span><span class="p">(</span><span class="ne">RuntimeError</span><span class="p">,</span> <span class="s2">"Missing"</span><span class="p">):</span>
             <span class="n">tiny_encoder</span><span class="p">()</span><span class="o">.</span><span class="n">load_weights</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">weights</span><span class="o">.</span><span class="n">items</span><span class="p">())[</span><span class="mi">1</span><span class="p">:])</span></div>
+
+
+<div class="viewcode-block" id="VisionEncoderTests.test_patch_embedding_matches_the_conv">
+<a class="viewcode-back" href="../../../../../_autosummary/mstar.model.command_a_plus.tests.test_vision.html#mstar.model.command_a_plus.tests.test_vision.VisionEncoderTests.test_patch_embedding_matches_the_conv">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_patch_embedding_matches_the_conv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">embeddings</span> <span class="o">=</span> <span class="n">tiny_encoder</span><span class="p">()</span><span class="o">.</span><span class="n">embeddings</span>
+        <span class="n">pixels</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">32</span><span class="p">)</span>
+        <span class="n">conv</span> <span class="o">=</span> <span class="n">embeddings</span><span class="o">.</span><span class="n">patch_embedding</span><span class="p">(</span><span class="n">pixels</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_close</span><span class="p">(</span><span class="n">embeddings</span><span class="p">(</span><span class="n">pixels</span><span class="p">),</span> <span class="n">conv</span> <span class="o">+</span> <span class="n">embeddings</span><span class="o">.</span><span class="n">position_embedding</span><span class="o">.</span><span class="n">weight</span><span class="p">)</span></div>
 </div>
 
 

@@ -561,6 +561,7 @@ window.runMermaid = runMermaid;</script>
 <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="../../../../../architecture.html">Architecture</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../models.html">Supported Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../asr.html">Speech recognition: Whisper and Qwen3-ASR</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../../../../api.html">API Reference</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../../../_autosummary/mstar.api_server.html">mstar.api_server</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../../../_autosummary/mstar.api_server.auth.html">mstar.api_server.auth</a></li>
@@ -593,6 +594,7 @@ window.runMermaid = runMermaid;</script>
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../../../_autosummary/mstar.conductor.html">mstar.conductor</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../../_autosummary/mstar.conductor.mps.html">mstar.conductor.mps</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../../_autosummary/mstar.conductor.request_info.html">mstar.conductor.request_info</a></li>
 </ul>
 </details></li>
@@ -711,6 +713,11 @@ window.runMermaid = runMermaid;</script>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../_autosummary/mstar.model.qwen3_5.components.html">mstar.model.qwen3_5.components</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../_autosummary/mstar.model.qwen3_5.config.html">mstar.model.qwen3_5.config</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../_autosummary/mstar.model.qwen3_5.video.html">mstar.model.qwen3_5.video</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../../_autosummary/mstar.model.qwen3_asr.html">mstar.model.qwen3_asr</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../_autosummary/mstar.model.qwen3_asr.constants.html">mstar.model.qwen3_asr.constants</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../_autosummary/mstar.model.qwen3_asr.repetition.html">mstar.model.qwen3_asr.repetition</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../../_autosummary/mstar.model.submodule_base.html">mstar.model.submodule_base</a></li>
@@ -1252,6 +1259,7 @@ window.runMermaid = runMermaid;</script>
         <span class="n">accelerator_graph</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">enable_nvtx</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">backend</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"auto"</span><span class="p">,</span>
+        <span class="n">use_tensor_cores</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="n">check_flashinfer_head_dim</span><span class="p">(</span><span class="n">head_dim</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="n">device</span>
@@ -1286,7 +1294,7 @@ window.runMermaid = runMermaid;</script>
                 <span class="n">workspace_buffer</span><span class="p">,</span>
                 <span class="s2">"NHD"</span><span class="p">,</span>
                 <span class="n">use_cuda_graph</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                <span class="n">use_tensor_cores</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">use_tensor_cores</span><span class="o">=</span><span class="n">use_tensor_cores</span><span class="p">,</span>
                 <span class="n">paged_kv_indptr_buffer</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_paged_kv_indptr_buf</span><span class="p">,</span>
                 <span class="n">paged_kv_indices_buffer</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_paged_kv_indices_buf</span><span class="p">,</span>
                 <span class="n">paged_kv_last_page_len_buffer</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_paged_kv_last_page_len_buf</span><span class="p">,</span>
@@ -1295,7 +1303,7 @@ window.runMermaid = runMermaid;</script>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">attn_wrapper</span> <span class="o">=</span> <span class="n">flashinfer</span><span class="o">.</span><span class="n">BatchDecodeWithPagedKVCacheWrapper</span><span class="p">(</span>
                 <span class="n">workspace_buffer</span><span class="p">,</span> <span class="s2">"NHD"</span><span class="p">,</span>
-                <span class="n">use_tensor_cores</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">use_tensor_cores</span><span class="o">=</span><span class="n">use_tensor_cores</span><span class="p">,</span>
                 <span class="n">backend</span><span class="o">=</span><span class="n">backend</span><span class="p">,</span>
             <span class="p">)</span>
 
@@ -1409,6 +1417,7 @@ window.runMermaid = runMermaid;</script>
         <span class="n">max_prefill_rows</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">device</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
         <span class="n">backend</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"auto"</span><span class="p">,</span>
+        <span class="n">use_tensor_cores</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">mstar.engine.resources.kv.plan</span><span class="w"> </span><span class="kn">import</span> <span class="n">SINK_PAGE</span>
 
@@ -1424,7 +1433,8 @@ window.runMermaid = runMermaid;</script>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_decode</span> <span class="o">=</span> <span class="n">FlashInferDecodeWrapper</span><span class="p">(</span>
             <span class="n">workspace_buffer</span><span class="o">=</span><span class="n">decode_workspace</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span>
-            <span class="n">max_num_pages</span><span class="o">=</span><span class="n">max_num_pages</span><span class="p">,</span> <span class="n">accelerator_graph</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kv</span><span class="p">,</span>
+            <span class="n">max_num_pages</span><span class="o">=</span><span class="n">max_num_pages</span><span class="p">,</span> <span class="n">accelerator_graph</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">use_tensor_cores</span><span class="o">=</span><span class="n">use_tensor_cores</span><span class="p">,</span> <span class="o">**</span><span class="n">kv</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="c1"># one row past the prompt rows takes the step's other tokens (see `plan`)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_prefill</span> <span class="o">=</span> <span class="n">FlashInferPrefillWrapper</span><span class="p">(</span>

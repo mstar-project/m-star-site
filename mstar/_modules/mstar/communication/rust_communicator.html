@@ -561,6 +561,7 @@ window.runMermaid = runMermaid;</script>
 <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="../../../architecture.html">Architecture</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../models.html">Supported Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../asr.html">Speech recognition: Whisper and Qwen3-ASR</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../../api.html">API Reference</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../_autosummary/mstar.api_server.html">mstar.api_server</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.api_server.auth.html">mstar.api_server.auth</a></li>
@@ -593,6 +594,7 @@ window.runMermaid = runMermaid;</script>
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../_autosummary/mstar.conductor.html">mstar.conductor</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.conductor.mps.html">mstar.conductor.mps</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.conductor.request_info.html">mstar.conductor.request_info</a></li>
 </ul>
 </details></li>
@@ -711,6 +713,11 @@ window.runMermaid = runMermaid;</script>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.qwen3_5.components.html">mstar.model.qwen3_5.components</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.qwen3_5.config.html">mstar.model.qwen3_5.config</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.qwen3_5.video.html">mstar.model.qwen3_5.video</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../_autosummary/mstar.model.qwen3_asr.html">mstar.model.qwen3_asr</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.qwen3_asr.constants.html">mstar.model.qwen3_asr.constants</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.qwen3_asr.repetition.html">mstar.model.qwen3_asr.repetition</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.model.submodule_base.html">mstar.model.submodule_base</a></li>
@@ -1086,6 +1093,14 @@ window.runMermaid = runMermaid;</script>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">protocol</span> <span class="o">==</span> <span class="n">CommProtocol</span><span class="o">.</span><span class="n">TCP</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_register</span><span class="p">(</span><span class="n">entity_id</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_inner</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">entity_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">codec</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">msg</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="RustZMQCommunicator.try_send_bytes">
+<a class="viewcode-back" href="../../../_autosummary/mstar.communication.rust_communicator.html#mstar.communication.rust_communicator.RustZMQCommunicator.try_send_bytes">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">try_send_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entity_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">protocol</span> <span class="o">==</span> <span class="n">CommProtocol</span><span class="o">.</span><span class="n">TCP</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_register</span><span class="p">(</span><span class="n">entity_id</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_inner</span><span class="o">.</span><span class="n">try_send</span><span class="p">(</span><span class="n">entity_id</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="RustZMQCommunicator.get_all_new_messages">

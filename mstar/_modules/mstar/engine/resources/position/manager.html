@@ -561,6 +561,7 @@ window.runMermaid = runMermaid;</script>
 <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="../../../../../architecture.html">Architecture</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../models.html">Supported Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../asr.html">Speech recognition: Whisper and Qwen3-ASR</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../../../../api.html">API Reference</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../../../_autosummary/mstar.api_server.html">mstar.api_server</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../../../_autosummary/mstar.api_server.auth.html">mstar.api_server.auth</a></li>
@@ -593,6 +594,7 @@ window.runMermaid = runMermaid;</script>
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../../../_autosummary/mstar.conductor.html">mstar.conductor</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../../_autosummary/mstar.conductor.mps.html">mstar.conductor.mps</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../../_autosummary/mstar.conductor.request_info.html">mstar.conductor.request_info</a></li>
 </ul>
 </details></li>
@@ -711,6 +713,11 @@ window.runMermaid = runMermaid;</script>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../_autosummary/mstar.model.qwen3_5.components.html">mstar.model.qwen3_5.components</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../_autosummary/mstar.model.qwen3_5.config.html">mstar.model.qwen3_5.config</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../_autosummary/mstar.model.qwen3_5.video.html">mstar.model.qwen3_5.video</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../../_autosummary/mstar.model.qwen3_asr.html">mstar.model.qwen3_asr</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../_autosummary/mstar.model.qwen3_asr.constants.html">mstar.model.qwen3_asr.constants</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../_autosummary/mstar.model.qwen3_asr.repetition.html">mstar.model.qwen3_asr.repetition</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../../_autosummary/mstar.model.submodule_base.html">mstar.model.submodule_base</a></li>
@@ -1021,6 +1028,16 @@ window.runMermaid = runMermaid;</script>
                 <span class="n">dtype</span><span class="o">=</span><span class="n">info</span><span class="o">.</span><span class="n">kv_dtype</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Unknown position backend </span><span class="si">{</span><span class="n">spec</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">backend</span><span class="si">!r}</span><span class="s2">"</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PositionManager.fusable_rope_theta">
+<a class="viewcode-back" href="../../../../../_autosummary/mstar.engine.resources.position.manager.html#mstar.engine.resources.position.manager.PositionManager.fusable_rope_theta">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">fusable_rope_theta</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">head_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""The theta of the RoPE ``apply_qk`` applies, when that is plain</span>
+<span class="sd">        rotate-half RoPE over the whole ``head_dim`` (not interleaved, no</span>
+<span class="sd">        scaling, no RoPE dtype), which a layer may apply in a fused kernel of</span>
+<span class="sd">        its own instead; None otherwise."""</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
 </div>
 
 
@@ -1108,6 +1125,17 @@ window.runMermaid = runMermaid;</script>
         <span class="c1"># `clear_preplan` can put the targets back. Unlike KV's, these forks are</span>
         <span class="c1"># staged: a counter is host-only, so copying it early races nothing.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_preplan_fork_undo</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+
+<div class="viewcode-block" id="RopeManager.fusable_rope_theta">
+<a class="viewcode-back" href="../../../../../_autosummary/mstar.engine.resources.position.manager.html#mstar.engine.resources.position.manager.RopeManager.fusable_rope_theta">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">fusable_rope_theta</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">head_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">cfg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span>
+        <span class="n">plain</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">cfg</span><span class="o">.</span><span class="n">rope_scale</span> <span class="o">==</span> <span class="mf">1.0</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">cfg</span><span class="o">.</span><span class="n">interleave</span> <span class="ow">and</span> <span class="n">cfg</span><span class="o">.</span><span class="n">rope_dtype</span> <span class="ow">is</span> <span class="kc">None</span>
+            <span class="ow">and</span> <span class="ow">not</span> <span class="n">cfg</span><span class="o">.</span><span class="n">llama31_params</span> <span class="ow">and</span> <span class="n">cfg</span><span class="o">.</span><span class="n">rotary_dim</span> <span class="ow">in</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">head_dim</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">rope_theta</span><span class="p">)</span> <span class="k">if</span> <span class="n">plain</span> <span class="k">else</span> <span class="kc">None</span></div>
+
 
 <div class="viewcode-block" id="RopeManager.depends_on">
 <a class="viewcode-back" href="../../../../../_autosummary/mstar.engine.resources.position.manager.html#mstar.engine.resources.position.manager.RopeManager.depends_on">[docs]</a>

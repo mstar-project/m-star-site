@@ -561,6 +561,7 @@ window.runMermaid = runMermaid;</script>
 <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="../../../../../architecture.html">Architecture</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../models.html">Supported Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../asr.html">Speech recognition: Whisper and Qwen3-ASR</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../../../../api.html">API Reference</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../../../_autosummary/mstar.api_server.html">mstar.api_server</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../../../_autosummary/mstar.api_server.auth.html">mstar.api_server.auth</a></li>
@@ -593,6 +594,7 @@ window.runMermaid = runMermaid;</script>
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../../../_autosummary/mstar.conductor.html">mstar.conductor</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../../_autosummary/mstar.conductor.mps.html">mstar.conductor.mps</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../../_autosummary/mstar.conductor.request_info.html">mstar.conductor.request_info</a></li>
 </ul>
 </details></li>
@@ -711,6 +713,11 @@ window.runMermaid = runMermaid;</script>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../_autosummary/mstar.model.qwen3_5.components.html">mstar.model.qwen3_5.components</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../_autosummary/mstar.model.qwen3_5.config.html">mstar.model.qwen3_5.config</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../_autosummary/mstar.model.qwen3_5.video.html">mstar.model.qwen3_5.video</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../../_autosummary/mstar.model.qwen3_asr.html">mstar.model.qwen3_asr</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../_autosummary/mstar.model.qwen3_asr.constants.html">mstar.model.qwen3_asr.constants</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../_autosummary/mstar.model.qwen3_asr.repetition.html">mstar.model.qwen3_asr.repetition</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../../_autosummary/mstar.model.submodule_base.html">mstar.model.submodule_base</a></li>
@@ -1497,6 +1504,12 @@ window.runMermaid = runMermaid;</script>
 <span class="k">class</span><span class="w"> </span><span class="nc">KVStep</span><span class="p">(</span><span class="n">ResourceStep</span><span class="p">):</span>
     <span class="c1"># write: bool # @nsagan: opting to remove this for now bc it's dead code</span>
     <span class="n">commit</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="c1"># The step writes this cache's planned tokens eagerly, outside any captured</span>
+    <span class="c1"># graph (e.g. in ``preprocess``, before the replay). Its addressing stays an</span>
+    <span class="c1"># ordinary plan state rather than the slot's static buffers, which are sized</span>
+    <span class="c1"># for the bucket's in-graph tokens: a decoder prefill whose encoder context</span>
+    <span class="c1"># is far longer than its prompt can then replay a graph sized by the prompt.</span>
+    <span class="n">eager_write</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 
     <span class="c1"># e.g., for batched CFG</span>
     <span class="n">combined_labels</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>

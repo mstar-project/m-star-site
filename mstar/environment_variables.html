@@ -208,6 +208,7 @@
 <ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="architecture.html">Architecture</a></li>
 <li class="toctree-l1"><a class="reference internal" href="models.html">Supported Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="asr.html">Speech recognition: Whisper and Qwen3-ASR</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="api.html">API Reference</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2 has-children"><a class="reference internal" href="_autosummary/mstar.api_server.html">mstar.api_server</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.api_server.auth.html">mstar.api_server.auth</a></li>
@@ -240,6 +241,7 @@
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="_autosummary/mstar.conductor.html">mstar.conductor</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.conductor.mps.html">mstar.conductor.mps</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.conductor.request_info.html">mstar.conductor.request_info</a></li>
 </ul>
 </details></li>
@@ -358,6 +360,11 @@
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.model.qwen3_5.components.html">mstar.model.qwen3_5.components</a></li>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.model.qwen3_5.config.html">mstar.model.qwen3_5.config</a></li>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.model.qwen3_5.video.html">mstar.model.qwen3_5.video</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="_autosummary/mstar.model.qwen3_asr.html">mstar.model.qwen3_asr</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.model.qwen3_asr.constants.html">mstar.model.qwen3_asr.constants</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.model.qwen3_asr.repetition.html">mstar.model.qwen3_asr.repetition</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.model.submodule_base.html">mstar.model.submodule_base</a></li>
@@ -702,7 +709,11 @@ documented here as they are introduced.</p>
 this can be set per-process while the rest of the mesh stays on
 pyzmq. Under <code class="docutils literal notranslate"><span class="pre">MSTAR_RUST_GRAPH=AUTO</span></code>, <code class="docutils literal notranslate"><span class="pre">0</span></code> also keeps that
 worker’s graph runtime on Python – the Rust one cannot share a
-pyzmq transport.</p></td>
+pyzmq transport. An extension built before 0.1.1 has no
+non-blocking <code class="docutils literal notranslate"><span class="pre">try_send</span></code>, which the API server’s preprocess thread
+sends with: for that thread alone, <code class="docutils literal notranslate"><span class="pre">AUTO</span></code> then uses pyzmq with a
+warning and <code class="docutils literal notranslate"><span class="pre">1</span></code> raises, asking for a rebuild. The conductor, the
+workers and the rest of the API server keep the Rust transport.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_RUST_GRAPH</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">AUTO</span></code></p></td>
@@ -935,6 +946,30 @@ checkpoint the registry names. For serving a fine-tune of the same
 architecture off a mounted volume, where the registry entry would
 otherwise pull the public weights from the Hub.</p></td>
 </tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_ASR_DATA</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">data/asr</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">test/asr</span></code> (GPU parity tests): the set <code class="docutils literal notranslate"><span class="pre">benchmark.asr_data</span></code> built.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_WHISPER_REPO</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">openai/whisper-large-v3-turbo</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">test/asr/test_whisper_parity.py</span></code>: the Whisper checkpoint to compare.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_QWEN_ASR_REPO</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Qwen/Qwen3-ASR-1.7B</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">test/asr/test_qwen3_asr_parity.py</span></code>: the Qwen3-ASR checkpoint to compare.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_QWEN_ASR_REF</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">refs/Qwen3-ASR</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">test/asr/test_qwen3_asr_parity.py</span></code>: a checkout of the qwen-asr SDK,
+the reference transcripts come from.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_QWEN_ASR_REF_SITE</span></code></p></td>
+<td><p>unset</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">test/asr/test_qwen3_asr_parity.py</span></code>: a directory holding transformers
+4.57, put first on the path of the subprocess that runs the SDK (whose
+model code does not run on transformers 5). Unset under transformers 5,
+the SDK comparison skips.</p></td>
+</tr>
 </tbody>
 </table>
 </div>
@@ -1097,7 +1132,10 @@ ingest.</p></td>
 </div>
 <section id="rust-frontend-limitations">
 <h3>Rust frontend limitations<a class="headerlink" href="#rust-frontend-limitations" title="Link to this heading">#</a></h3>
-<p>The Rust frontend carries no audio encoder or media muxer (the Python frontend
+<p>The Rust frontend serves no <code class="docutils literal notranslate"><span class="pre">/generate/ws</span></code>, so a model’s live client input
+(appends to a running request, see <a class="reference internal" href="clients.html"><span class="doc">Using a Server</span></a>) needs the Python frontend;
+over <code class="docutils literal notranslate"><span class="pre">/generate</span></code> such a model’s input ends when the request is submitted.</p>
+<p>It also carries no audio encoder or media muxer (the Python frontend
 uses <code class="docutils literal notranslate"><span class="pre">soundfile</span></code> / <code class="docutils literal notranslate"><span class="pre">ffmpeg</span></code>), so two surfaces degrade:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">/v1/audio/speech</span></code> produces only <code class="docutils literal notranslate"><span class="pre">wav</span></code> and <code class="docutils literal notranslate"><span class="pre">pcm</span></code>. Any other
@@ -1212,10 +1250,12 @@ refuse to start on a mismatch. Leave <code class="docutils literal notranslate">
 which serialises the very overlap this flag buys.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_PRE_PLAN_SPEC</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">1</span></code></p></td>
+<td><p>config’s <code class="docutils literal notranslate"><span class="pre">knobs:</span> <span class="pre">pre_plan</span></code>, else <code class="docutils literal notranslate"><span class="pre">1</span></code></p></td>
 <td><p>Pre-plan the speculative batch’s attention on a dedicated thread
 while the previous replay runs. <code class="docutils literal notranslate"><span class="pre">0</span></code> plans inline on the GPU
-thread.</p></td>
+thread, which Whisper turbo’s serve config sets: its 4-layer steps
+are too short to hide the planning in. Read by
+<code class="docutils literal notranslate"><span class="pre">knobs.pre_plan_enabled</span></code>.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_DECODE_BUCKETS</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">1,2,4,8,16,32,48,64,96,128</span></code></p></td>
@@ -1314,12 +1354,12 @@ the sampler writes each request’s last token to a slot-addressed
 master and the next step reads its input ids from it, so the worker
 routes the signal with no tensor (no per-request store, hold or
 cleanup per step). Only nodes that declare the read
-(<code class="docutils literal notranslate"><span class="pre">reads_device_loopback</span></code>: Qwen3.5 decode) and only when the sampler
-has graph buffers; the sampler keeps the masters for those nodes
-alone, so a node that takes its tokens on the host (Whisper’s
-decoder) no longer pays the eager-step master write, a small
-synchronous host-to-device copy per step. <code class="docutils literal notranslate"><span class="pre">0</span></code> keeps every node on
-the per-request tensor path.</p></td>
+(<code class="docutils literal notranslate"><span class="pre">reads_device_loopback</span></code>: the decode walks of Qwen3.5, Qwen3-ASR and
+Whisper, which also keeps its timestamp rule state in the sampler’s
+declared loop-back state) and only when the sampler has graph
+buffers; the sampler keeps the masters for those nodes alone, so a
+node that takes its tokens on the host does not pay the eager-step
+master write. <code class="docutils literal notranslate"><span class="pre">0</span></code> keeps every node on the per-request tensor path.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_INGRAPH_DECODE_ROPE</span></code></p></td>
 <td><p>config’s <code class="docutils literal notranslate"><span class="pre">knobs:</span> <span class="pre">ingraph_decode_rope</span></code>, else <code class="docutils literal notranslate"><span class="pre">0</span></code></p></td>

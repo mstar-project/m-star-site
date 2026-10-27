@@ -51,7 +51,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="mstar.model.vjepa2" href="mstar.model.vjepa2.html" />
-    <link rel="prev" title="mstar.model.qwen3_5.video" href="mstar.model.qwen3_5.video.html" />
+    <link rel="prev" title="mstar.model.qwen3_asr.repetition" href="mstar.model.qwen3_asr.repetition.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="0.2.1" />
@@ -208,6 +208,7 @@
 <ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="../architecture.html">Architecture</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../models.html">Supported Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../asr.html">Speech recognition: Whisper and Qwen3-ASR</a></li>
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="../api.html">API Reference</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l2 has-children"><a class="reference internal" href="mstar.api_server.html">mstar.api_server</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="mstar.api_server.auth.html">mstar.api_server.auth</a></li>
@@ -240,6 +241,7 @@
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="mstar.conductor.html">mstar.conductor</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="mstar.conductor.mps.html">mstar.conductor.mps</a></li>
 <li class="toctree-l3"><a class="reference internal" href="mstar.conductor.request_info.html">mstar.conductor.request_info</a></li>
 </ul>
 </details></li>
@@ -358,6 +360,11 @@
 <li class="toctree-l4"><a class="reference internal" href="mstar.model.qwen3_5.components.html">mstar.model.qwen3_5.components</a></li>
 <li class="toctree-l4"><a class="reference internal" href="mstar.model.qwen3_5.config.html">mstar.model.qwen3_5.config</a></li>
 <li class="toctree-l4"><a class="reference internal" href="mstar.model.qwen3_5.video.html">mstar.model.qwen3_5.video</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="mstar.model.qwen3_asr.html">mstar.model.qwen3_asr</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="mstar.model.qwen3_asr.constants.html">mstar.model.qwen3_asr.constants</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mstar.model.qwen3_asr.repetition.html">mstar.model.qwen3_asr.repetition</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3 current active"><a class="current reference internal" href="#">mstar.model.submodule_base</a></li>
@@ -685,6 +692,7 @@
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.model.submodule_base.HostRows"><code class="docutils literal notranslate"><span class="pre">HostRows</span></code></a><ul class="pst-show_toc_level nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.model.submodule_base.HostRows.buffers"><code class="docutils literal notranslate"><span class="pre">HostRows.buffers</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.model.submodule_base.HostRows.first_values"><code class="docutils literal notranslate"><span class="pre">HostRows.first_values()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.model.submodule_base.HostRows.request_ids"><code class="docutils literal notranslate"><span class="pre">HostRows.request_ids</span></code></a></li>
 </ul>
 </li>
@@ -1116,6 +1124,24 @@ ran the requests in; a padded replay leaves extra rows past the real ones.</p>
 <dt class="sig sig-object py" id="mstar.model.submodule_base.HostRows.buffers">
 <span class="sig-name descname"><span class="pre">buffers</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#dict" title="(in Python v3.12)"><span class="pre">dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.14)"><span class="pre">Tensor</span></a><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#mstar.model.submodule_base.HostRows.buffers" title="Link to this definition">#</a></dt>
 <dd><p>Alias for field number 1</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mstar.model.submodule_base.HostRows.first_values">
+<span class="sig-name descname"><span class="pre">first_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">request_ids</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mstar/model/submodule_base.html#HostRows.first_values"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mstar.model.submodule_base.HostRows.first_values" title="Link to this definition">#</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">(rid,</span> <span class="pre">value)</span></code> for each of <code class="docutils literal notranslate"><span class="pre">request_ids</span></code> that has a row, where
+<code class="docutils literal notranslate"><span class="pre">value</span></code> is the first element of its row of buffer <code class="docutils literal notranslate"><span class="pre">name</span></code>, off one
+<code class="docutils literal notranslate"><span class="pre">tolist</span></code>; None when the step staged no such buffer. A request with
+no row is skipped, as the per-request stop path skips a request with
+no output.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>)</p></li>
+<li><p><strong>request_ids</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/collections.abc.html#collections.abc.Sequence" title="(in Python v3.12)"><em>Sequence</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a><em>]</em>)</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
@@ -2110,12 +2136,12 @@ transfer yet.</p>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="mstar.model.qwen3_5.video.html"
+       href="mstar.model.qwen3_asr.repetition.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">mstar.model.qwen3_5.video</p>
+        <p class="prev-next-title">mstar.model.qwen3_asr.repetition</p>
       </div>
     </a>
     <a class="right-next"
@@ -2179,6 +2205,7 @@ transfer yet.</p>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.model.submodule_base.HostRows"><code class="docutils literal notranslate"><span class="pre">HostRows</span></code></a><ul class="pst-show_toc_level nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.model.submodule_base.HostRows.buffers"><code class="docutils literal notranslate"><span class="pre">HostRows.buffers</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.model.submodule_base.HostRows.first_values"><code class="docutils literal notranslate"><span class="pre">HostRows.first_values()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.model.submodule_base.HostRows.request_ids"><code class="docutils literal notranslate"><span class="pre">HostRows.request_ids</span></code></a></li>
 </ul>
 </li>
