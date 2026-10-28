@@ -55,7 +55,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="0.2.1" />
-    <meta name="docbuild:last-update" content="Oct 27, 2026"/>
+    <meta name="docbuild:last-update" content="Oct 28, 2026"/>
   
     
     <script src="../_static/searchtools.js"></script>
@@ -249,6 +249,7 @@
 <li class="toctree-l3 has-children"><a class="reference internal" href="mstar.engine.resources.html">mstar.engine.resources</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="mstar.engine.resources.attn.html">mstar.engine.resources.attn</a></li>
 <li class="toctree-l4"><a class="reference internal" href="mstar.engine.resources.base.html">mstar.engine.resources.base</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mstar.engine.resources.dsa.html">mstar.engine.resources.dsa</a></li>
 <li class="toctree-l4"><a class="reference internal" href="mstar.engine.resources.kv.html">mstar.engine.resources.kv</a></li>
 <li class="toctree-l4"><a class="reference internal" href="mstar.engine.resources.position.html">mstar.engine.resources.position</a></li>
 <li class="toctree-l4"><a class="reference internal" href="mstar.engine.resources.recurrent.html">mstar.engine.resources.recurrent</a></li>
@@ -296,6 +297,12 @@
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="mstar.model.flux2_klein.html">mstar.model.flux2_klein</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="mstar.model.flux2_klein.components.html">mstar.model.flux2_klein.components</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="mstar.model.glm52.html">mstar.model.glm52</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="mstar.model.glm52.components.html">mstar.model.glm52.components</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mstar.model.glm52.config.html">mstar.model.glm52.config</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mstar.model.glm52.weight_loader.html">mstar.model.glm52.weight_loader</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="mstar.model.higgs_audio.html">mstar.model.higgs_audio</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -346,6 +353,7 @@
 <li class="toctree-l4"><a class="reference internal" href="mstar.model.orpheus.config.html">mstar.model.orpheus.config</a></li>
 </ul>
 </details></li>
+<li class="toctree-l3"><a class="reference internal" href="mstar.model.parakeet.html">mstar.model.parakeet</a></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="mstar.model.pi05.html">mstar.model.pi05</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="mstar.model.pi05.components.html">mstar.model.pi05.components</a></li>
 <li class="toctree-l4"><a class="reference internal" href="mstar.model.pi05.config.html">mstar.model.pi05.config</a></li>
@@ -406,11 +414,13 @@
 </details></li>
 <li class="toctree-l2 current active has-children"><a class="current reference internal" href="#">mstar.utils</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="mstar.utils.adarms_norm.html">mstar.utils.adarms_norm</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mstar.utils.cache_home.html">mstar.utils.cache_home</a></li>
 <li class="toctree-l3"><a class="reference internal" href="mstar.utils.client_errors.html">mstar.utils.client_errors</a></li>
 <li class="toctree-l3"><a class="reference internal" href="mstar.utils.containers.html">mstar.utils.containers</a></li>
 <li class="toctree-l3"><a class="reference internal" href="mstar.utils.device.html">mstar.utils.device</a></li>
 <li class="toctree-l3"><a class="reference internal" href="mstar.utils.exitcode.html">mstar.utils.exitcode</a></li>
 <li class="toctree-l3"><a class="reference internal" href="mstar.utils.fast_tokenize.html">mstar.utils.fast_tokenize</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mstar.utils.fp8_block.html">mstar.utils.fp8_block</a></li>
 <li class="toctree-l3"><a class="reference internal" href="mstar.utils.gc_freeze.html">mstar.utils.gc_freeze</a></li>
 <li class="toctree-l3"><a class="reference internal" href="mstar.utils.generation_kwargs.html">mstar.utils.generation_kwargs</a></li>
 <li class="toctree-l3"><a class="reference internal" href="mstar.utils.h2d.html">mstar.utils.h2d</a></li>
@@ -664,20 +674,26 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="mstar.utils.adarms_norm.html#module-mstar.utils.adarms_norm" title="mstar.utils.adarms_norm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">adarms_norm</span></code></a></p></td>
 <td><p>Fused AdaRMS normalisation + scale/shift/gate Triton kernel.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="mstar.utils.client_errors.html#module-mstar.utils.client_errors" title="mstar.utils.client_errors"><code class="xref py py-obj docutils literal notranslate"><span class="pre">client_errors</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="mstar.utils.cache_home.html#module-mstar.utils.cache_home" title="mstar.utils.cache_home"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cache_home</span></code></a></p></td>
+<td><p>The user's cache root, which M*'s on-disk caches (compiled kernels, downloaded checkpoints) live under.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="mstar.utils.client_errors.html#module-mstar.utils.client_errors" title="mstar.utils.client_errors"><code class="xref py py-obj docutils literal notranslate"><span class="pre">client_errors</span></code></a></p></td>
 <td><p>Client-visible text for an exception raised while serving a request.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="mstar.utils.containers.html#module-mstar.utils.containers" title="mstar.utils.containers"><code class="xref py py-obj docutils literal notranslate"><span class="pre">containers</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="mstar.utils.containers.html#module-mstar.utils.containers" title="mstar.utils.containers"><code class="xref py py-obj docutils literal notranslate"><span class="pre">containers</span></code></a></p></td>
 <td><p>Small generic containers with no engine or worker knowledge</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="mstar.utils.device.html#module-mstar.utils.device" title="mstar.utils.device"><code class="xref py py-obj docutils literal notranslate"><span class="pre">device</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="mstar.utils.device.html#module-mstar.utils.device" title="mstar.utils.device"><code class="xref py py-obj docutils literal notranslate"><span class="pre">device</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="mstar.utils.exitcode.html#module-mstar.utils.exitcode" title="mstar.utils.exitcode"><code class="xref py py-obj docutils literal notranslate"><span class="pre">exitcode</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="mstar.utils.exitcode.html#module-mstar.utils.exitcode" title="mstar.utils.exitcode"><code class="xref py py-obj docutils literal notranslate"><span class="pre">exitcode</span></code></a></p></td>
 <td><p>Words for a child process's exit status, for log lines and error messages.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="mstar.utils.fast_tokenize.html#module-mstar.utils.fast_tokenize" title="mstar.utils.fast_tokenize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fast_tokenize</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="mstar.utils.fast_tokenize.html#module-mstar.utils.fast_tokenize" title="mstar.utils.fast_tokenize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fast_tokenize</span></code></a></p></td>
 <td><p>Tokenize a long prompt as parallel chunks, byte-identical to one encode.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="mstar.utils.fp8_block.html#module-mstar.utils.fp8_block" title="mstar.utils.fp8_block"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fp8_block</span></code></a></p></td>
+<td><p>FP8 block-scale checkpoints: the <code class="docutils literal notranslate"><span class="pre">quantization_config</span></code> they declare, and their weights dequantized.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="mstar.utils.gc_freeze.html#module-mstar.utils.gc_freeze" title="mstar.utils.gc_freeze"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gc_freeze</span></code></a></p></td>
 <td><p>Move a process's set-up heap out of the garbage collector's reach.</p></td>
@@ -784,7 +800,7 @@ By M* Team
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Oct 27, 2026.
+  Last updated on Oct 28, 2026.
   <br/>
 </p>
   </div>

@@ -30,12 +30,14 @@
    adarms_norm
    add_layernorm
    attention
+   cache_home
    causal_conv1d
    client_errors
    containers
    device
    exitcode
    fast_tokenize
+   fp8_block
    fused_moe
    gc_freeze
    generation_kwargs

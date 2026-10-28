@@ -37,6 +37,7 @@
    cosmos3
    fish_s2_pro
    flux2_klein
+   glm52
    higgs_audio
    kokoro
    lingbot_world
@@ -48,6 +49,7 @@
    omnilingual_asr
    omnivoice
    orpheus
+   parakeet
    pi05
    qwen3_5
    qwen3_asr
