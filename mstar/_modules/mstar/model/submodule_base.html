@@ -609,7 +609,6 @@ window.runMermaid = runMermaid;</script>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.engine.resources.dsa.html">mstar.engine.resources.dsa</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.engine.resources.kv.html">mstar.engine.resources.kv</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.engine.resources.position.html">mstar.engine.resources.position</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.engine.resources.recurrent.html">mstar.engine.resources.recurrent</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.engine.resources.rms_norm.html">mstar.engine.resources.rms_norm</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.engine.resources.runner.html">mstar.engine.resources.runner</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.engine.resources.sampler.html">mstar.engine.resources.sampler</a></li>
@@ -688,7 +687,6 @@ window.runMermaid = runMermaid;</script>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.nemotron_duplex.components.html">mstar.model.nemotron_duplex.components</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.nemotron_duplex.config.html">mstar.model.nemotron_duplex.config</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.nemotron_duplex.realtime_api.html">mstar.model.nemotron_duplex.realtime_api</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.nemotron_duplex.submodules.html">mstar.model.nemotron_duplex.submodules</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../_autosummary/mstar.model.omnilingual_asr.html">mstar.model.omnilingual_asr</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -1017,6 +1015,33 @@ window.runMermaid = runMermaid;</script>
 
 
 
+<div class="viewcode-block" id="StopCheck">
+<a class="viewcode-back" href="../../../_autosummary/mstar.model.submodule_base.html#mstar.model.submodule_base.StopCheck">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">StopCheck</span><span class="p">(</span><span class="n">NamedTuple</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""``check_stop``'s answer when the step also has outputs that are not data.</span>
+
+<span class="sd">    ``withheld`` names outputs of this step the worker leaves unrouted for the</span>
+<span class="sd">    request, e.g. a frame streamed beside a stop token: a streaming edge then</span>
+<span class="sd">    gets no item for it, so its consumer needs no device read to find and drop</span>
+<span class="sd">    it. A plain ``set`` return is the same as ``StopCheck(stops)``.</span>
+<span class="sd">    """</span>
+
+    <span class="n">stops</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="nb">frozenset</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">()</span>
+    <span class="n">withheld</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="BatchedStopCheck">
+<a class="viewcode-back" href="../../../_autosummary/mstar.model.submodule_base.html#mstar.model.submodule_base.BatchedStopCheck">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">BatchedStopCheck</span><span class="p">(</span><span class="n">NamedTuple</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""``StopCheck`` for ``check_stop_batched``: rid -&gt; loops to stop and</span>
+<span class="sd">    rid -&gt; withheld outputs, rids with none left out of each."""</span>
+
+    <span class="n">stops</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span>
+    <span class="n">withheld</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]]</span></div>
+
+
+
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">mstar.engine.accelerator_graph_config</span><span class="w"> </span><span class="kn">import</span> <span class="n">AcceleratorGraphConfig</span><span class="p">,</span> <span class="n">PiecewiseAcceleratorGraphConfig</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">mstar.engine.accelerator_graph_runner</span><span class="w"> </span><span class="kn">import</span> <span class="n">PiecewiseAcceleratorGraphRunner</span>
@@ -1149,22 +1174,23 @@ window.runMermaid = runMermaid;</script>
 
 <span class="sd">        ``reuse`` holds clones already taken of the row outputs (see</span>
 <span class="sd">        ``clone_row_outputs``); a stop buffer that is the very same tensor as a</span>
-<span class="sd">        row output takes that clone instead of a second copy. The row clone is</span>
-<span class="sd">        narrowed to the real rows, which is every row the stop check reads.</span>
+<span class="sd">        row output takes that clone instead of a second copy, and a tensor under</span>
+<span class="sd">        two names is cloned once. The row clone is narrowed to the real rows,</span>
+<span class="sd">        which is every row the stop check reads.</span>
 <span class="sd">        """</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_stop_buffers</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
         <span class="n">rows</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">row_outputs</span> <span class="ow">or</span> <span class="p">{}</span>
+        <span class="n">clones</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="nb">id</span><span class="p">(</span><span class="n">rows</span><span class="p">[</span><span class="n">name</span><span class="p">]):</span> <span class="n">clone</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">clone</span> <span class="ow">in</span> <span class="p">(</span><span class="n">reuse</span> <span class="ow">or</span> <span class="p">{})</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">rows</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">clone</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span>
+        <span class="p">}</span>
 
-        <span class="k">def</span><span class="w"> </span><span class="nf">_clone</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_clone</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
-                <span class="k">if</span> <span class="p">(</span>
-                    <span class="n">reuse</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-                    <span class="ow">and</span> <span class="n">value</span> <span class="ow">is</span> <span class="n">rows</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
-                    <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">reuse</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">),</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span>
-                <span class="p">):</span>
-                    <span class="k">return</span> <span class="n">reuse</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
-                <span class="k">return</span> <span class="n">value</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span>
+                <span class="k">if</span> <span class="nb">id</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">clones</span><span class="p">:</span>
+                    <span class="n">clones</span><span class="p">[</span><span class="nb">id</span><span class="p">(</span><span class="n">value</span><span class="p">)]</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span>
+                <span class="k">return</span> <span class="n">clones</span><span class="p">[</span><span class="nb">id</span><span class="p">(</span><span class="n">value</span><span class="p">)]</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
                 <span class="k">return</span> <span class="p">[</span>
                     <span class="n">x</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="k">else</span> <span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">value</span>
@@ -1174,7 +1200,7 @@ window.runMermaid = runMermaid;</script>
             <span class="c1"># pass anything else through: dropping it could lose a stop signal</span>
             <span class="k">return</span> <span class="n">value</span>
 
-        <span class="k">return</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">_clone</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_stop_buffers</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span></div>
+        <span class="k">return</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">_clone</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_stop_buffers</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span></div>
 
 
 <div class="viewcode-block" id="BatchedModelOutput.clone_row_outputs">
@@ -2152,7 +2178,7 @@ window.runMermaid = runMermaid;</script>
         <span class="bp">self</span><span class="p">,</span> <span class="n">request_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">request_info</span><span class="p">:</span> <span class="n">CurrentForwardPassInfo</span><span class="p">,</span>
         <span class="n">outputs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]],</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="n">StopCheck</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Return the set of dynamic-loop names that should stop after this step.</span>
 
@@ -2167,6 +2193,10 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">        will run for that rid and its output discarded — the standard</span>
 <span class="sd">        1-wasted-step cost for any stop signal.</span>
 
+<span class="sd">        A ``StopCheck`` also names outputs of this step that are not routed</span>
+<span class="sd">        (``StopCheck.withheld``), decided off the same read; it may withhold</span>
+<span class="sd">        without stopping.</span>
+
 <span class="sd">        Default: no stops.</span>
 <span class="sd">        """</span>
         <span class="k">return</span> <span class="nb">set</span><span class="p">()</span></div>
@@ -2179,13 +2209,14 @@ window.runMermaid = runMermaid;</script>
         <span class="n">request_infos</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">CurrentForwardPassInfo</span><span class="p">],</span>
         <span class="n">host_rows</span><span class="p">:</span> <span class="n">HostRows</span><span class="p">,</span>
         <span class="n">step_walk</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">|</span> <span class="n">BatchedStopCheck</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""``check_stop`` for the whole batch at once, off the host rows.</span>
 
-<span class="sd">        Optional. Returns rid -&gt; loops to stop (rids with none left out), and</span>
-<span class="sd">        must agree with ``check_stop`` for every rid. None, or a raise, falls</span>
-<span class="sd">        back to the per-request path. ``step_walk`` is the walk every row ran,</span>
-<span class="sd">        or None when the step mixes walks (each row's is on its info).</span>
+<span class="sd">        Optional. Returns rid -&gt; loops to stop (rids with none left out), or a</span>
+<span class="sd">        ``BatchedStopCheck`` for a submodule whose ``check_stop`` withholds,</span>
+<span class="sd">        and must agree with ``check_stop`` for every rid. None, or a raise,</span>
+<span class="sd">        falls back to the per-request path. ``step_walk`` is the walk every row</span>
+<span class="sd">        ran, or None when the step mixes walks (each row's is on its info).</span>
 <span class="sd">        """</span>
         <span class="k">return</span> <span class="kc">None</span></div>
 

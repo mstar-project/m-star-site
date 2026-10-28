@@ -609,7 +609,6 @@ window.runMermaid = runMermaid;</script>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.engine.resources.dsa.html">mstar.engine.resources.dsa</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.engine.resources.kv.html">mstar.engine.resources.kv</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.engine.resources.position.html">mstar.engine.resources.position</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.engine.resources.recurrent.html">mstar.engine.resources.recurrent</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.engine.resources.rms_norm.html">mstar.engine.resources.rms_norm</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.engine.resources.runner.html">mstar.engine.resources.runner</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.engine.resources.sampler.html">mstar.engine.resources.sampler</a></li>
@@ -688,7 +687,6 @@ window.runMermaid = runMermaid;</script>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.nemotron_duplex.components.html">mstar.model.nemotron_duplex.components</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.nemotron_duplex.config.html">mstar.model.nemotron_duplex.config</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.nemotron_duplex.realtime_api.html">mstar.model.nemotron_duplex.realtime_api</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.nemotron_duplex.submodules.html">mstar.model.nemotron_duplex.submodules</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../_autosummary/mstar.model.omnilingual_asr.html">mstar.model.omnilingual_asr</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -1150,6 +1148,14 @@ window.runMermaid = runMermaid;</script>
                 <span class="n">streaming</span><span class="o">=</span><span class="nb">bool</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"streaming"</span><span class="p">,</span> <span class="kc">True</span><span class="p">)),</span>
                 <span class="n">request_id</span><span class="o">=</span><span class="n">rid</span><span class="p">,</span>
             <span class="p">)</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="c1"># a refused input: an in-band error chunk carries its 400 to the client</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"submit </span><span class="si">%s</span><span class="s2"> refused: </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="n">rid</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_send</span><span class="p">({</span>
+                <span class="s2">"t"</span><span class="p">:</span> <span class="s2">"chunk"</span><span class="p">,</span> <span class="s2">"rid"</span><span class="p">:</span> <span class="n">rid</span><span class="p">,</span> <span class="s2">"sub"</span><span class="p">:</span> <span class="n">sub</span><span class="p">,</span> <span class="s2">"modality"</span><span class="p">:</span> <span class="s2">"error"</span><span class="p">,</span>
+                <span class="s2">"data"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">"utf-8"</span><span class="p">),</span> <span class="s2">"metadata"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"status"</span><span class="p">:</span> <span class="mi">400</span><span class="p">},</span>
+            <span class="p">})</span>
+            <span class="k">return</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>  <span class="c1"># noqa: BLE001 — one bad request must not kill the loop</span>
             <span class="n">status</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="s2">"status_code"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">status</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>

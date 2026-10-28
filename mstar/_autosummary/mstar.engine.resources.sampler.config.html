@@ -256,7 +256,6 @@
 <li class="toctree-l4"><a class="reference internal" href="mstar.engine.resources.dsa.html">mstar.engine.resources.dsa</a></li>
 <li class="toctree-l4"><a class="reference internal" href="mstar.engine.resources.kv.html">mstar.engine.resources.kv</a></li>
 <li class="toctree-l4"><a class="reference internal" href="mstar.engine.resources.position.html">mstar.engine.resources.position</a></li>
-<li class="toctree-l4"><a class="reference internal" href="mstar.engine.resources.recurrent.html">mstar.engine.resources.recurrent</a></li>
 <li class="toctree-l4"><a class="reference internal" href="mstar.engine.resources.rms_norm.html">mstar.engine.resources.rms_norm</a></li>
 <li class="toctree-l4"><a class="reference internal" href="mstar.engine.resources.runner.html">mstar.engine.resources.runner</a></li>
 <li class="toctree-l4 current active"><a class="reference internal" href="mstar.engine.resources.sampler.html">mstar.engine.resources.sampler</a></li>
@@ -335,7 +334,6 @@
 <li class="toctree-l4"><a class="reference internal" href="mstar.model.nemotron_duplex.components.html">mstar.model.nemotron_duplex.components</a></li>
 <li class="toctree-l4"><a class="reference internal" href="mstar.model.nemotron_duplex.config.html">mstar.model.nemotron_duplex.config</a></li>
 <li class="toctree-l4"><a class="reference internal" href="mstar.model.nemotron_duplex.realtime_api.html">mstar.model.nemotron_duplex.realtime_api</a></li>
-<li class="toctree-l4"><a class="reference internal" href="mstar.model.nemotron_duplex.submodules.html">mstar.model.nemotron_duplex.submodules</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="mstar.model.omnilingual_asr.html">mstar.model.omnilingual_asr</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -711,6 +709,9 @@
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.engine.resources.sampler.config.SamplingReqConfig.validate"><code class="docutils literal notranslate"><span class="pre">SamplingReqConfig.validate()</span></code></a></li>
 </ul>
 </li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.engine.resources.sampler.config.check_bool_knob"><code class="docutils literal notranslate"><span class="pre">check_bool_knob()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.engine.resources.sampler.config.check_int_knob"><code class="docutils literal notranslate"><span class="pre">check_int_knob()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.engine.resources.sampler.config.check_real_knob"><code class="docutils literal notranslate"><span class="pre">check_real_knob()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.engine.resources.sampler.config.derive_seed"><code class="docutils literal notranslate"><span class="pre">derive_seed()</span></code></a></li>
 </ul>
             </nav>
@@ -732,7 +733,16 @@ step without pulling them in behind it.</p>
 <p class="rubric">Functions</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#mstar.engine.resources.sampler.config.derive_seed" title="mstar.engine.resources.sampler.config.derive_seed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">derive_seed</span></code></a>(seed, stream)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#mstar.engine.resources.sampler.config.check_bool_knob" title="mstar.engine.resources.sampler.config.check_bool_knob"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_bool_knob</span></code></a>(key, value)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#mstar.engine.resources.sampler.config.check_int_knob" title="mstar.engine.resources.sampler.config.check_int_knob"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_int_knob</span></code></a>(key, value, rule, ok)</p></td>
+<td><p>Raise <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> unless <code class="docutils literal notranslate"><span class="pre">value</span></code> is an integer satisfying <code class="docutils literal notranslate"><span class="pre">ok</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#mstar.engine.resources.sampler.config.check_real_knob" title="mstar.engine.resources.sampler.config.check_real_knob"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_real_knob</span></code></a>(key, value, rule, ok)</p></td>
+<td><p>Raise <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> unless <code class="docutils literal notranslate"><span class="pre">value</span></code> is a finite number satisfying <code class="docutils literal notranslate"><span class="pre">ok</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#mstar.engine.resources.sampler.config.derive_seed" title="mstar.engine.resources.sampler.config.derive_seed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">derive_seed</span></code></a>(seed, stream)</p></td>
 <td><p>A seed for one named stream of a request, as a non-negative int64.</p></td>
 </tr>
 </tbody>
@@ -768,7 +778,7 @@ is reused) at <code class="docutils literal notranslate"><span class="pre">defau
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>width</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a>)</p></li>
-<li><p><strong>dtype</strong> (<a class="reference external" href="https://docs.pytorch.org/docs/stable/tensor_attributes.html#torch.dtype" title="(in PyTorch v2.14)"><em>dtype</em></a>)</p></li>
+<li><p><strong>dtype</strong> (<a class="reference external" href="https://docs.pytorch.org/docs/stable/tensor_attributes.html#torch.dtype" title="(in PyTorch v2.15)"><em>dtype</em></a>)</p></li>
 <li><p><strong>default</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#tuple" title="(in Python v3.12)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.12/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3.12/library/functions.html#float" title="(in Python v3.12)"><em>float</em></a><em>, </em><em>...</em><em>]</em>)</p></li>
 </ul>
 </dd>
@@ -780,7 +790,7 @@ is reused) at <code class="docutils literal notranslate"><span class="pre">defau
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="mstar.engine.resources.sampler.config.LoopbackState.dtype">
-<span class="sig-name descname"><span class="pre">dtype</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensor_attributes.html#torch.dtype" title="(in PyTorch v2.14)"><span class="pre">dtype</span></a></span><a class="headerlink" href="#mstar.engine.resources.sampler.config.LoopbackState.dtype" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">dtype</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensor_attributes.html#torch.dtype" title="(in PyTorch v2.15)"><span class="pre">dtype</span></a></span><a class="headerlink" href="#mstar.engine.resources.sampler.config.LoopbackState.dtype" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -865,7 +875,7 @@ resource stays free of the manager and its kernels.</p>
 <li><p><strong>segments</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#tuple" title="(in Python v3.12)"><em>tuple</em></a><em>[</em><a class="reference internal" href="mstar.engine.resources.step.html#mstar.engine.resources.step.Segment" title="mstar.engine.resources.step.Segment"><em>Segment</em></a><em>, </em><em>...</em><em>] </em><em>| </em><em>None</em>)</p></li>
 <li><p><strong>apply_penalty</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/functions.html#bool" title="(in Python v3.12)"><em>bool</em></a>)</p></li>
 <li><p><strong>apply_filters</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/functions.html#bool" title="(in Python v3.12)"><em>bool</em></a>)</p></li>
-<li><p><strong>prefill_tracked_tokens</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#dict" title="(in Python v3.12)"><em>dict</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.14)"><em>Tensor</em></a><em>]</em>)</p></li>
+<li><p><strong>prefill_tracked_tokens</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#dict" title="(in Python v3.12)"><em>dict</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.15)"><em>Tensor</em></a><em>]</em>)</p></li>
 <li><p><strong>kept_rids</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#frozenset" title="(in Python v3.12)"><em>frozenset</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.12/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a><em>] </em><em>| </em><em>None</em>)</p></li>
 <li><p><strong>loopback_writes</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#frozenset" title="(in Python v3.12)"><em>frozenset</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a><em>]</em>)</p></li>
 </ul>
@@ -893,7 +903,7 @@ resource stays free of the manager and its kernels.</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="mstar.engine.resources.sampler.config.SamplerStep.prefill_tracked_tokens">
-<span class="sig-name descname"><span class="pre">prefill_tracked_tokens</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#dict" title="(in Python v3.12)"><span class="pre">dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.14)"><span class="pre">Tensor</span></a><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#mstar.engine.resources.sampler.config.SamplerStep.prefill_tracked_tokens" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">prefill_tracked_tokens</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#dict" title="(in Python v3.12)"><span class="pre">dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.15)"><span class="pre">Tensor</span></a><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#mstar.engine.resources.sampler.config.SamplerStep.prefill_tracked_tokens" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -1011,6 +1021,53 @@ node cannot honour. None means the sampler’s default.</p>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="mstar.engine.resources.sampler.config.check_bool_knob">
+<span class="sig-prename descclassname"><span class="pre">mstar.engine.resources.sampler.config.</span></span><span class="sig-name descname"><span class="pre">check_bool_knob</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mstar/engine/resources/sampler/config.html#check_bool_knob"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mstar.engine.resources.sampler.config.check_bool_knob" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mstar.engine.resources.sampler.config.check_int_knob">
+<span class="sig-prename descclassname"><span class="pre">mstar.engine.resources.sampler.config.</span></span><span class="sig-name descname"><span class="pre">check_int_knob</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rule</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ok</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mstar/engine/resources/sampler/config.html#check_int_knob"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mstar.engine.resources.sampler.config.check_int_knob" title="Link to this definition">#</a></dt>
+<dd><p>Raise <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> unless <code class="docutils literal notranslate"><span class="pre">value</span></code> is an integer satisfying <code class="docutils literal notranslate"><span class="pre">ok</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>)</p></li>
+<li><p><strong>rule</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mstar.engine.resources.sampler.config.check_real_knob">
+<span class="sig-prename descclassname"><span class="pre">mstar.engine.resources.sampler.config.</span></span><span class="sig-name descname"><span class="pre">check_real_knob</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rule</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ok</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mstar/engine/resources/sampler/config.html#check_real_knob"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mstar.engine.resources.sampler.config.check_real_knob" title="Link to this definition">#</a></dt>
+<dd><p>Raise <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> unless <code class="docutils literal notranslate"><span class="pre">value</span></code> is a finite number satisfying <code class="docutils literal notranslate"><span class="pre">ok</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>)</p></li>
+<li><p><strong>rule</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="mstar.engine.resources.sampler.config.derive_seed">
 <span class="sig-prename descclassname"><span class="pre">mstar.engine.resources.sampler.config.</span></span><span class="sig-name descname"><span class="pre">derive_seed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stream</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mstar/engine/resources/sampler/config.html#derive_seed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mstar.engine.resources.sampler.config.derive_seed" title="Link to this definition">#</a></dt>
 <dd><p>A seed for one named stream of a request, as a non-negative int64.</p>
@@ -1120,6 +1177,9 @@ request’s samplers do not draw correlated numbers from one seed.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.engine.resources.sampler.config.SamplingReqConfig.validate"><code class="docutils literal notranslate"><span class="pre">SamplingReqConfig.validate()</span></code></a></li>
 </ul>
 </li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.engine.resources.sampler.config.check_bool_knob"><code class="docutils literal notranslate"><span class="pre">check_bool_knob()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.engine.resources.sampler.config.check_int_knob"><code class="docutils literal notranslate"><span class="pre">check_int_knob()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.engine.resources.sampler.config.check_real_knob"><code class="docutils literal notranslate"><span class="pre">check_real_knob()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.engine.resources.sampler.config.derive_seed"><code class="docutils literal notranslate"><span class="pre">derive_seed()</span></code></a></li>
 </ul>
   </nav></div>

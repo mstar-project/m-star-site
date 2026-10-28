@@ -256,7 +256,6 @@
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.engine.resources.dsa.html">mstar.engine.resources.dsa</a></li>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.engine.resources.kv.html">mstar.engine.resources.kv</a></li>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.engine.resources.position.html">mstar.engine.resources.position</a></li>
-<li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.engine.resources.recurrent.html">mstar.engine.resources.recurrent</a></li>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.engine.resources.rms_norm.html">mstar.engine.resources.rms_norm</a></li>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.engine.resources.runner.html">mstar.engine.resources.runner</a></li>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.engine.resources.sampler.html">mstar.engine.resources.sampler</a></li>
@@ -335,7 +334,6 @@
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.model.nemotron_duplex.components.html">mstar.model.nemotron_duplex.components</a></li>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.model.nemotron_duplex.config.html">mstar.model.nemotron_duplex.config</a></li>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.model.nemotron_duplex.realtime_api.html">mstar.model.nemotron_duplex.realtime_api</a></li>
-<li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.model.nemotron_duplex.submodules.html">mstar.model.nemotron_duplex.submodules</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="_autosummary/mstar.model.omnilingual_asr.html">mstar.model.omnilingual_asr</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -1287,8 +1285,9 @@ On its own it lowers first-audio latency at high concurrency; with
 overlap, which raised c=32 throughput by about a fifth on an H100.</p></li>
 <li><p>The codec decoder runs in float32 by default, reproducing the reference
 decoder bit for bit. <code class="docutils literal notranslate"><span class="pre">model_kwargs:</span> <span class="pre">{codec_dtype:</span> <span class="pre">bfloat16}</span></code> in the
-deployment YAML halves its GPU time when throughput matters more than
-bit-exactness (the Talker is bf16 either way).</p></li>
+deployment YAML selects a bf16 codec (the Talker is bf16 either way). On a
+B300 that is slower, not faster: cuDNN’s heuristics run several of its
+convs on a kernel without tensor cores, so measure before switching.</p></li>
 <li><p>Opt-in AudioSeal watermark on the codec’s output (off by default; install
 <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-e</span> <span class="pre">'.[audioseal]'</span></code>). Turn it on in the deployment YAML:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">model_kwargs</span><span class="p">:</span>
