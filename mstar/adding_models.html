@@ -420,6 +420,7 @@
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.utils.cache_home.html">mstar.utils.cache_home</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.utils.client_errors.html">mstar.utils.client_errors</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.utils.containers.html">mstar.utils.containers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.utils.cpus.html">mstar.utils.cpus</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.utils.device.html">mstar.utils.device</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.utils.exitcode.html">mstar.utils.exitcode</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.utils.fast_tokenize.html">mstar.utils.fast_tokenize</a></li>
@@ -1719,6 +1720,11 @@ that depend on tensor values in <code class="docutils literal notranslate"><span
 objects to stop, for example after seeing the EOS token. This is how a decode loop
 terminates.</p>
 </dd>
+<dt><code class="docutils literal notranslate"><span class="pre">on_request_added(self,</span> <span class="pre">request_id,</span> <span class="pre">request_info)</span></code> (optional)</dt><dd><p>Called on the worker’s main thread when the request reaches the worker, before any of
+its steps, with the request’s first <code class="docutils literal notranslate"><span class="pre">CurrentForwardPassInfo</span></code>. For host work worth
+starting early on a thread of the submodule’s own; it must not touch the device. The
+DiT scaffold draws a request’s seeded noise here (<code class="docutils literal notranslate"><span class="pre">PREFETCH_SEEDS</span></code>).</p>
+</dd>
 <dt><code class="docutils literal notranslate"><span class="pre">cleanup_request(self,</span> <span class="pre">request_id)</span></code> (optional)</dt><dd><p>Free per-request state held inside the submodule when a request finishes: buffers,
 per-request caches, counters. See Qwen3-Omni’s <code class="docutils literal notranslate"><span class="pre">Code2WavSubmodule</span></code> for an example.</p>
 </dd>
@@ -1729,6 +1735,18 @@ packed <code class="docutils literal notranslate"><span class="pre">(total_token
 boundaries depend on the real sequence lengths and therefore cannot be computed inside
 the captured region. Both methods are defined on <code class="docutils literal notranslate"><span class="pre">NodeSubmodule</span></code>, so any node can use
 them.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">spanned_outputs(graph_walk)</span> <span class="pre">-&gt;</span> <span class="pre">frozenset[str]</span></code> (optional)</dt><dd><p>Outputs whose valid length per row is known only on the device, such as audio with
+silence to trim. <code class="docutils literal notranslate"><span class="pre">forward_batched</span></code> returns a <code class="docutils literal notranslate"><span class="pre">BatchedModelOutput</span></code> whose
+<code class="docutils literal notranslate"><span class="pre">output_spans</span></code> maps the output’s name to a <code class="docutils literal notranslate"><span class="pre">[bs,</span> <span class="pre">2]</span></code> int64 tensor on the device:
+row <code class="docutils literal notranslate"><span class="pre">i</span></code> holds the first and one-past-last index of row <code class="docutils literal notranslate"><span class="pre">i</span></code>’s valid samples along
+the output’s last dimension. A step that returns spans returns one for every output
+declared here, since per-request forwards are merged by name. The forward keeps a
+fixed width and does no host read.
+The worker cuts each row to its span after the step’s completion event, before the stop
+check, transport or a streaming edge reads it. The cut is a view, not a copy. Engine-side
+<code class="docutils literal notranslate"><span class="pre">postprocess</span></code> still sees the uncut output. A spanned output must not feed a node that
+the same worker speculates into.</p>
 </dd>
 </dl>
 <p>Two more methods control batching and CUDA graphs: <code class="docutils literal notranslate"><span class="pre">can_batch</span></code> with
@@ -2396,11 +2414,13 @@ the resource name.</p>
 </section>
 <section id="preprocessing-threads">
 <h3>Preprocessing threads<a class="headerlink" href="#preprocessing-threads" title="Link to this heading">#</a></h3>
-<p>The API server runs <code class="docutils literal notranslate"><span class="pre">load_image</span></code> / <code class="docutils literal notranslate"><span class="pre">process_prompt</span></code> with torch’s intra-op pool, which
-defaults to one thread per core. For a few small ops per request a small pool is faster,
-especially on a shared node, where an op waits on any of its threads another process has
-descheduled. A model sets its size with <code class="docutils literal notranslate"><span class="pre">PREPROCESS_TORCH_THREADS</span></code> on the class (Qwen3.5
-uses 4). A deployment overrides it at the top level of its config; <code class="docutils literal notranslate"><span class="pre">null</span></code> keeps torch’s
+<p>The API server runs <code class="docutils literal notranslate"><span class="pre">load_image</span></code> / <code class="docutils literal notranslate"><span class="pre">process_prompt</span></code> and output encoding with torch’s
+intra-op pool. Torch sizes it at one thread per host core, which in a container can be
+several times the CPUs the cgroup quota lets run, and an op waits on any of its threads
+the scheduler has parked. The API server therefore defaults to a quarter of the CPUs it
+may use (its affinity, capped by the cgroup <code class="docutils literal notranslate"><span class="pre">cpu.max</span></code> quota), at most 4. A model sets
+its own size with <code class="docutils literal notranslate"><span class="pre">PREPROCESS_TORCH_THREADS</span></code> on the class (Qwen3.5 uses 4). A
+deployment overrides either at the top level of its config; <code class="docutils literal notranslate"><span class="pre">null</span></code> keeps torch’s
 default:</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">model</span><span class="p">:</span><span class="w"> </span><span class="s">"qwen3_5_4b"</span>
 <span class="nt">preprocess_torch_threads</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4</span>
@@ -2806,6 +2826,11 @@ from <code class="docutils literal notranslate"><span class="pre">denoise</span>
 scalar adds a <code class="docutils literal notranslate"><span class="pre">STEP_SCALARS</span></code> entry naming the attribute of its <code class="docutils literal notranslate"><span class="pre">FlowMatchSchedule</span></code>
 to slice it from — the base stages that tensor on the device and slices it per step, so
 nothing in the batching path has to change.</p>
+<p>A model whose <code class="docutils literal notranslate"><span class="pre">seed_loop_back</span></code> depends on nothing but the bucket key and the request’s
+seed sets <code class="docutils literal notranslate"><span class="pre">PREFETCH_SEEDS</span> <span class="pre">=</span> <span class="pre">True</span></code> (klein and Z-Image do): the base then draws the noise
+when the request reaches the worker, on a thread of its own, and iteration 0 only copies
+it to the device. Otherwise the CPU draw runs on the GPU thread at iteration 0, once per
+joining row.</p>
 <p>Every span a layer attends over must be declared with its own label (default: one
 <code class="docutils literal notranslate"><span class="pre">&quot;main&quot;</span></code> segment per request); <code class="docutils literal notranslate"><span class="pre">ragged_for(label)</span></code> hands that span’s kernel to the
 layers, which fall back to SDPA when no ragged resource is bound.</p>
