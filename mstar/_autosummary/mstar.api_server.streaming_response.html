@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>mstar.model.cosmos3.tests.test_video_capture &#8212; M* v0.2.1 Documentation</title>
+    <title>mstar.api_server.streaming_response &#8212; M* v0.2.1 Documentation</title>
   
   
   
@@ -46,16 +46,16 @@
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=ccdb6887"></script>
     <script src="../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/mstar.model.cosmos3.tests.test_video_capture';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/mstar.api_server.streaming_response';</script>
     <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="mstar.model.flux2_klein" href="mstar.model.flux2_klein.html" />
-    <link rel="prev" title="mstar.model.cosmos3.tests.test_sound" href="mstar.model.cosmos3.tests.test_sound.html" />
+    <link rel="next" title="mstar.communication" href="mstar.communication.html" />
+    <link rel="prev" title="mstar.api_server.rust_frontend" href="mstar.api_server.rust_frontend.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="0.2.1" />
-    <meta name="docbuild:last-update" content="Oct 28, 2026"/>
+    <meta name="docbuild:last-update" content="Oct 29, 2026"/>
   
     
     <script src="../_static/searchtools.js"></script>
@@ -210,7 +210,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../models.html">Supported Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../asr.html">Speech recognition: Whisper and Qwen3-ASR</a></li>
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="../api.html">API Reference</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
-<li class="toctree-l2 has-children"><a class="reference internal" href="mstar.api_server.html">mstar.api_server</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2 current active has-children"><a class="reference internal" href="mstar.api_server.html">mstar.api_server</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="mstar.api_server.auth.html">mstar.api_server.auth</a></li>
 <li class="toctree-l3"><a class="reference internal" href="mstar.api_server.media_io.html">mstar.api_server.media_io</a></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="mstar.api_server.openai.html">mstar.api_server.openai</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -226,6 +226,7 @@
 </details></li>
 <li class="toctree-l3"><a class="reference internal" href="mstar.api_server.request_types.html">mstar.api_server.request_types</a></li>
 <li class="toctree-l3"><a class="reference internal" href="mstar.api_server.rust_frontend.html">mstar.api_server.rust_frontend</a></li>
+<li class="toctree-l3 current active"><a class="current reference internal" href="#">mstar.api_server.streaming_response</a></li>
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="mstar.communication.html">mstar.communication</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -273,7 +274,7 @@
 <li class="toctree-l3"><a class="reference internal" href="mstar.graph.special_destinations.html">mstar.graph.special_destinations</a></li>
 </ul>
 </details></li>
-<li class="toctree-l2 current active has-children"><a class="reference internal" href="mstar.model.html">mstar.model</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2 has-children"><a class="reference internal" href="mstar.model.html">mstar.model</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="mstar.model.audio_watermark.html">mstar.model.audio_watermark</a></li>
 <li class="toctree-l3"><a class="reference internal" href="mstar.model.canary.html">mstar.model.canary</a></li>
 <li class="toctree-l3"><a class="reference internal" href="mstar.model.canary_qwen.html">mstar.model.canary_qwen</a></li>
@@ -288,14 +289,14 @@
 <li class="toctree-l4"><a class="reference internal" href="mstar.model.command_a_plus.tests.html">mstar.model.command_a_plus.tests</a></li>
 </ul>
 </details></li>
-<li class="toctree-l3 current active has-children"><a class="reference internal" href="mstar.model.cosmos3.html">mstar.model.cosmos3</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l3 has-children"><a class="reference internal" href="mstar.model.cosmos3.html">mstar.model.cosmos3</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="mstar.model.cosmos3.components.html">mstar.model.cosmos3.components</a></li>
 <li class="toctree-l4"><a class="reference internal" href="mstar.model.cosmos3.config.html">mstar.model.cosmos3.config</a></li>
 <li class="toctree-l4"><a class="reference internal" href="mstar.model.cosmos3.constants.html">mstar.model.cosmos3.constants</a></li>
 <li class="toctree-l4"><a class="reference internal" href="mstar.model.cosmos3.loader.html">mstar.model.cosmos3.loader</a></li>
 <li class="toctree-l4"><a class="reference internal" href="mstar.model.cosmos3.sessions.html">mstar.model.cosmos3.sessions</a></li>
 <li class="toctree-l4"><a class="reference internal" href="mstar.model.cosmos3.submodules.html">mstar.model.cosmos3.submodules</a></li>
-<li class="toctree-l4 current active"><a class="reference internal" href="mstar.model.cosmos3.tests.html">mstar.model.cosmos3.tests</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mstar.model.cosmos3.tests.html">mstar.model.cosmos3.tests</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="mstar.model.flux2_klein.html">mstar.model.flux2_klein</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -527,7 +528,7 @@
       
       
       
-      <li><a href="https://github.com/mstar-project/mstar/blob/main/docs/_autosummary/mstar.model.cosmos3.tests.test_video_capture.rst?plain=1" target="_blank"
+      <li><a href="https://github.com/mstar-project/mstar/blob/main/docs/_autosummary/mstar.api_server.streaming_response.rst?plain=1" target="_blank"
    class="btn btn-sm btn-source-file-button dropdown-item"
    title="Show source"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -544,7 +545,7 @@
       
       
       
-      <li><a href="https://github.com/mstar-project/mstar/issues/new?title=Issue%20on%20page%20%2F_autosummary/mstar.model.cosmos3.tests.test_video_capture.html&body=Your%20issue%20content%20here." target="_blank"
+      <li><a href="https://github.com/mstar-project/mstar/issues/new?title=Issue%20on%20page%20%2F_autosummary/mstar.api_server.streaming_response.html&body=Your%20issue%20content%20here." target="_blank"
    class="btn btn-sm btn-source-issues-button dropdown-item"
    title="Open an issue"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -574,7 +575,7 @@
       
       
       
-      <li><a href="../_sources/_autosummary/mstar.model.cosmos3.tests.test_video_capture.rst" target="_blank"
+      <li><a href="../_sources/_autosummary/mstar.api_server.streaming_response.rst" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -657,7 +658,7 @@
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>mstar.model.cosmos3.tests.test_video_capture</h1>
+    <h1>mstar.api_server.streaming_response</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -667,10 +668,7 @@
             </div>
             <nav aria-label="Page">
                 <ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.model.cosmos3.tests.test_video_capture.test_masked_capture_matches_eager_layout"><code class="docutils literal notranslate"><span class="pre">test_masked_capture_matches_eager_layout()</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.model.cosmos3.tests.test_video_capture.test_postprocess_captured_video_step"><code class="docutils literal notranslate"><span class="pre">test_postprocess_captured_video_step()</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.model.cosmos3.tests.test_video_capture.test_video_capture_buckets_and_keys"><code class="docutils literal notranslate"><span class="pre">test_video_capture_buckets_and_keys()</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.model.cosmos3.tests.test_video_capture.test_windowed_captured_inputs_carry_the_window_layout"><code class="docutils literal notranslate"><span class="pre">test_windowed_captured_inputs_carry_the_window_layout()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.api_server.streaming_response.ReleasingStreamingResponse"><code class="docutils literal notranslate"><span class="pre">ReleasingStreamingResponse</span></code></a></li>
 </ul>
             </nav>
         </div>
@@ -682,77 +680,38 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="module-mstar.model.cosmos3.tests.test_video_capture">
-<span id="mstar-model-cosmos3-tests-test-video-capture"></span><h1>mstar.model.cosmos3.tests.test_video_capture<a class="headerlink" href="#module-mstar.model.cosmos3.tests.test_video_capture" title="Link to this heading">#</a></h1>
-<p>CPU checks for the video / windowed denoise CUDA-graph capture: one graph
-per latent shape built with every frame declared noisy, the request’s
-clean/noisy layout carried as a per-token mask input. Covers the bucket
-declaration, the capture key (video, chained windows; never kv windows),
-the captured inputs a windowed request stages, the captured-step tail in
-<code class="docutils literal notranslate"><span class="pre">postprocess</span></code> (masked velocity, pinned frames, window boundary), and the
-mask’s exact equivalence to the eager layout on a tiny transformer.</p>
-<p class="rubric">Functions</p>
+  <section id="module-mstar.api_server.streaming_response">
+<span id="mstar-api-server-streaming-response"></span><h1>mstar.api_server.streaming_response<a class="headerlink" href="#module-mstar.api_server.streaming_response" title="Link to this heading">#</a></h1>
+<p>A streaming response that cleans up after a body Starlette never started.</p>
+<p class="rubric">Classes</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#mstar.model.cosmos3.tests.test_video_capture.test_masked_capture_matches_eager_layout" title="mstar.model.cosmos3.tests.test_video_capture.test_masked_capture_matches_eager_layout"><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_masked_capture_matches_eager_layout</span></code></a>()</p></td>
-<td><p>On a tiny transformer: the all-frames-noisy graph layout with the clean/noisy mask reproduces the eager i2v layout's velocity on the noisy frames exactly (the clean frame's output is what postprocess zeroes).</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#mstar.model.cosmos3.tests.test_video_capture.test_postprocess_captured_video_step" title="mstar.model.cosmos3.tests.test_video_capture.test_postprocess_captured_video_step"><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_postprocess_captured_video_step</span></code></a>(monkeypatch)</p></td>
-<td><p>The captured tail zeroes the clean frames' velocity, re-pins masked frames, and closes a chained window at its last step.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#mstar.model.cosmos3.tests.test_video_capture.test_video_capture_buckets_and_keys" title="mstar.model.cosmos3.tests.test_video_capture.test_video_capture_buckets_and_keys"><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_video_capture_buckets_and_keys</span></code></a>(monkeypatch)</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#mstar.model.cosmos3.tests.test_video_capture.test_windowed_captured_inputs_carry_the_window_layout" title="mstar.model.cosmos3.tests.test_video_capture.test_windowed_captured_inputs_carry_the_window_layout"><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_windowed_captured_inputs_carry_the_window_layout</span></code></a>(...)</p></td>
-<td><p>A chained window past the first stages the graph's inputs: timesteps from the within-window step over every token, and the token mask zero on the re-pinned overlap frames.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#mstar.api_server.streaming_response.ReleasingStreamingResponse" title="mstar.api_server.streaming_response.ReleasingStreamingResponse"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ReleasingStreamingResponse</span></code></a>(content, *, ...)</p></td>
+<td><p>A <code class="docutils literal notranslate"><span class="pre">StreamingResponse</span></code> that calls <code class="docutils literal notranslate"><span class="pre">release</span></code> when its body never started.</p></td>
 </tr>
 </tbody>
 </table>
 </div>
-<dl class="py function">
-<dt class="sig sig-object py" id="mstar.model.cosmos3.tests.test_video_capture.test_masked_capture_matches_eager_layout">
-<span class="sig-prename descclassname"><span class="pre">mstar.model.cosmos3.tests.test_video_capture.</span></span><span class="sig-name descname"><span class="pre">test_masked_capture_matches_eager_layout</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mstar/model/cosmos3/tests/test_video_capture.html#test_masked_capture_matches_eager_layout"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mstar.model.cosmos3.tests.test_video_capture.test_masked_capture_matches_eager_layout" title="Link to this definition">#</a></dt>
-<dd><p>On a tiny transformer: the all-frames-noisy graph layout with the
-clean/noisy mask reproduces the eager i2v layout’s velocity on the noisy
-frames exactly (the clean frame’s output is what postprocess zeroes).</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="mstar.api_server.streaming_response.ReleasingStreamingResponse">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">mstar.api_server.streaming_response.</span></span><span class="sig-name descname"><span class="pre">ReleasingStreamingResponse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">content</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">release</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mstar/api_server/streaming_response.html#ReleasingStreamingResponse"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mstar.api_server.streaming_response.ReleasingStreamingResponse" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">StreamingResponse</span></code></p>
+<p>A <code class="docutils literal notranslate"><span class="pre">StreamingResponse</span></code> that calls <code class="docutils literal notranslate"><span class="pre">release</span></code> when its body never started.</p>
+<p>Starlette sends the headers before it iterates the body, and leaves the
+body unstarted when that send raises: uvicorn 0.28.0 (the release that
+reports ASGI 2.4) raises from <code class="docutils literal notranslate"><span class="pre">send</span></code> once the client has left. A server
+that cancels the response before its first step would do the same; current
+uvicorn does neither, so there the body starts and aborts the request
+itself, and this is a guard. An async generator that never started never
+runs its <code class="docutils literal notranslate"><span class="pre">finally</span></code>, so what the body releases on an early exit (its
+engine request, read-ahead pieces, uploaded files) would be held until the
+process restarts.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>None</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="mstar.model.cosmos3.tests.test_video_capture.test_postprocess_captured_video_step">
-<span class="sig-prename descclassname"><span class="pre">mstar.model.cosmos3.tests.test_video_capture.</span></span><span class="sig-name descname"><span class="pre">test_postprocess_captured_video_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">monkeypatch</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mstar/model/cosmos3/tests/test_video_capture.html#test_postprocess_captured_video_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mstar.model.cosmos3.tests.test_video_capture.test_postprocess_captured_video_step" title="Link to this definition">#</a></dt>
-<dd><p>The captured tail zeroes the clean frames’ velocity, re-pins masked
-frames, and closes a chained window at its last step.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>None</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="mstar.model.cosmos3.tests.test_video_capture.test_video_capture_buckets_and_keys">
-<span class="sig-prename descclassname"><span class="pre">mstar.model.cosmos3.tests.test_video_capture.</span></span><span class="sig-name descname"><span class="pre">test_video_capture_buckets_and_keys</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">monkeypatch</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mstar/model/cosmos3/tests/test_video_capture.html#test_video_capture_buckets_and_keys"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mstar.model.cosmos3.tests.test_video_capture.test_video_capture_buckets_and_keys" title="Link to this definition">#</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>None</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="mstar.model.cosmos3.tests.test_video_capture.test_windowed_captured_inputs_carry_the_window_layout">
-<span class="sig-prename descclassname"><span class="pre">mstar.model.cosmos3.tests.test_video_capture.</span></span><span class="sig-name descname"><span class="pre">test_windowed_captured_inputs_carry_the_window_layout</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">monkeypatch</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mstar/model/cosmos3/tests/test_video_capture.html#test_windowed_captured_inputs_carry_the_window_layout"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mstar.model.cosmos3.tests.test_video_capture.test_windowed_captured_inputs_carry_the_window_layout" title="Link to this definition">#</a></dt>
-<dd><p>A chained window past the first stages the graph’s inputs: timesteps
-from the within-window step over every token, and the token mask zero on
-the re-pinned overlap frames.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>None</p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>content</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/collections.abc.html#collections.abc.AsyncGenerator" title="(in Python v3.12)"><em>AsyncGenerator</em></a>)</p></li>
+<li><p><strong>release</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/collections.abc.html#collections.abc.Callable" title="(in Python v3.12)"><em>Callable</em></a><em>[</em><em>[</em><em>]</em><em>, </em><em>None</em><em>]</em>)</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -771,20 +730,20 @@ the re-pinned overlap frames.</p>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="mstar.model.cosmos3.tests.test_sound.html"
+       href="mstar.api_server.rust_frontend.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">mstar.model.cosmos3.tests.test_sound</p>
+        <p class="prev-next-title">mstar.api_server.rust_frontend</p>
       </div>
     </a>
     <a class="right-next"
-       href="mstar.model.flux2_klein.html"
+       href="mstar.communication.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">mstar.model.flux2_klein</p>
+        <p class="prev-next-title">mstar.communication</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -806,10 +765,7 @@ the re-pinned overlap frames.</p>
   </div>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.model.cosmos3.tests.test_video_capture.test_masked_capture_matches_eager_layout"><code class="docutils literal notranslate"><span class="pre">test_masked_capture_matches_eager_layout()</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.model.cosmos3.tests.test_video_capture.test_postprocess_captured_video_step"><code class="docutils literal notranslate"><span class="pre">test_postprocess_captured_video_step()</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.model.cosmos3.tests.test_video_capture.test_video_capture_buckets_and_keys"><code class="docutils literal notranslate"><span class="pre">test_video_capture_buckets_and_keys()</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.model.cosmos3.tests.test_video_capture.test_windowed_captured_inputs_carry_the_window_layout"><code class="docutils literal notranslate"><span class="pre">test_windowed_captured_inputs_carry_the_window_layout()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.api_server.streaming_response.ReleasingStreamingResponse"><code class="docutils literal notranslate"><span class="pre">ReleasingStreamingResponse</span></code></a></li>
 </ul>
   </nav></div>
 
@@ -843,7 +799,7 @@ By M* Team
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Oct 28, 2026.
+  Last updated on Oct 29, 2026.
   <br/>
 </p>
   </div>

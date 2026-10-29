@@ -410,7 +410,7 @@ window.runMermaid = runMermaid;</script>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="0.2.1" />
-    <meta name="docbuild:last-update" content="Oct 28, 2026"/>
+    <meta name="docbuild:last-update" content="Oct 29, 2026"/>
   
     
     <script src="../../../../../../_static/searchtools.js"></script>
@@ -579,6 +579,7 @@ window.runMermaid = runMermaid;</script>
 </details></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../../../_autosummary/mstar.api_server.request_types.html">mstar.api_server.request_types</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../../../_autosummary/mstar.api_server.rust_frontend.html">mstar.api_server.rust_frontend</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../../../_autosummary/mstar.api_server.streaming_response.html">mstar.api_server.streaming_response</a></li>
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../../../../_autosummary/mstar.communication.html">mstar.communication</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -1165,6 +1166,23 @@ window.runMermaid = runMermaid;</script>
 
 
 
+<div class="viewcode-block" id="PrefixedPrefillWrapper">
+<a class="viewcode-back" href="../../../../../../_autosummary/mstar.engine.resources.attn.ragged.wrappers.html#mstar.engine.resources.attn.ragged.wrappers.PrefixedPrefillWrapper">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">PrefixedPrefillWrapper</span><span class="p">(</span><span class="n">_RaggedPrefillBase</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Query segment ``i`` attends key segment ``i``, which holds a frozen</span>
+<span class="sd">    prefix followed by the query's own tokens (the KV-backed dense attention</span>
+<span class="sd">    backend's layout). Causal aligns each query block to the end of its keys."""</span>
+
+<div class="viewcode-block" id="PrefixedPrefillWrapper.plan">
+<a class="viewcode-back" href="../../../../../../_autosummary/mstar.engine.resources.attn.ragged.wrappers.html#mstar.engine.resources.attn.ragged.wrappers.PrefixedPrefillWrapper.plan">[docs]</a>
+    <span class="nd">@torch</span><span class="o">.</span><span class="n">compiler</span><span class="o">.</span><span class="n">disable</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">plan</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">q_cu_seqlens</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">kv_cu_seqlens</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">causal</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Each ``[num_segments + 1]`` with [0] == 0; CPU tensors preferred."""</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_plan</span><span class="p">(</span><span class="n">q_cu_seqlens</span><span class="p">,</span> <span class="n">kv_cu_seqlens</span><span class="p">,</span> <span class="n">causal</span><span class="p">)</span></div>
+</div>
+
+
+
 <span class="k">class</span><span class="w"> </span><span class="nc">_FlashInferRaggedPrefillBase</span><span class="p">(</span><span class="n">_RaggedPrefillBase</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""FlashInfer's ragged prefill (``BatchPrefillWithRaggedKVCacheWrapper``).</span>
 
@@ -1282,6 +1300,13 @@ window.runMermaid = runMermaid;</script>
 <span class="k">class</span><span class="w"> </span><span class="nc">FlashInferRaggedCrossPrefillWrapper</span><span class="p">(</span><span class="n">_FlashInferRaggedPrefillBase</span><span class="p">,</span> <span class="n">RaggedCrossPrefillWrapper</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""Ragged cross-attention through FlashInfer."""</span></div>
 
+
+
+<div class="viewcode-block" id="FlashInferPrefixedPrefillWrapper">
+<a class="viewcode-back" href="../../../../../../_autosummary/mstar.engine.resources.attn.ragged.wrappers.html#mstar.engine.resources.attn.ragged.wrappers.FlashInferPrefixedPrefillWrapper">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">FlashInferPrefixedPrefillWrapper</span><span class="p">(</span><span class="n">_FlashInferRaggedPrefillBase</span><span class="p">,</span> <span class="n">PrefixedPrefillWrapper</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Prefixed attention through FlashInfer."""</span></div>
+
 </pre></div>
 
                 </article>
@@ -1329,7 +1354,7 @@ By M* Team
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Oct 28, 2026.
+  Last updated on Oct 29, 2026.
   <br/>
 </p>
   </div>
