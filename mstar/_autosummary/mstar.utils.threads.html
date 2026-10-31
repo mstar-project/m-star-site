@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>mstar.model.nemotron_duplex.components.rnnt &#8212; M* v0.2.1 Documentation</title>
+    <title>mstar.utils.threads &#8212; M* v0.2.1 Documentation</title>
   
   
   
@@ -46,12 +46,12 @@
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=ccdb6887"></script>
     <script src="../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/mstar.model.nemotron_duplex.components.rnnt';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/mstar.utils.threads';</script>
     <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="mstar.model.nemotron_duplex.config" href="mstar.model.nemotron_duplex.config.html" />
-    <link rel="prev" title="mstar.model.nemotron_duplex.components.dft" href="mstar.model.nemotron_duplex.components.dft.html" />
+    <link rel="next" title="mstar.utils.utf8_stream" href="mstar.utils.utf8_stream.html" />
+    <link rel="prev" title="mstar.utils.streams" href="mstar.utils.streams.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="0.2.1" />
@@ -244,6 +244,7 @@
 <li class="toctree-l2 has-children"><a class="reference internal" href="mstar.conductor.html">mstar.conductor</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="mstar.conductor.mps.html">mstar.conductor.mps</a></li>
 <li class="toctree-l3"><a class="reference internal" href="mstar.conductor.request_info.html">mstar.conductor.request_info</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mstar.conductor.workers.html">mstar.conductor.workers</a></li>
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="mstar.engine.html">mstar.engine</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -276,7 +277,7 @@
 <li class="toctree-l3"><a class="reference internal" href="mstar.graph.special_destinations.html">mstar.graph.special_destinations</a></li>
 </ul>
 </details></li>
-<li class="toctree-l2 current active has-children"><a class="reference internal" href="mstar.model.html">mstar.model</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2 has-children"><a class="reference internal" href="mstar.model.html">mstar.model</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="mstar.model.audio_watermark.html">mstar.model.audio_watermark</a></li>
 <li class="toctree-l3"><a class="reference internal" href="mstar.model.canary.html">mstar.model.canary</a></li>
 <li class="toctree-l3"><a class="reference internal" href="mstar.model.canary_qwen.html">mstar.model.canary_qwen</a></li>
@@ -338,9 +339,8 @@
 </details></li>
 <li class="toctree-l3"><a class="reference internal" href="mstar.model.media_limits.html">mstar.model.media_limits</a></li>
 <li class="toctree-l3"><a class="reference internal" href="mstar.model.multimodal.html">mstar.model.multimodal</a></li>
-<li class="toctree-l3 current active has-children"><a class="reference internal" href="mstar.model.nemotron_duplex.html">mstar.model.nemotron_duplex</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
-<li class="toctree-l4 current active"><a class="reference internal" href="mstar.model.nemotron_duplex.components.html">mstar.model.nemotron_duplex.components</a></li>
-<li class="toctree-l4"><a class="reference internal" href="mstar.model.nemotron_duplex.config.html">mstar.model.nemotron_duplex.config</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="mstar.model.nemotron_duplex.html">mstar.model.nemotron_duplex</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="mstar.model.nemotron_duplex.components.html">mstar.model.nemotron_duplex.components</a></li>
 <li class="toctree-l4"><a class="reference internal" href="mstar.model.nemotron_duplex.realtime_api.html">mstar.model.nemotron_duplex.realtime_api</a></li>
 </ul>
 </details></li>
@@ -423,7 +423,7 @@
 <li class="toctree-l3"><a class="reference internal" href="mstar.streaming.topology.html">mstar.streaming.topology</a></li>
 </ul>
 </details></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="mstar.utils.html">mstar.utils</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2 current active has-children"><a class="reference internal" href="mstar.utils.html">mstar.utils</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="mstar.utils.adarms_norm.html">mstar.utils.adarms_norm</a></li>
 <li class="toctree-l3"><a class="reference internal" href="mstar.utils.cache_home.html">mstar.utils.cache_home</a></li>
 <li class="toctree-l3"><a class="reference internal" href="mstar.utils.client_errors.html">mstar.utils.client_errors</a></li>
@@ -445,6 +445,7 @@
 <li class="toctree-l3"><a class="reference internal" href="mstar.utils.profiler.html">mstar.utils.profiler</a></li>
 <li class="toctree-l3"><a class="reference internal" href="mstar.utils.socket_prefix.html">mstar.utils.socket_prefix</a></li>
 <li class="toctree-l3"><a class="reference internal" href="mstar.utils.streams.html">mstar.utils.streams</a></li>
+<li class="toctree-l3 current active"><a class="current reference internal" href="#">mstar.utils.threads</a></li>
 <li class="toctree-l3"><a class="reference internal" href="mstar.utils.utf8_stream.html">mstar.utils.utf8_stream</a></li>
 </ul>
 </details></li>
@@ -538,7 +539,7 @@
       
       
       
-      <li><a href="https://github.com/mstar-project/mstar/blob/main/docs/_autosummary/mstar.model.nemotron_duplex.components.rnnt.rst?plain=1" target="_blank"
+      <li><a href="https://github.com/mstar-project/mstar/blob/main/docs/_autosummary/mstar.utils.threads.rst?plain=1" target="_blank"
    class="btn btn-sm btn-source-file-button dropdown-item"
    title="Show source"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -555,7 +556,7 @@
       
       
       
-      <li><a href="https://github.com/mstar-project/mstar/issues/new?title=Issue%20on%20page%20%2F_autosummary/mstar.model.nemotron_duplex.components.rnnt.html&body=Your%20issue%20content%20here." target="_blank"
+      <li><a href="https://github.com/mstar-project/mstar/issues/new?title=Issue%20on%20page%20%2F_autosummary/mstar.utils.threads.html&body=Your%20issue%20content%20here." target="_blank"
    class="btn btn-sm btn-source-issues-button dropdown-item"
    title="Open an issue"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -585,7 +586,7 @@
       
       
       
-      <li><a href="../_sources/_autosummary/mstar.model.nemotron_duplex.components.rnnt.rst" target="_blank"
+      <li><a href="../_sources/_autosummary/mstar.utils.threads.rst" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -668,7 +669,7 @@
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>mstar.model.nemotron_duplex.components.rnnt</h1>
+    <h1>mstar.utils.threads</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -678,23 +679,12 @@
             </div>
             <nav aria-label="Page">
                 <ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.model.nemotron_duplex.components.rnnt.RnntDecoder"><code class="docutils literal notranslate"><span class="pre">RnntDecoder</span></code></a><ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.model.nemotron_duplex.components.rnnt.RnntDecoder.forward"><code class="docutils literal notranslate"><span class="pre">RnntDecoder.forward()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.model.nemotron_duplex.components.rnnt.RnntDecoder.load_weights"><code class="docutils literal notranslate"><span class="pre">RnntDecoder.load_weights()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.model.nemotron_duplex.components.rnnt.RnntDecoder.predict"><code class="docutils literal notranslate"><span class="pre">RnntDecoder.predict()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.model.nemotron_duplex.components.rnnt.RnntDecoder.remap"><code class="docutils literal notranslate"><span class="pre">RnntDecoder.remap()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.utils.threads.Thread"><code class="docutils literal notranslate"><span class="pre">Thread</span></code></a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.utils.threads.Thread.start"><code class="docutils literal notranslate"><span class="pre">Thread.start()</span></code></a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.model.nemotron_duplex.components.rnnt.RnntJoint"><code class="docutils literal notranslate"><span class="pre">RnntJoint</span></code></a><ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.model.nemotron_duplex.components.rnnt.RnntJoint.forward"><code class="docutils literal notranslate"><span class="pre">RnntJoint.forward()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.model.nemotron_duplex.components.rnnt.RnntJoint.joint"><code class="docutils literal notranslate"><span class="pre">RnntJoint.joint()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.model.nemotron_duplex.components.rnnt.RnntJoint.joint_after_projection"><code class="docutils literal notranslate"><span class="pre">RnntJoint.joint_after_projection()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.model.nemotron_duplex.components.rnnt.RnntJoint.load_weights"><code class="docutils literal notranslate"><span class="pre">RnntJoint.load_weights()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.model.nemotron_duplex.components.rnnt.RnntJoint.project_encoder"><code class="docutils literal notranslate"><span class="pre">RnntJoint.project_encoder()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.model.nemotron_duplex.components.rnnt.RnntJoint.project_prednet"><code class="docutils literal notranslate"><span class="pre">RnntJoint.project_prednet()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.model.nemotron_duplex.components.rnnt.RnntJoint.remap"><code class="docutils literal notranslate"><span class="pre">RnntJoint.remap()</span></code></a></li>
-</ul>
-</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.utils.threads.ThreadPool"><code class="docutils literal notranslate"><span class="pre">ThreadPool</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.utils.threads.pin_thread"><code class="docutils literal notranslate"><span class="pre">pin_thread()</span></code></a></li>
 </ul>
             </nav>
         </div>
@@ -706,101 +696,61 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="module-mstar.model.nemotron_duplex.components.rnnt">
-<span id="mstar-model-nemotron-duplex-components-rnnt"></span><h1>mstar.model.nemotron_duplex.components.rnnt<a class="headerlink" href="#module-mstar.model.nemotron_duplex.components.rnnt" title="Link to this heading">#</a></h1>
-<p>RNN-T transcription head (<code class="docutils literal notranslate"><span class="pre">stt_model.rnnt_decoder.*</span></code> / <code class="docutils literal notranslate"><span class="pre">rnnt_joint.*</span></code>).</p>
-<p>The streaming user-transcription branch: a 2-layer LSTM prediction network and a
-joint network combining encoder + prediction features. Ported to exact
-checkpoint parity; the LSTM params are declared by hand (matching <code class="docutils literal notranslate"><span class="pre">nn.LSTM</span></code>’s
-<code class="docutils literal notranslate"><span class="pre">weight_ih_l{n}</span></code> / <code class="docutils literal notranslate"><span class="pre">weight_hh_l{n}</span></code> / <code class="docutils literal notranslate"><span class="pre">bias_*</span></code> names) to avoid meta-device
-init issues.</p>
-<p>Forward math mirrors NeMo <code class="docutils literal notranslate"><span class="pre">RNNTDecoder.predict</span></code> / <code class="docutils literal notranslate"><span class="pre">RNNTJoint.joint</span></code>
-(branch <code class="docutils literal notranslate"><span class="pre">nemotron-labs-voicechat</span></code>, <code class="docutils literal notranslate"><span class="pre">nemo/collections/asr/modules/rnnt.py</span></code>):</p>
-<blockquote>
-<div><ul class="simple">
-<li><p>predict: <code class="docutils literal notranslate"><span class="pre">embed(y)</span></code> -&gt; optional zero SOS prepend -&gt; <code class="docutils literal notranslate"><span class="pre">nn.LSTM</span></code> (time-first,
-<code class="docutils literal notranslate"><span class="pre">batch_first=False</span></code>, plain LSTM since <code class="docutils literal notranslate"><span class="pre">normalization_mode</span> <span class="pre">is</span> <span class="pre">None</span></code>) -&gt;
-prediction features <code class="docutils literal notranslate"><span class="pre">g</span></code> [B, U(+1), H] plus LSTM <code class="docutils literal notranslate"><span class="pre">(h,</span> <span class="pre">c)</span></code> state.</p></li>
-<li><p>joint: <code class="docutils literal notranslate"><span class="pre">enc(f)</span></code> [B, T, H] and <code class="docutils literal notranslate"><span class="pre">pred(g)</span></code> [B, U, H] broadcast-added as
-<code class="docutils literal notranslate"><span class="pre">enc(f)[:,</span> <span class="pre">:,</span> <span class="pre">None,</span> <span class="pre">:]</span> <span class="pre">+</span> <span class="pre">pred(g)[:,</span> <span class="pre">None,</span> <span class="pre">:,</span> <span class="pre">:]</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">joint_net</span></code> (ReLU -&gt;
-Dropout(id in eval) -&gt; Linear 640-&gt;1025) -&gt; raw logits [B, T, U, 1025].
-<code class="docutils literal notranslate"><span class="pre">log_softmax</span></code> is <code class="docutils literal notranslate"><span class="pre">None</span></code> in the checkpoint config, so on CUDA no
-log-softmax is applied (raw logits are returned); argmax-equivalent either way.</p></li>
-</ul>
-</div></blockquote>
+  <section id="module-mstar.utils.threads">
+<span id="mstar-utils-threads"></span><h1>mstar.utils.threads<a class="headerlink" href="#module-mstar.utils.threads" title="Link to this heading">#</a></h1>
+<p>Starting threads, and moving the threads a step passes through onto their CPUs.</p>
+<p>A step passes between the worker’s main thread, its GPU thread and its plan
+thread several times (submit, launch, done, commit, plan ready), and each
+handoff blocks one thread and wakes another. On a host with deep idle states a
+thread woken on another core first waits for that core to leave C6 (130-175 µs
+on the B300 host this was measured on); woken on a core that is already
+running, it starts at once. The API server’s result threads (the message
+thread, and the Rust frontend’s bridge) hand every step’s tokens on the same
+way. <code class="docutils literal notranslate"><span class="pre">step_thread_core</span></code> (<code class="docutils literal notranslate"><span class="pre">mstar.utils.cpus</span></code>) pins them.</p>
+<p>A new thread starts with its creator’s CPU mask, so a thread or pool that a
+pinned thread starts would share its CPU. <code class="docutils literal notranslate"><span class="pre">Thread</span></code> and <code class="docutils literal notranslate"><span class="pre">ThreadPool</span></code> start
+theirs on the process mask; ruff refuses a bare <code class="docutils literal notranslate"><span class="pre">threading.Thread</span></code> or
+<code class="docutils literal notranslate"><span class="pre">ThreadPoolExecutor</span></code> under <code class="docutils literal notranslate"><span class="pre">mstar/</span></code> (<code class="docutils literal notranslate"><span class="pre">banned-api</span></code> in pyproject.toml).</p>
+<p class="rubric">Functions</p>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#mstar.utils.threads.pin_thread" title="mstar.utils.threads.pin_thread"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pin_thread</span></code></a>(cpus, process_mask)</p></td>
+<td><p>Confine the calling thread to <code class="docutils literal notranslate"><span class="pre">cpus</span></code>.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
 <p class="rubric">Classes</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#mstar.model.nemotron_duplex.components.rnnt.RnntDecoder" title="mstar.model.nemotron_duplex.components.rnnt.RnntDecoder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RnntDecoder</span></code></a>([config])</p></td>
-<td><p></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#mstar.utils.threads.Thread" title="mstar.utils.threads.Thread"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Thread</span></code></a>([group, target, name, args, kwargs, ...])</p></td>
+<td><p>A <code class="docutils literal notranslate"><span class="pre">threading.Thread</span></code> that runs on the process mask, whatever its creator's and whatever its <code class="docutils literal notranslate"><span class="pre">run</span></code> is: a target, an override that doesn't call <code class="docutils literal notranslate"><span class="pre">super().run()</span></code>, a mixin's.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#mstar.model.nemotron_duplex.components.rnnt.RnntJoint" title="mstar.model.nemotron_duplex.components.rnnt.RnntJoint"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RnntJoint</span></code></a>([config])</p></td>
-<td><p></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#mstar.utils.threads.ThreadPool" title="mstar.utils.threads.ThreadPool"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ThreadPool</span></code></a>([max_workers, ...])</p></td>
+<td><p>A <code class="docutils literal notranslate"><span class="pre">ThreadPoolExecutor</span></code> whose threads run on the process mask before <code class="docutils literal notranslate"><span class="pre">initializer</span></code>, whatever the mask of the thread that started them.</p></td>
 </tr>
 </tbody>
 </table>
 </div>
 <dl class="py class">
-<dt class="sig sig-object py" id="mstar.model.nemotron_duplex.components.rnnt.RnntDecoder">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">mstar.model.nemotron_duplex.components.rnnt.</span></span><span class="sig-name descname"><span class="pre">RnntDecoder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mstar/model/nemotron_duplex/components/rnnt.html#RnntDecoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mstar.model.nemotron_duplex.components.rnnt.RnntDecoder" title="Link to this definition">#</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.pytorch.org/docs/stable/generated/torch.nn.Module.html#torch.nn.Module" title="(in PyTorch v2.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></a></p>
+<dt class="sig sig-object py" id="mstar.utils.threads.Thread">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">mstar.utils.threads.</span></span><span class="sig-name descname"><span class="pre">Thread</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">group</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">daemon</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mstar/utils/threads.html#Thread"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mstar.utils.threads.Thread" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.12/library/threading.html#threading.Thread" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Thread</span></code></a></p>
+<p>A <code class="docutils literal notranslate"><span class="pre">threading.Thread</span></code> that runs on the process mask, whatever its
+creator’s and whatever its <code class="docutils literal notranslate"><span class="pre">run</span></code> is: a target, an override that doesn’t
+call <code class="docutils literal notranslate"><span class="pre">super().run()</span></code>, a mixin’s. Wrapped at <code class="docutils literal notranslate"><span class="pre">start</span></code> so that calling
+<code class="docutils literal notranslate"><span class="pre">run</span></code> directly stays on the caller’s thread and mask.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="mstar.utils.threads.Thread.start">
+<span class="sig-name descname"><span class="pre">start</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mstar/utils/threads.html#Thread.start"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mstar.utils.threads.Thread.start" title="Link to this definition">#</a></dt>
+<dd><p>Start the thread’s activity.</p>
+<p>It must be called at most once per thread object. It arranges for the
+object’s run() method to be invoked in a separate thread of control.</p>
+<p>This method will raise a RuntimeError if called more than once on the
+same thread object.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>config</strong> (<a class="reference internal" href="mstar.model.nemotron_duplex.config.html#mstar.model.nemotron_duplex.config.RnntConfig" title="mstar.model.nemotron_duplex.config.RnntConfig"><em>RnntConfig</em></a><em> | </em><em>None</em>)</p>
-</dd>
-</dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="mstar.model.nemotron_duplex.components.rnnt.RnntDecoder.forward">
-<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_sos</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mstar.model.nemotron_duplex.components.rnnt.RnntDecoder.forward" title="Link to this definition">#</a></dt>
-<dd><p>Prediction-network forward (NeMo <code class="docutils literal notranslate"><span class="pre">RNNTDecoder.predict</span></code>).</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>y</strong> – token ids <code class="docutils literal notranslate"><span class="pre">[B,</span> <span class="pre">U]</span></code> (long) or <code class="docutils literal notranslate"><span class="pre">None</span></code> (zero pad-token embedding).</p></li>
-<li><p><strong>state</strong> – optional <code class="docutils literal notranslate"><span class="pre">(h,</span> <span class="pre">c)</span></code> each <code class="docutils literal notranslate"><span class="pre">[L,</span> <span class="pre">B,</span> <span class="pre">H]</span></code>; <code class="docutils literal notranslate"><span class="pre">None</span></code> -&gt; zeros.</p></li>
-<li><p><strong>add_sos</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/functions.html#bool" title="(in Python v3.12)"><em>bool</em></a>) – prepend a zero “start of sequence” step -&gt; output <code class="docutils literal notranslate"><span class="pre">[B,</span> <span class="pre">U+1,</span> <span class="pre">H]</span></code>.</p></li>
-<li><p><strong>batch_size</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a><em> | </em><em>None</em>) – batch size when <code class="docutils literal notranslate"><span class="pre">y</span></code> and <code class="docutils literal notranslate"><span class="pre">state</span></code> are both <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">(g,</span> <span class="pre">(h,</span> <span class="pre">c))</span></code> with <code class="docutils literal notranslate"><span class="pre">g</span></code> shape <code class="docutils literal notranslate"><span class="pre">[B,</span> <span class="pre">U(+1),</span> <span class="pre">H]</span></code> and state <code class="docutils literal notranslate"><span class="pre">[L,</span> <span class="pre">B,</span> <span class="pre">H]</span></code>.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="mstar.model.nemotron_duplex.components.rnnt.RnntDecoder.load_weights">
-<span class="sig-name descname"><span class="pre">load_weights</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weights</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mstar/model/nemotron_duplex/components/rnnt.html#RnntDecoder.load_weights"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mstar.model.nemotron_duplex.components.rnnt.RnntDecoder.load_weights" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="mstar.model.nemotron_duplex.components.rnnt.RnntDecoder.predict">
-<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_sos</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mstar/model/nemotron_duplex/components/rnnt.html#RnntDecoder.predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mstar.model.nemotron_duplex.components.rnnt.RnntDecoder.predict" title="Link to this definition">#</a></dt>
-<dd><p>Prediction-network forward (NeMo <code class="docutils literal notranslate"><span class="pre">RNNTDecoder.predict</span></code>).</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>y</strong> – token ids <code class="docutils literal notranslate"><span class="pre">[B,</span> <span class="pre">U]</span></code> (long) or <code class="docutils literal notranslate"><span class="pre">None</span></code> (zero pad-token embedding).</p></li>
-<li><p><strong>state</strong> – optional <code class="docutils literal notranslate"><span class="pre">(h,</span> <span class="pre">c)</span></code> each <code class="docutils literal notranslate"><span class="pre">[L,</span> <span class="pre">B,</span> <span class="pre">H]</span></code>; <code class="docutils literal notranslate"><span class="pre">None</span></code> -&gt; zeros.</p></li>
-<li><p><strong>add_sos</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/functions.html#bool" title="(in Python v3.12)"><em>bool</em></a>) – prepend a zero “start of sequence” step -&gt; output <code class="docutils literal notranslate"><span class="pre">[B,</span> <span class="pre">U+1,</span> <span class="pre">H]</span></code>.</p></li>
-<li><p><strong>batch_size</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a><em> | </em><em>None</em>) – batch size when <code class="docutils literal notranslate"><span class="pre">y</span></code> and <code class="docutils literal notranslate"><span class="pre">state</span></code> are both <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">(g,</span> <span class="pre">(h,</span> <span class="pre">c))</span></code> with <code class="docutils literal notranslate"><span class="pre">g</span></code> shape <code class="docutils literal notranslate"><span class="pre">[B,</span> <span class="pre">U(+1),</span> <span class="pre">H]</span></code> and state <code class="docutils literal notranslate"><span class="pre">[L,</span> <span class="pre">B,</span> <span class="pre">H]</span></code>.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="mstar.model.nemotron_duplex.components.rnnt.RnntDecoder.remap">
-<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">remap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mstar/model/nemotron_duplex/components/rnnt.html#RnntDecoder.remap"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mstar.model.nemotron_duplex.components.rnnt.RnntDecoder.remap" title="Link to this definition">#</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>)</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#str" title="(in Python v3.12)">str</a> | None</p>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
 </dd>
 </dl>
 </dd></dl>
@@ -808,116 +758,43 @@ log-softmax is applied (raw logits are returned); argmax-equivalent either way.<
 </dd></dl>
 
 <dl class="py class">
-<dt class="sig sig-object py" id="mstar.model.nemotron_duplex.components.rnnt.RnntJoint">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">mstar.model.nemotron_duplex.components.rnnt.</span></span><span class="sig-name descname"><span class="pre">RnntJoint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mstar/model/nemotron_duplex/components/rnnt.html#RnntJoint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mstar.model.nemotron_duplex.components.rnnt.RnntJoint" title="Link to this definition">#</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.pytorch.org/docs/stable/generated/torch.nn.Module.html#torch.nn.Module" title="(in PyTorch v2.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></a></p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>config</strong> (<a class="reference internal" href="mstar.model.nemotron_duplex.config.html#mstar.model.nemotron_duplex.config.RnntConfig" title="mstar.model.nemotron_duplex.config.RnntConfig"><em>RnntConfig</em></a><em> | </em><em>None</em>)</p>
-</dd>
-</dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="mstar.model.nemotron_duplex.components.rnnt.RnntJoint.forward">
-<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">encoder_outputs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decoder_outputs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mstar/model/nemotron_duplex/components/rnnt.html#RnntJoint.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mstar.model.nemotron_duplex.components.rnnt.RnntJoint.forward" title="Link to this definition">#</a></dt>
-<dd><p>NeMo <code class="docutils literal notranslate"><span class="pre">RNNTJoint.forward</span></code> (non-fused logits path).</p>
-<p><code class="docutils literal notranslate"><span class="pre">encoder_outputs</span></code> <code class="docutils literal notranslate"><span class="pre">[B,</span> <span class="pre">D=1024,</span> <span class="pre">T]</span></code> and <code class="docutils literal notranslate"><span class="pre">decoder_outputs</span></code> <code class="docutils literal notranslate"><span class="pre">[B,</span> <span class="pre">D=640,</span> <span class="pre">U]</span></code>
-(time-last, as produced by the conformer / decoder); transposed to
-<code class="docutils literal notranslate"><span class="pre">[B,</span> <span class="pre">T,</span> <span class="pre">D]</span></code> / <code class="docutils literal notranslate"><span class="pre">[B,</span> <span class="pre">U,</span> <span class="pre">D]</span></code> then jointed -&gt; logits <code class="docutils literal notranslate"><span class="pre">[B,</span> <span class="pre">T,</span> <span class="pre">U,</span> <span class="pre">1025]</span></code>.</p>
+<dt class="sig sig-object py" id="mstar.utils.threads.ThreadPool">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">mstar.utils.threads.</span></span><span class="sig-name descname"><span class="pre">ThreadPool</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">max_workers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thread_name_prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initializer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mstar/utils/threads.html#ThreadPool"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mstar.utils.threads.ThreadPool" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ThreadPoolExecutor</span></code></p>
+<p>A <code class="docutils literal notranslate"><span class="pre">ThreadPoolExecutor</span></code> whose threads run on the process mask before
+<code class="docutils literal notranslate"><span class="pre">initializer</span></code>, whatever the mask of the thread that started them.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>encoder_outputs</strong> (<a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.15)"><em>Tensor</em></a>)</p></li>
-<li><p><strong>decoder_outputs</strong> (<a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.15)"><em>Tensor</em></a>)</p></li>
+<li><p><strong>max_workers</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>thread_name_prefix</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>)</p></li>
+<li><p><strong>initializer</strong> (<em>Callable</em><em>[</em><em>...</em><em>, </em><a class="reference internal" href="mstar.api_server.openai.protocol.html#mstar.api_server.openai.protocol.ModelCard.object" title="mstar.api_server.openai.protocol.ModelCard.object"><em>object</em></a><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>initargs</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#tuple" title="(in Python v3.12)"><em>tuple</em></a>)</p></li>
 </ul>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.15)"><em>Tensor</em></a></p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt class="sig sig-object py" id="mstar.model.nemotron_duplex.components.rnnt.RnntJoint.joint">
-<span class="sig-name descname"><span class="pre">joint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mstar/model/nemotron_duplex/components/rnnt.html#RnntJoint.joint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mstar.model.nemotron_duplex.components.rnnt.RnntJoint.joint" title="Link to this definition">#</a></dt>
-<dd><p>Full joint step: project encoder <code class="docutils literal notranslate"><span class="pre">[B,</span> <span class="pre">T,</span> <span class="pre">1024]</span></code> + prednet <code class="docutils literal notranslate"><span class="pre">[B,</span> <span class="pre">U,</span> <span class="pre">640]</span></code>.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="mstar.utils.threads.pin_thread">
+<span class="sig-prename descclassname"><span class="pre">mstar.utils.threads.</span></span><span class="sig-name descname"><span class="pre">pin_thread</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cpus</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">process_mask</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mstar/utils/threads.html#pin_thread"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mstar.utils.threads.pin_thread" title="Link to this definition">#</a></dt>
+<dd><p>Confine the calling thread to <code class="docutils literal notranslate"><span class="pre">cpus</span></code>.</p>
+<p>A thread’s intra-op (OpenMP) pool is started by its first parallel op
+with the mask the thread has then, and a pool confined to one CPU runs a
+parallel op many times slower. So go back to the process mask first (the
+main thread, already confined, starts the GPU and plan threads), start the
+pool there with one op as wide as the pool, and only then move.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>f</strong> (<a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.15)"><em>Tensor</em></a>)</p></li>
-<li><p><strong>g</strong> (<a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.15)"><em>Tensor</em></a>)</p></li>
+<li><p><strong>cpus</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/collections.abc.html#collections.abc.Collection" title="(in Python v3.12)"><em>Collection</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.12/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a><em>]</em>)</p></li>
+<li><p><strong>process_mask</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/collections.abc.html#collections.abc.Collection" title="(in Python v3.12)"><em>Collection</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.12/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a><em>]</em>)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.15)"><em>Tensor</em></a></p>
+<dd class="field-even"><p>None</p>
 </dd>
 </dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="mstar.model.nemotron_duplex.components.rnnt.RnntJoint.joint_after_projection">
-<span class="sig-name descname"><span class="pre">joint_after_projection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mstar/model/nemotron_duplex/components/rnnt.html#RnntJoint.joint_after_projection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mstar.model.nemotron_duplex.components.rnnt.RnntJoint.joint_after_projection" title="Link to this definition">#</a></dt>
-<dd><p>Combine projected enc <code class="docutils literal notranslate"><span class="pre">f</span></code> <code class="docutils literal notranslate"><span class="pre">[B,</span> <span class="pre">T,</span> <span class="pre">H]</span></code> and pred <code class="docutils literal notranslate"><span class="pre">g</span></code> <code class="docutils literal notranslate"><span class="pre">[B,</span> <span class="pre">U,</span> <span class="pre">H]</span></code>.</p>
-<p><code class="docutils literal notranslate"><span class="pre">f[:,</span> <span class="pre">:,</span> <span class="pre">None,</span> <span class="pre">:]</span> <span class="pre">+</span> <span class="pre">g[:,</span> <span class="pre">None,</span> <span class="pre">:,</span> <span class="pre">:]</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">joint_net</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">[B,</span> <span class="pre">T,</span> <span class="pre">U,</span> <span class="pre">1025]</span></code>.
-Returns raw logits (<code class="docutils literal notranslate"><span class="pre">log_softmax</span> <span class="pre">is</span> <span class="pre">None</span></code> -&gt; not applied on CUDA).</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>f</strong> (<a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.15)"><em>Tensor</em></a>)</p></li>
-<li><p><strong>g</strong> (<a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.15)"><em>Tensor</em></a>)</p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.15)"><em>Tensor</em></a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="mstar.model.nemotron_duplex.components.rnnt.RnntJoint.load_weights">
-<span class="sig-name descname"><span class="pre">load_weights</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weights</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mstar/model/nemotron_duplex/components/rnnt.html#RnntJoint.load_weights"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mstar.model.nemotron_duplex.components.rnnt.RnntJoint.load_weights" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="mstar.model.nemotron_duplex.components.rnnt.RnntJoint.project_encoder">
-<span class="sig-name descname"><span class="pre">project_encoder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mstar/model/nemotron_duplex/components/rnnt.html#RnntJoint.project_encoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mstar.model.nemotron_duplex.components.rnnt.RnntJoint.project_encoder" title="Link to this definition">#</a></dt>
-<dd><p>Project encoder features <code class="docutils literal notranslate"><span class="pre">[B,</span> <span class="pre">T,</span> <span class="pre">1024]</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">[B,</span> <span class="pre">T,</span> <span class="pre">640]</span></code>.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>f</strong> (<a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.15)"><em>Tensor</em></a>)</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.15)"><em>Tensor</em></a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="mstar.model.nemotron_duplex.components.rnnt.RnntJoint.project_prednet">
-<span class="sig-name descname"><span class="pre">project_prednet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">g</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mstar/model/nemotron_duplex/components/rnnt.html#RnntJoint.project_prednet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mstar.model.nemotron_duplex.components.rnnt.RnntJoint.project_prednet" title="Link to this definition">#</a></dt>
-<dd><p>Project prediction features <code class="docutils literal notranslate"><span class="pre">[B,</span> <span class="pre">U,</span> <span class="pre">640]</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">[B,</span> <span class="pre">U,</span> <span class="pre">640]</span></code>.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>g</strong> (<a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.15)"><em>Tensor</em></a>)</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.15)"><em>Tensor</em></a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="mstar.model.nemotron_duplex.components.rnnt.RnntJoint.remap">
-<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">remap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mstar/model/nemotron_duplex/components/rnnt.html#RnntJoint.remap"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mstar.model.nemotron_duplex.components.rnnt.RnntJoint.remap" title="Link to this definition">#</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>)</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#str" title="(in Python v3.12)">str</a> | None</p>
-</dd>
-</dl>
-</dd></dl>
-
 </dd></dl>
 
 </section>
@@ -934,20 +811,20 @@ Returns raw logits (<code class="docutils literal notranslate"><span class="pre"
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="mstar.model.nemotron_duplex.components.dft.html"
+       href="mstar.utils.streams.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">mstar.model.nemotron_duplex.components.dft</p>
+        <p class="prev-next-title">mstar.utils.streams</p>
       </div>
     </a>
     <a class="right-next"
-       href="mstar.model.nemotron_duplex.config.html"
+       href="mstar.utils.utf8_stream.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">mstar.model.nemotron_duplex.config</p>
+        <p class="prev-next-title">mstar.utils.utf8_stream</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -969,23 +846,12 @@ Returns raw logits (<code class="docutils literal notranslate"><span class="pre"
   </div>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.model.nemotron_duplex.components.rnnt.RnntDecoder"><code class="docutils literal notranslate"><span class="pre">RnntDecoder</span></code></a><ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.model.nemotron_duplex.components.rnnt.RnntDecoder.forward"><code class="docutils literal notranslate"><span class="pre">RnntDecoder.forward()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.model.nemotron_duplex.components.rnnt.RnntDecoder.load_weights"><code class="docutils literal notranslate"><span class="pre">RnntDecoder.load_weights()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.model.nemotron_duplex.components.rnnt.RnntDecoder.predict"><code class="docutils literal notranslate"><span class="pre">RnntDecoder.predict()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.model.nemotron_duplex.components.rnnt.RnntDecoder.remap"><code class="docutils literal notranslate"><span class="pre">RnntDecoder.remap()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.utils.threads.Thread"><code class="docutils literal notranslate"><span class="pre">Thread</span></code></a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.utils.threads.Thread.start"><code class="docutils literal notranslate"><span class="pre">Thread.start()</span></code></a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.model.nemotron_duplex.components.rnnt.RnntJoint"><code class="docutils literal notranslate"><span class="pre">RnntJoint</span></code></a><ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.model.nemotron_duplex.components.rnnt.RnntJoint.forward"><code class="docutils literal notranslate"><span class="pre">RnntJoint.forward()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.model.nemotron_duplex.components.rnnt.RnntJoint.joint"><code class="docutils literal notranslate"><span class="pre">RnntJoint.joint()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.model.nemotron_duplex.components.rnnt.RnntJoint.joint_after_projection"><code class="docutils literal notranslate"><span class="pre">RnntJoint.joint_after_projection()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.model.nemotron_duplex.components.rnnt.RnntJoint.load_weights"><code class="docutils literal notranslate"><span class="pre">RnntJoint.load_weights()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.model.nemotron_duplex.components.rnnt.RnntJoint.project_encoder"><code class="docutils literal notranslate"><span class="pre">RnntJoint.project_encoder()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.model.nemotron_duplex.components.rnnt.RnntJoint.project_prednet"><code class="docutils literal notranslate"><span class="pre">RnntJoint.project_prednet()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.model.nemotron_duplex.components.rnnt.RnntJoint.remap"><code class="docutils literal notranslate"><span class="pre">RnntJoint.remap()</span></code></a></li>
-</ul>
-</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.utils.threads.ThreadPool"><code class="docutils literal notranslate"><span class="pre">ThreadPool</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.utils.threads.pin_thread"><code class="docutils literal notranslate"><span class="pre">pin_thread()</span></code></a></li>
 </ul>
   </nav></div>
 

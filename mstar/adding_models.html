@@ -243,6 +243,7 @@
 <li class="toctree-l2 has-children"><a class="reference internal" href="_autosummary/mstar.conductor.html">mstar.conductor</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.conductor.mps.html">mstar.conductor.mps</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.conductor.request_info.html">mstar.conductor.request_info</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.conductor.workers.html">mstar.conductor.workers</a></li>
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="_autosummary/mstar.engine.html">mstar.engine</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -339,7 +340,6 @@
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.model.multimodal.html">mstar.model.multimodal</a></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="_autosummary/mstar.model.nemotron_duplex.html">mstar.model.nemotron_duplex</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.model.nemotron_duplex.components.html">mstar.model.nemotron_duplex.components</a></li>
-<li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.model.nemotron_duplex.config.html">mstar.model.nemotron_duplex.config</a></li>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.model.nemotron_duplex.realtime_api.html">mstar.model.nemotron_duplex.realtime_api</a></li>
 </ul>
 </details></li>
@@ -444,6 +444,7 @@
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.utils.profiler.html">mstar.utils.profiler</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.utils.socket_prefix.html">mstar.utils.socket_prefix</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.utils.streams.html">mstar.utils.streams</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.utils.threads.html">mstar.utils.threads</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.utils.utf8_stream.html">mstar.utils.utf8_stream</a></li>
 </ul>
 </details></li>
@@ -1239,6 +1240,14 @@ none. The engine reads only this hook to order a split walk’s rows, so a spec 
 config carries <code class="docutils literal notranslate"><span class="pre">splits</span></code> must return them here. <code class="docutils literal notranslate"><span class="pre">AttentionSpec</span></code> and
 <code class="docutils literal notranslate"><span class="pre">LinearAttnSpec</span></code> return their config’s <code class="docutils literal notranslate"><span class="pre">splits</span></code>.</p></li>
 </ul>
+<p>Two lockstep-parallel nodes on one worker (TP or SP nodes placed on the same ranks) must not
+share a resource whose state rank 0 decides for the other ranks outside the step that uses it:
+a resource implementing <code class="docutils literal notranslate"><span class="pre">supports_eviction</span></code>, <code class="docutils literal notranslate"><span class="pre">lease_cached_prefix</span></code> or <code class="docutils literal notranslate"><span class="pre">page_trail</span></code>, which
+the paged KV cache does with or without host offload. The other ranks replay each decision
+with the next step of the node it was recorded under, so two nodes on one such resource could
+admit out of step. The conductor refuses that placement (<code class="docutils literal notranslate"><span class="pre">Resource.journals_resident_moves</span></code>
+says which resources it covers); give each node a spec of its own, or place the nodes on
+different workers.</p>
 <p>The spec types are:</p>
 <div class="pst-scrollable-table-container"><table class="table">
 <colgroup>
@@ -1684,9 +1693,9 @@ within itself and matches the offline mask. <code class="docutils literal notran
 <code class="docutils literal notranslate"><span class="pre">head_dim</span> <span class="pre">**</span> <span class="pre">-0.5</span></code>). A per-query window takes no sink, and its right context is 0.
 <code class="docutils literal notranslate"><span class="pre">retention</span></code> may be a single <code class="docutils literal notranslate"><span class="pre">SinkWindow</span></code> when it does not depend on the source length.
 <code class="docutils literal notranslate"><span class="pre">BoundedKVConfig(dtype=None)</span></code> stores the cache in the engine’s KV dtype, for layers that
-compute in it. Nemotron VoiceChat’s streaming encoder (<code class="docutils literal notranslate"><span class="pre">ENCODER_KV</span></code>,
-<code class="docutils literal notranslate"><span class="pre">encoder_kv_config</span></code> in <code class="docutils literal notranslate"><span class="pre">mstar/model/nemotron_duplex/components/conformer.py</span></code>) is the
-per-query example.</p>
+compute in it. The streaming FastConformer (<code class="docutils literal notranslate"><span class="pre">encoder_kv_config</span></code> in
+<code class="docutils literal notranslate"><span class="pre">mstar/model/components/fastconformer_stream.py</span></code>, Nemotron VoiceChat’s <code class="docutils literal notranslate"><span class="pre">ENCODER_KV</span></code>) is
+the per-query example.</p>
 </section>
 </section>
 </section>
@@ -2996,8 +3005,9 @@ partition.</p></li>
 <span class="pre">target_partition=...)</span></code> instead of a plain <code class="docutils literal notranslate"><span class="pre">GraphEdge</span></code>.</p></li>
 </ul>
 <p>The consuming partition’s <code class="docutils literal notranslate"><span class="pre">get_partition_forward_pass_args</span></code> reads
-<code class="docutils literal notranslate"><span class="pre">incoming_connections</span></code>, which provides token counts and a <code class="docutils literal notranslate"><span class="pre">producer_done</span></code> flag, and
-uses them to decide when to run.</p>
+<code class="docutils literal notranslate"><span class="pre">incoming_connections</span></code>, which provides token counts and a <code class="docutils literal notranslate"><span class="pre">producer_done</span></code> flag for
+each stream from another partition, and uses them to decide when to run. A stream from the
+client (below) has no entry there.</p>
 <p>Keep a walk that consumes a stream to one node or one <code class="docutils literal notranslate"><span class="pre">Loop</span></code> on one node group, and move
 later work into a downstream partition fed by its own <code class="docutils literal notranslate"><span class="pre">StreamingGraphEdge</span></code>. A consumer
 whose every input is streamed runs again as soon as the next chunk arrives, and the
@@ -3078,6 +3088,12 @@ and a final chunk, and a loop fed by the stream ends as any stream-terminated lo
 Over <code class="docutils literal notranslate"><span class="pre">/generate/ws</span></code> the client appends and ends input explicitly (see
 <a class="reference internal" href="clients.html"><span class="doc">Using a Server</span></a>); every other route ends the input as soon as the request is submitted.
 <code class="docutils literal notranslate"><span class="pre">/generate/ws</span></code> is on the Python frontend only, not <code class="docutils literal notranslate"><span class="pre">--rust-frontend</span></code>.</p></li>
+<li><p>The API server’s data worker is the stream’s producer. The conductor tells it the
+consuming node and its ranks once per call, when it dispatches the request, and the data
+worker sends each append’s items to every one of those ranks itself, and then the
+stream’s end with how many items it carried. Every rank gets each item whole, so a client
+stream can’t take a <code class="docutils literal notranslate"><span class="pre">sharding_config.shard_dim</span></code> entry (startup refuses one). Once the
+consuming partition ends, later appends for its streams are answered as late.</p></li>
 </ul>
 </section>
 </section>
