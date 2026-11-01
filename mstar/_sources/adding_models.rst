@@ -490,9 +490,19 @@ the pool's ``resources:`` key. Each snapshot slot costs as much as a request slo
   least recently used snapshot that no request holds.
 
 Snapshots stay off without ``prefix_slots``, and also above one rank, without a named KV
-cache, or when that cache's ``prefix_cache`` is off; in those three cases the pool allocates
-no snapshot slots. Every cache on the node then stays shut, and the engine logs which
-resource kept it shut.
+cache, when that cache isn't on every node of the pool, or when its ``prefix_cache`` is
+off or can't open at the pool's world size; in those cases the pool allocates no snapshot
+slots. Neither does a pool whose cache the engine keeps shut for another reason, such as a
+model that names no checkpoint and sets no salt. Every cache on the node of a pool without
+snapshots stays shut, and the engine logs which pool kept it shut.
+``opening_prefix_caches`` in ``mstar/engine/resources/kv/config.py`` is that rule over the
+specs. The engine evaluates it once, before it builds any resource, and opens exactly the
+caches it returns of those it holds; the conductor's routing and the API server's prompt
+hashing take, for each rank, the caches the rank holds and its engine opens
+(``prefix_caches_by_rank``). Each spec answers for itself:
+``NodeResourceSpec.keeps_prefix_cache`` says whether the resource keeps a prefix cache of
+its own, and ``restores_prefix`` marks one whose state a hit must restore (the pool, and
+the resource over it), so another resource takes part through its spec alone.
 
 A model with a keyed label is checked at load time. Loading fails in two more cases:
 
@@ -682,17 +692,21 @@ The spec types are:
        ``head_dim`` (all pre-sharding, as in ``KVConfig``), an ``sm_scale`` that
        defaults to ``head_dim ** -0.5``, ``backend`` (``RaggedAttnBackend.AUTO``, the
        default, ``RaggedAttnBackend.FLASHINFER``, or ``RaggedAttnBackend.DENSE``),
-       ``flashinfer_backend``, and the
+       ``flashinfer_backend``, the
        two CUDA-graph ceilings ``max_segments_per_request`` and
-       ``max_tokens_per_request``. ``DENSE`` runs FA3 ``flash_attn_varlen`` (AITER on ROCm)
-       and falls back to FlashInfer if that kernel is missing. By default the heads are split
-       across all TP × SP ranks of the node; ``shard_over_sp=False`` splits them across the
-       TP ranks only, for an attention each sequence-parallel rank runs whole over its own
-       tokens (one over a replicated stream, or a cross-attention from the rank's query
-       shard). ``workspace_mb`` sizes each label's FlashInfer workspace per slot (default
-       ``MSTAR_WORKSPACE_BUFFER_MB``, 512); a node with many labels can declare less, since a
-       ragged prefill only uses it for split-KV partials. See `Cacheless attention (encoder
-       towers)`_.
+       ``max_tokens_per_request``, ``compile_op``, ``shard_over_sp`` and
+       ``workspace_mb``. ``DENSE`` runs FA3
+       ``flash_attn_varlen`` (AITER on ROCm) and falls back to FlashInfer if that kernel is
+       missing. By default the heads are split across all TP × SP ranks of the node;
+       ``shard_over_sp=False`` splits them across the TP ranks only, for an attention
+       each sequence-parallel rank runs whole over its own tokens (one over a
+       replicated stream, or a cross-attention from the rank's query shard).
+       ``workspace_mb`` sizes each label's FlashInfer workspace per slot (default
+       ``MSTAR_WORKSPACE_BUFFER_MB``, 512); a node with many labels can declare less,
+       since a ragged prefill only uses it for split-KV partials. ``compile_op``,
+       ``shard_over_sp`` and ``workspace_mb`` are the model's declaration; the serving
+       config's ``resources:`` overrides take only the backends and the two ceilings.
+       See `Cacheless attention (encoder towers)`_ for ``compile_op``.
    * - ``RaggedCrossAttentionSpec(config=RaggedAttentionConfig(...))``
      - The cross-attention counterpart: one span of each request attends another
        (``RaggedCrossAttentionStep(pairs=...)``). Same config. See `Cross-attention
@@ -939,7 +953,11 @@ encoder node only, and names no cache:
 
 A layer binds the key as it binds any other resource, then attends through the resource's
 ``run(q, k, v, label=None)``. There is no KV write to pair it with, so no
-``AttentionCallable`` is involved.
+``AttentionCallable`` is involved. A compiled caller breaks at ``run``; with
+``RaggedAttentionConfig(compile_op=True)``, ``run`` traces as the ``mstar::ragged_attention``
+custom op instead, so the region keeps one graph across the attention (worth it for a
+compiled, uncaptured region; it costs startup time and capture memory where the region
+is also captured). An eager call goes straight to the kernel.
 
 The step is an ordinary ``AttentionStep``, and its ``segments`` are the entire layout.
 There is no cache to read the layout off, so a label that carries no segment in the
@@ -967,14 +985,15 @@ step names the ``(q_label, kv_label)`` pairs:
 
 Each pair is planned as its own layout, pairing each request's ``q_label`` span with that
 request's ``kv_label`` span; cross-attention is never causal. A layer attends through
-``RaggedAttentionCallable(resource, cross_label(q_label, kv_label))``, passing the key
+``resource.run(q, k, v, label=cross_label(q_label, kv_label))``, passing the key
 span's tokens as ``k`` and ``v``. One resource has one head geometry, so a model whose
 attentions differ in head count or head dim declares one spec per (kind, geometry).
 LTX-2.5 is the reference (``mstar/model/ltx2_5/submodules.py``).
 
-Called with ``return_lse=True``, a ragged or ragged cross-attention callable on the FlashInfer
-backend also returns each query row's log-sum-exp (``[total_tokens, H]``, fp32, natural log)
-from the same plan, which is what merging attentions over disjoint key sets needs. Under sequence parallelism
+Called with ``return_lse=True``, a ragged or ragged cross-attention resource's ``run`` on the
+FlashInfer backend also returns each query row's log-sum-exp (``[total_tokens, H]``, fp32,
+natural log) from the same plan, which is what merging attentions over disjoint key sets
+needs; a compiled caller breaks there even with ``compile_op``. Under sequence parallelism
 LTX-2.5's audio queries attend each rank's share of the video tokens, and
 ``attention_over_sharded_keys`` (``mstar/model/components/distributed/sequence_parallel.py``)
 merges them.
@@ -1173,15 +1192,22 @@ methods are:
 ``check_stop(...) -> set[str] | StopCheck`` (optional)
    Runs off the GPU thread, and may read tensor values. Return the names of the ``Loop``
    objects to stop, for example after seeing the EOS token. This is how a decode loop
-   terminates. A prefill samples the first token before its decode loop exists, so a stop
-   there is returned as ``END_PARTITION`` (from ``mstar.model.submodule_base``) instead:
-   the worker reports the partition done with that pass, and the conductor ends it rather
-   than start decode. Return it only from a row outside any loop; from inside one the
-   request fails. ``TokenStepNode`` does this for its ``PREFILL_WALK``. It suits a partition
-   with nothing left to run once generation stops: a model that runs another walk after its
-   loop (an ``align`` walk, or image generation after thinking) or publishes final-only
-   state at the loop's stop needs its own transition instead. Keep ``check_stop_batched``,
-   if you write one, in agreement.
+   terminates. An AR submodule whose loop ends on a stop token sets
+   ``self.token_stop = TokenStop(...)`` in ``__init__`` instead of writing one; that also
+   gives it ``check_stop_batched``, which checks a whole step off one host copy of its
+   tokens. The token budget is the loop's cap from ``get_loop_caps``, not a stop check.
+   A prefill samples the first token before its decode loop exists, so a stop there is
+   returned as ``END_PARTITION`` (from ``mstar.model.submodule_base``) instead: the worker
+   reports the partition done with that pass, and the conductor ends it rather than start
+   decode. Return it only from a row outside any loop; from inside one the request fails.
+   ``TokenStop`` does this for the walks in its ``prefill_walks``, whose token counts toward
+   the budget, so ``get_loop_caps`` gives the loop ``max(1, max_output_tokens - 1)``. A
+   model that prefills a prompt over several passes sets ``last_prefill_flag`` to the
+   ``step_metadata`` flag of its last pass (Qwen3.5: ``"last_prefill"``), or a stop id
+   sampled on its first pass ends the request. It suits a partition with nothing left to run once generation stops: a model that runs
+   another walk after its loop (an ``align`` walk, or image generation after thinking) or
+   publishes final-only state at the loop's stop needs its own transition instead. Keep
+   ``check_stop_batched``, if you write one, in agreement.
    To also keep some of this step's outputs from being routed, return
    ``StopCheck(stops, withheld=(names...))``, for example a frame streamed alongside the
    EOS token: its consumer then never receives it, instead of finding and dropping it with
@@ -1732,6 +1758,14 @@ Both types share the base ``PiecewiseCudaGraphConfig`` fields:
   when the region was leased, for example when the outer step is ``None``, and not
   whenever ``runner.can_run`` is true: a refused batch can still fit a bucket, and
   replaying it would declare the region's resources twice.
+- ``one_row_per_step`` makes the runner lease, check (``can_run``) and replay the region as
+  one row, whatever the step's batch size, under the step's first request. It is for a
+  packed region that runs every request's segments as one ragged batch, such as a vision
+  tower, and needs ``lease_before_step`` and ``capture_batch_sizes=[1]``. The region's
+  ``declare_step`` then receives ``[first_rid]`` with every request's ``seq_lens``, so the
+  whole step's segments count against that one request's ``max_segments_per_request``,
+  which for this region is a per-step ceiling. Pair it with a ``can_lease`` that refuses a
+  step with more.
 - ``capture_batch_sizes`` lists the batch sizes to record. ``None`` uses the runner
   default.
 - ``compile`` runs ``torch.compile`` on ``capture_fn`` before capture. The default is
@@ -1948,6 +1982,49 @@ example, ``configs/qwen3tts.yaml`` selects FA2 under ``talker_attn``,
    with a message describing the migration. Move the block under ``resources:``, keyed by
    the resource name.
 
+Routing across data-parallel replicas
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When a node group has several replicas, the conductor sends each new request to the
+replica where it is cheapest (see "Data-parallel routing" in :doc:`serving`). A resource
+whose state makes a request cheaper on one replica than another takes part through its
+spec, so models declare nothing for it.
+
+**The hook.** ``NodeResourceSpec.routing_mirror(ctx)`` returns a ``RoutingMirror`` or
+``None``, the default. The router asks once per set of node groups with replicas that
+holds one of the spec's nodes, and ``ctx`` (a ``RoutingContext``) gives the replica count,
+the walks of the worker graphs there that hold the spec's nodes, the resource's keyed
+labels with the walks that key each (empty for a resource that is not a KV cache), and
+whether every replica's engine opens its prefix cache, which the router derives with
+``prefix_caches_by_rank``.
+A mirror is conductor-side bookkeeping that follows the resource's own rules as far as
+the conductor's inputs allow. The module that defines one must stay free of kernels,
+since the conductor builds it.
+
+**The mirror's methods.** Each is given the request's ``ResourceReqConfig`` for the
+resource, which the conductor builds and validates before the pick.
+
+- ``facts(config)`` reports the request's ``RoutingFacts`` on each replica: named counts,
+  such as ``work`` (prompt positions) and ``kv_hit`` (of those, the ones predicted cached).
+  The router adds every mirror's row on a replica field by field, then prices the sum
+  once with ``routing_cost`` in ``mstar/conductor/routing.py``, one term per
+  ``routing_weights`` key, each 0 when its facts are absent.
+- ``add_request(config, replica)`` records the placement once the request is dispatched,
+  and returns a handle.
+- ``remove_request(handle, ran)`` releases it when the request leaves. ``ran`` says
+  whether a pass came back for one of the request's partitions with a walk on the
+  resource's node groups.
+
+**Adding a resource.** A new resource adds its fields to ``RoutingFacts``, its mirror,
+and its term to ``routing_cost`` and ``RoutingWeights``. ``ReplicaRouter`` changes only
+if its fields are not counts that add, or if its mirror reads a model declaration other
+than the KV ones, which then becomes a ``RoutingContext`` field that ``ReplicaRouter``
+fills. ``KVSpec`` with a ``PagedKVConfig`` is the one implementation. Its mirror runs the
+worker's own ``PrefixIndex`` and ``PageArena`` per replica, with no storage, takes each
+request's lease, pages and index entries at dispatch, an item's end inside a page among
+them, and exists only where a walk keying the cache runs and ``opening_prefix_caches``
+says the workers open it.
+
 Preprocessing threads
 ~~~~~~~~~~~~~~~~~~~~~
 
@@ -1966,7 +2043,9 @@ default:
    preprocess_torch_threads: 4
 
 The setting applies only to the API server process. The conductor and workers keep
-torch's default.
+torch's default. It does not size video decoding: each torchcodec decode that asks
+``media_limits.video_decode_threads`` (``Model.load_video`` does) runs FFmpeg with up to 8
+threads, no more than the CPUs the process's CPU plan leaves unpinned (``CpuPlan.left``).
 
 A pool that small is slow for a large copy, and a 121-frame 832x480 video is 145 MB. A
 video decoder should therefore emit its clip in the layout the encoder takes, transposed
