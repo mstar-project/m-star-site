@@ -287,10 +287,15 @@ There are two ``ResourceReqConfig`` subclasses:
   metadata. The model passes ``return_logprobs`` into its ``SamplingReqConfig`` (the
   conductor refuses the request otherwise), its forward samples once per step and
   hands over row-addressed stop buffers (``BatchedModelOutput.check_stop_buffers``):
-  the log-probs ride the same copy to the host. ``logprobs_mode`` is ``"raw"`` only
-  for now. The captured sampler scores every step once it is on, so it is off by
-  default and a deployment turns it on with
+  the log-probs ride the same copy to the host. The captured sampler scores every
+  step once it is on, so it is off by default and a deployment turns it on with
   ``resources: {<sampler key>: {enable_logprobs: true}}``.
+  ``logprobs_mode: "processed"`` (``enable_processed_logprobs``, CUDA) scores the
+  distribution the token was drawn from instead: after the penalty, temperature,
+  min-p, top-k/top-p and min-tokens floor. A greedy token scores 0 there, so a
+  trainer sampling greedily wants ``"raw"``. It renorms every step's distribution
+  again, about 0.15 ms at batch 1 and 0.5 ms at batch 128 on a GB200 with a 248k
+  vocabulary, so it is a separate switch.
 
   ``SamplerStep(apply_filters=False)`` samples a step with top-k/top-p off (e.g. a
   TTS's first code); declare it the same way on every step of a walk.
@@ -1452,6 +1457,12 @@ last step did not keep its value on the device (its first decode step, after the
 still brings it routed; put it over the one read from the device with
 ``sampler.overwrite_rows(rows, (ids, routed_ids))``.
 
+On such a node a captured step writes each row's token and RNG offset back to the request's
+row inside the graph (``knobs: sampler_ingraph_scatter``, on by default). Those rows are
+allocated once, ``knobs: sampler_slots`` of them, so a request takes its row when the runner
+admits it and waits while none is free, as it does for a recurrent state slot. A row the
+step drops (``SamplerStep(kept_rids=...)``) writes the trash row, so it keeps its offset.
+
 State that a decode loop carries from step to step beside the token, such as Whisper's
 timestamp rule state, is declared on the sampler, not kept in the model:
 
@@ -2483,10 +2494,14 @@ step count, the ragged-attention ``declare_step`` and one CUDA-graph bucket per
 ``bucket_key`` is whatever has to match for two rows to share a forward, and it is also
 the CUDA-graph bucket key — shape, but equally a knob like whether CFG is on.
 
-A multi-step scheduler that carries solver state between iterations (wan22's UniPC, with
-``unipc_model_outputs`` and ``unipc_last_sample``) names it in ``SOLVER_STATE``; those
-become loop-back edges alongside ``latents``, seeded by ``seed_loop_back`` and returned
-from ``denoise`` as a ``{name: tensor}`` mapping. A scheduler needing another per-step
+A multi-step scheduler that carries solver state between iterations names it in
+``SOLVER_STATE``; those become loop-back edges alongside ``latents``, seeded by
+``seed_loop_back`` and returned from ``denoise`` as a ``{name: tensor}`` mapping. UniPC
+comes with the scaffold: a subclass of ``UniPCDenoiseLoopSubmodule`` implements
+``model_output`` in place of ``denoise``, and the base carries
+``unipc_model_outputs`` and ``unipc_last_sample`` and steps each row by the loop counter
+from its own tables, with no host read, so rows at different steps share a forward
+(wan22 is the example). A scheduler needing another per-step
 scalar adds a ``STEP_SCALARS`` entry naming the attribute of its ``FlowMatchSchedule``
 to slice it from — the base stages that tensor on the device and slices it per step, so
 nothing in the batching path has to change.

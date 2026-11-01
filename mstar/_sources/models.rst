@@ -384,8 +384,11 @@ With ``resources: {sampler: {enable_logprobs: true}}`` in the deployment's
 YAML, ``"return_logprobs": true`` in ``model_kwargs`` on ``/generate`` puts each
 token's raw log-prob in its chunk's ``metadata`` (``{"logprobs": [...]}``, one per
 token, as ``token_ids``). Qwen3.5 reports them; other models refuse the request
-with a 400. Top alternatives and OpenAI's ``logprobs`` are not supported yet. On
-any deployment,
+with a 400. Add ``enable_processed_logprobs: true`` and ``"logprobs_mode":
+"processed"`` for the log-prob under the distribution it was actually drawn from
+(penalties and top-k/top-p applied); greedy requests want ``"raw"``, as a greedy
+token scores 0 there. Top alternatives and OpenAI's ``logprobs`` are not
+supported yet. On any deployment,
 ``"return_token_ids": true`` adds each text chunk's sampled ids
 (``{"token_ids": [...]}``), stop tokens included, so a trainer need not
 re-tokenize the text.
@@ -1354,11 +1357,14 @@ first use. The first DiT call after startup is traced twice (a guard on the
 rotary table), so a server compiles at most two graphs per listed shape plus
 one.
 
-**UniPC runs inline, inside the DiT node.** Unlike cosmos3, the scheduler is not
-a separate stage: the solver state (the order-2 history buffer and the
-corrector's ``last_sample``) is carried on the denoise loop's own edges, so it
-travels with the request rather than living in a scheduler object on one rank.
-Requests are therefore independent and the loop is resumable across ranks.
+**UniPC runs inline, inside the DiT node.** The scheduler is the DiT scaffold's
+(``components/diffusion/unipc.py``, which cosmos3 runs too), not a separate
+stage: the solver state (the order-2 history buffer and the corrector's
+``last_sample``) is carried on the denoise loop's own edges, so it travels with
+the request rather than living in a scheduler object on one rank. Requests are
+therefore independent and the loop is resumable across ranks. ``dit_max_batch_size``
+(default 1) lets requests at one latent grid and guidance scale share a forward,
+each row count compiling its own graph.
 
 **What is accelerated by default.** The DiT runs under ``torch.compile``
 (``compile_dit``) and the untiled VAE decode runs the shared Wan VAE decoder,
