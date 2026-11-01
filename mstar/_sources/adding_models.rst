@@ -492,7 +492,9 @@ the pool's ``resources:`` key. Each snapshot slot costs as much as a request slo
   keys its page; a step whose token never reaches the chain, such as the one speculated
   past the reply's end, leaves the previous one in place.
 - A snapshot is keyed by the KV chain's key at its page. A full set of slots evicts the
-  least recently used snapshot that no request holds.
+  least recently used snapshot that no request holds, a decode snapshot before a prompt's,
+  so the slots hold about one prompt each. A decode snapshot that a later prompt restores
+  is kept like a prompt's from then on.
 
 Snapshots stay off without ``prefix_slots``, and also above one rank, without a named KV
 cache, when that cache isn't on every node of the pool, or when its ``prefix_cache`` is
@@ -634,7 +636,11 @@ The spec types are:
        (default ``True``) runs one-token decode rows on FlashInfer's tensor-core
        kernel; ``False`` picks the CUDA-core decode kernel, which can be faster for
        MHA and narrow GQA (few query heads per KV head). Measure before changing it:
-       Whisper and Qwen3-ASR declare ``False``. ``FLASHINFER_MLA`` is
+       Whisper and Qwen3-ASR declare ``False``. ``decode_fmha`` (default ``False``) runs
+       captured one-token decode rows on FlashInfer's trtllm-gen fmha kernel on Blackwell,
+       with no FlashInfer plan per step; a geometry trtllm-gen has no kernel for keeps
+       the paged kernel, with a warning. Eager steps and prompt rows stay on the paged
+       kernels. Qwen3.5 declares ``True``. ``FLASHINFER_MLA`` is
        Multi-head Latent Attention over a ``KVLayout.MLA`` cache. It needs ``sm_scale``,
        the softmax scale of the model's original qk head dim, which the other backends
        refuse. Its ``run`` takes the absorbed query (``[tokens, heads, kv_lora_rank]``)
@@ -1141,7 +1147,20 @@ methods are:
    ``declare_step`` needs a value that ``forward`` does not use, put that value in
    ``resource_step_info``.
 
-``declare_step(self, graph_walk, request_ids, inputs, slot_lease=None, piecewise_leases=None, **kwargs) -> SubmoduleStep | None``
+``get_input_sequence_len(self, graph_walk, fwd_info, inputs, **kwargs) -> InputSeqLenInfo | None`` (optional)
+   Return the length of the row's whole input, before any cached prefix is cut --
+   the engine subtracts what the prefix cache already holds. Return ``None`` for a
+   walk that declares no length, or when the inputs it would measure are absent.
+   Read off input shapes alone: this runs before ``prepare_inputs``.
+
+``speculative_input_seq_len(self, graph_walk, fwd_info, prev_seq_len) -> int | None`` (optional)
+   Estimate the length of a row continuing from the step in flight, before that step's
+   outputs reach it; ``prev_seq_len`` is its length in that step, or -1 if it ran on
+   another node. The default repeats ``prev_seq_len``. Only an estimate: it sizes the
+   token budget left for the rows a speculation merges in beside it. A walk with a fixed
+   length (one token a decode step) should return it.
+
+``declare_step(self, graph_walk, request_ids, inputs, slot_lease=None, piecewise_leases=None, per_request_info=None, **kwargs) -> SubmoduleStep | None``
    Declare what this batch's step does to the node's resources. See
    `Step 4a — Declare the step`_ below.
 
@@ -1226,6 +1245,25 @@ methods are:
    starting early on a thread of the submodule's own; it must not touch the device. The
    DiT scaffold draws a request's seeded noise here (``PREFETCH_SEEDS``).
 
+``get_stop_policies(self, graph_walk) -> dict[str, StopPolicy] | None`` (optional)
+   Declare what ``check_stop`` amounts to on a walk, per loop it can stop, when it is
+   only the common checks; the graph runtime then runs them over the step's token column
+   without calling ``check_stop``. That takes the batched output carrying the policies'
+   ``token_signal`` as a stop buffer (``BatchedModelOutput(check_stop_buffers={...})``,
+   as Qwen3.5 and Orpheus return); a step without one, or one that mixes walks,
+   still calls ``check_stop``. ``StopPolicy(StopKind.AR, token_signal=...,
+   eos_tokens=..., sampler=...)`` stops its loop on an EOS token (unless the ``sampler``
+   resource's request config sets ``ignore_eos``) or when the loop's iteration count plus
+   one reaches ``max_iters`` (``info.max_tokens`` unless given). ``StopKind.ITER`` checks
+   only the count, and ``StopKind.EOS`` only the token, for a loop whose cap is its budget.
+   The limits are computed from the request's forward-pass info whenever
+   the worker receives it, not per step. Return ``{}`` for a
+   walk on which ``check_stop`` never stops a loop, and ``None`` (the default) to keep
+   calling ``check_stop``. The policies must agree with ``check_stop`` for every row;
+   ``test/modular/test_stop_policies.py`` checks the models that declare them. A
+   ``TokenStop`` with ``runtime_check=True`` declares them for you: its loop's stop ids,
+   as ``StopKind.EOS``, on ``walk``; its ``prefill_walks`` keep ``check_stop``.
+
 ``cleanup_request(self, request_id)`` (optional)
    Free per-request state held inside the submodule when a request finishes: buffers,
    per-request caches, counters. See Qwen3-Omni's ``Code2WavSubmodule`` for an example.
@@ -1256,6 +1294,54 @@ methods are:
 
 Two more methods control batching and CUDA graphs: ``can_batch`` with
 ``forward_batched``, and ``get_cuda_graph_configs``. They are described in Step 5.
+
+**Chunked prefill (optional).** A walk with long prompts can run each across several steps,
+at most a token budget per step, so the decode rows batched beside it keep running. Each
+chunk is one iteration of a Loop around the node, which counts the tokens its chunks ran
+and ends at the prompt's length. To opt a walk in:
+
+- ``Model.get_chunking_policies()`` returns ``{node: (ChunkingPolicy, ...)}``, each policy
+  naming the ``walks`` it covers. It is declared on the model, not the submodule, because
+  the graph build reads it: ``Model`` wraps each chunkable node in its Loop wherever
+  ``get_graph_walk_graphs`` is read, so the model returns its walks as usual. The fields:
+
+  - ``chunkable=True`` lets the walk's rows be cut.
+  - ``max_batch_tokens``: the most tokens a step runs. A combined walk that carries
+    chunked rows sets one too, since its steps run under it.
+  - ``accumulated_outputs``: output edges a consumer needs every chunk of. They arrive as
+    one item per chunk, all when the prompt finishes.
+  - ``per_chunk_outputs``: streaming edges sent on every chunk as it runs, for a consumer
+    that can start on a prefix. Any edge in neither set carries the final chunk's output
+    alone.
+  - ``reuses_cached_prefix``: a callable saying whether a row may start past its cached
+    prefix; ``None`` (the default) is always. Set it where a row may have to write its
+    prefix again.
+  - ``reserve_whole_prefill`` (default on): a row's first chunk reserves the state its
+    whole prefill needs, so a part-done row cannot wedge on a full pool. Turn it off for
+    a walk whose state grows by something other than the tokens a step runs.
+
+  A streaming consumer of an accumulated edge whose ``ChunkPolicy`` expects one item
+  (``FixedChunkPolicy(1)``, say) sets ``Connection.join_dim``, so its ``StreamBuffer``
+  joins the pieces into that item. A consumer that can take the pieces as they come says
+  so with ``ChunkPolicy.allow_partial_input`` (``FixedChunkPolicy(allow_partial=True)``),
+  and the producer then sends the edge per chunk, as Qwen3-Omni's Thinker does into its
+  Talker. A chunked stream its consumer would misread, each piece taken for the whole
+  input, is refused at startup.
+- ``get_input_sequence_len(graph_walk, fwd_info, inputs)`` gives a row's length from its
+  input shapes, before ``prepare_inputs`` runs. The scheduler cuts the row by it, and a
+  row whose prepared input turns out another length fails.
+- ``split_inputs(graph_walk, fwd_info, inputs, start, end)`` cuts the whole prepared input
+  to tokens ``[start, end)``. ``ARNodeSubmodule``'s default cuts the token ids or
+  embeddings and any custom position ids, and refuses inputs it cannot see into
+  (``tensor_inputs``, ``kwargs``, ``resource_step_info``).
+
+Each chunk is a full forward, so it samples a token, but only the final chunk's token is
+real (``inputs.is_final_chunk``). The model need not handle that: the sampler commits no
+RNG offset or seen token for a row mid-prefill (it reads ``StepContext.chunk_tokens_after``),
+the Loop carries only the final chunk's outputs, and the worker takes no stop or prefix
+key from a non-final chunk. ``test/modular/test_chunked_prefill.py`` and
+``test/modular/test_bagel_chunked_prefill.py`` show how to test a chunking model. A
+deployment can change the budgets (see *Chunked prefill budgets* in :doc:`serving`).
 
 .. _Step 4a — Declare the step:
 
@@ -1972,7 +2058,7 @@ that a misspelled setting is never silently ignored:
    * - ``AttentionSpec``
      - ``backend`` (``auto`` / ``flashinfer`` / ``dense`` / ``flex`` / ``xpu_paged``),
        ``flashinfer_backend`` (``auto`` / ``fa2`` / ``fa3``), ``decode_tensor_cores``
-       (``true`` / ``false``)
+       (``true`` / ``false``), ``decode_fmha`` (``true`` / ``false``)
    * - ``CrossAttentionSpec``
      - ``backend`` (``auto`` / ``flashinfer``), ``flashinfer_backend``
        (``auto`` / ``fa2`` / ``fa3``), ``decode_tensor_cores`` (``true`` / ``false``)

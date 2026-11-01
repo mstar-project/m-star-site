@@ -604,6 +604,7 @@ window.runMermaid = runMermaid;</script>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.engine.accelerator_graph_backend.html">mstar.engine.accelerator_graph_backend</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.engine.accelerator_graph_config.html">mstar.engine.accelerator_graph_config</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.engine.accelerator_graph_runner.html">mstar.engine.accelerator_graph_runner</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.engine.chunking.html">mstar.engine.chunking</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.engine.fp32_precision.html">mstar.engine.fp32_precision</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.engine.node_dtype.html">mstar.engine.node_dtype</a></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../_autosummary/mstar.engine.resources.html">mstar.engine.resources</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -808,6 +809,7 @@ window.runMermaid = runMermaid;</script>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../_autosummary/mstar.worker.html">mstar.worker</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.worker.batch_builder.html">mstar.worker.batch_builder</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.worker.chunk_loops.html">mstar.worker.chunk_loops</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.worker.rid_table.html">mstar.worker.rid_table</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.worker.spec_rows.html">mstar.worker.spec_rows</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.worker.worker_metrics.html">mstar.worker.worker_metrics</a></li>
@@ -978,7 +980,7 @@ window.runMermaid = runMermaid;</script>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">defaultdict</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Sequence</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Sequence</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="n">fields</span><span class="p">,</span> <span class="n">replace</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">types</span><span class="w"> </span><span class="kn">import</span> <span class="n">MappingProxyType</span>
@@ -1055,7 +1057,11 @@ window.runMermaid = runMermaid;</script>
     <span class="n">prefill_walks</span><span class="p">:</span> <span class="nb">frozenset</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">()</span>
     <span class="c1"># for a prompt prefilled over several passes: the ``step_metadata`` flag of</span>
     <span class="c1"># the pass whose token is the reply's (earlier passes' tokens are not)</span>
-    <span class="n">last_prefill_flag</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span></div>
+    <span class="n">last_prefill_flag</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="c1"># the graph runtime checks ``walk``'s stop ids itself, without calling</span>
+    <span class="c1"># check_stop (``ARNodeSubmodule.get_stop_policies``); the prompt walks keep</span>
+    <span class="c1"># check_stop, which can end the partition</span>
+    <span class="n">runtime_check</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span></div>
 
 
 
@@ -1126,6 +1132,91 @@ window.runMermaid = runMermaid;</script>
 
 
 <span class="n">EMPTY_INPUT_METADATA</span> <span class="o">=</span> <span class="n">InputMetadata</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="StopKind">
+<a class="viewcode-back" href="../../../_autosummary/mstar.model.submodule_base.html#mstar.model.submodule_base.StopKind">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">StopKind</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""How a loop's stop is decided after each step (``StopPolicy``)."""</span>
+    <span class="c1"># the sampled token is one of the policy's EOS ids (unless the request</span>
+    <span class="c1"># ignores EOS), or the loop reached the request's iteration limit</span>
+    <span class="n">AR</span> <span class="o">=</span> <span class="s2">"ar"</span>
+    <span class="c1"># only the iteration limit</span>
+    <span class="n">ITER</span> <span class="o">=</span> <span class="s2">"iter"</span>
+    <span class="c1"># only the EOS ids: the loop's cap (``Model.get_loop_caps``) is its budget</span>
+    <span class="n">EOS</span> <span class="o">=</span> <span class="s2">"eos"</span></div>
+
+
+
+<div class="viewcode-block" id="StopLimits">
+<a class="viewcode-back" href="../../../_autosummary/mstar.model.submodule_base.html#mstar.model.submodule_base.StopLimits">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">StopLimits</span><span class="p">(</span><span class="n">NamedTuple</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""One request's limits under a ``StopPolicy``."""</span>
+    <span class="c1"># None: no iteration limit (``StopKind.EOS``)</span>
+    <span class="n">max_iters</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span>
+    <span class="n">ignore_eos</span><span class="p">:</span> <span class="nb">bool</span></div>
+
+
+
+<div class="viewcode-block" id="StopPolicy">
+<a class="viewcode-back" href="../../../_autosummary/mstar.model.submodule_base.html#mstar.model.submodule_base.StopPolicy">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">StopPolicy</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""A loop's stop check, declared so the graph runtime can run it without</span>
+<span class="sd">    calling ``check_stop`` (``NodeSubmodule.get_stop_policies``).</span>
+
+<span class="sd">    A row stops the loop when ``stops`` says so, given the loop's iteration</span>
+<span class="sd">    count as of the step (what ``check_stop`` reads as</span>
+<span class="sd">    ``dynamic_loop_iter_counts.get(loop, 0)``) and, for ``AR`` and ``EOS``,</span>
+<span class="sd">    the row's ``token_signal`` value.</span>
+<span class="sd">    """</span>
+    <span class="n">kind</span><span class="p">:</span> <span class="n">StopKind</span>
+    <span class="c1"># AR, EOS: the output signal carrying the sampled token, read off the host</span>
+    <span class="c1"># rows; the first value of the row</span>
+    <span class="n">token_signal</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="c1"># any iterable of ids; held as a frozenset</span>
+    <span class="n">eos_tokens</span><span class="p">:</span> <span class="nb">frozenset</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">()</span>
+    <span class="c1"># AR, EOS: the resource label whose request config carries ``ignore_eos``;</span>
+    <span class="c1"># None means EOS is never ignored</span>
+    <span class="n">sampler</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="c1"># the request's iteration limit for this loop; evaluated once per request</span>
+    <span class="c1"># and walk, not per step. None is ``info.max_tokens``.</span>
+    <span class="n">max_iters</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">CurrentForwardPassInfo</span><span class="p">],</span> <span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reads_token</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">token_signal</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"a </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">kind</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> StopPolicy needs a token_signal"</span><span class="p">)</span>
+        <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">"eos_tokens"</span><span class="p">,</span> <span class="nb">frozenset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">eos_tokens</span><span class="p">))</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">reads_token</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">kind</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">StopKind</span><span class="o">.</span><span class="n">ITER</span>
+
+<div class="viewcode-block" id="StopPolicy.limits">
+<a class="viewcode-back" href="../../../_autosummary/mstar.model.submodule_base.html#mstar.model.submodule_base.StopPolicy.limits">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">limits</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">info</span><span class="p">:</span> <span class="n">CurrentForwardPassInfo</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">StopLimits</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""One request's limits, from its forward-pass info."""</span>
+        <span class="n">max_iters</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">kind</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">StopKind</span><span class="o">.</span><span class="n">EOS</span><span class="p">:</span>
+            <span class="n">max_iters</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">info</span><span class="o">.</span><span class="n">max_tokens</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_iters</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_iters</span><span class="p">(</span><span class="n">info</span><span class="p">))</span>
+        <span class="n">ignore_eos</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reads_token</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">sampler</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">config</span> <span class="o">=</span> <span class="n">info</span><span class="o">.</span><span class="n">resource_configs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sampler</span><span class="p">)</span>
+            <span class="n">ignore_eos</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="s2">"ignore_eos"</span><span class="p">,</span> <span class="kc">False</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">StopLimits</span><span class="p">(</span><span class="n">max_iters</span><span class="p">,</span> <span class="n">ignore_eos</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="StopPolicy.stops">
+<a class="viewcode-back" href="../../../_autosummary/mstar.model.submodule_base.html#mstar.model.submodule_base.StopPolicy.stops">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">stops</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">count</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">token</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">limits</span><span class="p">:</span> <span class="n">StopLimits</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Whether a row with the loop at ``count`` and sampled ``token``</span>
+<span class="sd">        stops it: the count plus one reaches the limit, or (``AR``, ``EOS``)</span>
+<span class="sd">        the token is an EOS id the request does not ignore."""</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">limits</span><span class="o">.</span><span class="n">max_iters</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">count</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">&gt;=</span> <span class="n">limits</span><span class="o">.</span><span class="n">max_iters</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reads_token</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">limits</span><span class="o">.</span><span class="n">ignore_eos</span> <span class="ow">and</span> <span class="n">token</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">eos_tokens</span>
+        <span class="p">)</span></div>
+</div>
+
 
 
 <div class="viewcode-block" id="BatchedModelOutput">
@@ -1355,6 +1446,16 @@ window.runMermaid = runMermaid;</script>
     <span class="c1"># The request's real walk, stamped by the engine; None on capture templates</span>
     <span class="n">graph_walk</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
 
+    <span class="c1"># Set by the engine on a chunk of a split input: where it starts, and the</span>
+    <span class="c1"># whole input's length. None means not chunked.</span>
+    <span class="n">chunk_start</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">chunk_total</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_final_chunk</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">chunk_total</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> \
+            <span class="bp">self</span><span class="o">.</span><span class="n">chunk_start</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_seq_len</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">chunk_total</span>
+
 <div class="viewcode-block" id="NodeInputs.clone">
 <a class="viewcode-back" href="../../../_autosummary/mstar.model.submodule_base.html#mstar.model.submodule_base.NodeInputs.clone">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">clone</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1412,6 +1513,101 @@ window.runMermaid = runMermaid;</script>
             <span class="s2">"cannot be told apart; override `split_inputs`"</span>
         <span class="p">)</span>
     <span class="k">return</span> <span class="n">pos_ids</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="ChunkingPolicy">
+<a class="viewcode-back" href="../../../_autosummary/mstar.model.submodule_base.html#mstar.model.submodule_base.ChunkingPolicy">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ChunkingPolicy</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""How a walk's prefill may be split across steps; the default is not at all.</span>
+
+<span class="sd">    ``walks``: the walks this policy covers. Declared per node on the model</span>
+<span class="sd">    (``Model.get_chunking_policies``) rather than on the submodule, because</span>
+<span class="sd">    the graph build needs it: a chunkable node is wrapped in a Loop for</span>
+<span class="sd">    exactly these walks, and a chunk is one iteration of it.</span>
+
+<span class="sd">    ``accumulated_outputs``: output edges a consumer needs every chunk of,</span>
+<span class="sd">    gathered on the Loop and handed over as one item per chunk when the</span>
+<span class="sd">    prompt finishes. A streamed edge's consumer gets them joined into one item</span>
+<span class="sd">    by its ``StreamBuffer`` (``Connection.join_dim``). An edge not named here</span>
+<span class="sd">    or in ``per_chunk_outputs`` carries the final chunk's tensors alone.</span>
+
+<span class="sd">    ``per_chunk_outputs``: streaming output edges sent on every chunk as it</span>
+<span class="sd">    runs, each chunk's piece an item of its own, for a consumer that can</span>
+<span class="sd">    start on a prefix (``ChunkPolicy.allow_partial_input``, checked at load).</span>
+<span class="sd">    Disjoint from ``accumulated_outputs``.</span>
+
+<span class="sd">    ``reserve_whole_prefill``: whether a first chunk reserves the KV the</span>
+<span class="sd">    whole prefill needs, so a part-done row cannot wedge on a full arena.</span>
+<span class="sd">    Counted in tokens, so a walk whose KV grows by something else sets False</span>
+<span class="sd">    and reserves per chunk.</span>
+<span class="sd">    """</span>
+    <span class="n">walks</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">()</span>
+    <span class="c1"># rows may be split: `split_inputs` cuts them, `get_input_sequence_len` measures them</span>
+    <span class="n">chunkable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">accumulated_outputs</span><span class="p">:</span> <span class="nb">frozenset</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">()</span>
+    <span class="n">per_chunk_outputs</span><span class="p">:</span> <span class="nb">frozenset</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">()</span>
+    <span class="c1"># most tokens a step of this walk runs; a combined walk that carries chunks sets one too</span>
+    <span class="n">max_batch_tokens</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="c1"># whether a row may start past its cached prefix, asked before prepare; None is always</span>
+    <span class="n">reuses_cached_prefix</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">CurrentForwardPassInfo</span><span class="p">],</span> <span class="nb">bool</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">reserve_whole_prefill</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">both</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">accumulated_outputs</span> <span class="o">&amp;</span> <span class="bp">self</span><span class="o">.</span><span class="n">per_chunk_outputs</span>
+        <span class="k">if</span> <span class="n">both</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"outputs </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="n">both</span><span class="p">)</span><span class="si">}</span><span class="s2"> are both gathered and sent per chunk; name each in one"</span>
+            <span class="p">)</span></div>
+
+
+
+<span class="n">NO_CHUNKING</span> <span class="o">=</span> <span class="n">ChunkingPolicy</span><span class="p">()</span>
+
+
+<span class="c1"># A chunk Loop's count before its prompt's first chunk sets the real cap (the</span>
+<span class="c1"># prompt's length), and the stride of a row that runs whole: it ends the Loop.</span>
+<span class="c1"># Within the u32 both runtimes hold loop counters in.</span>
+<span class="n">CHUNK_LOOP_END</span> <span class="o">=</span> <span class="mi">2</span><span class="o">**</span><span class="mi">31</span> <span class="o">-</span> <span class="mi">1</span>
+
+
+<div class="viewcode-block" id="chunk_loop_name">
+<a class="viewcode-back" href="../../../_autosummary/mstar.model.submodule_base.html#mstar.model.submodule_base.chunk_loop_name">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">chunk_loop_name</span><span class="p">(</span><span class="n">node_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">graph_walk</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""The Loop a chunkable ``(node, walk)``'s prefill runs as.</span>
+
+<span class="sd">    Derived rather than declared so the graph build, the engine's stop check</span>
+<span class="sd">    and the startup validation all name the same loop without passing it</span>
+<span class="sd">    around. Per walk, not per node: a node can chunk under several walks and</span>
+<span class="sd">    each has its own loop state.</span>
+<span class="sd">    """</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">"chunk_loop:</span><span class="si">{</span><span class="n">node_name</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">graph_walk</span><span class="si">}</span><span class="s2">"</span></div>
+
+
+
+<div class="viewcode-block" id="chunk_tick_name">
+<a class="viewcode-back" href="../../../_autosummary/mstar.model.submodule_base.html#mstar.model.submodule_base.chunk_tick_name">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">chunk_tick_name</span><span class="p">(</span><span class="n">node_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">graph_walk</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""The chunk Loop's loop-back signal, carrying nothing.</span>
+
+<span class="sd">    Speculation offers a next-iteration target only for a node that routes an</span>
+<span class="sd">    edge back to itself, so without this a chunk-only step is a pipeline</span>
+<span class="sd">    bubble. The node declares it as an input too -- an edge it does not read is</span>
+<span class="sd">    no loop-back, just an output nobody consumes -- which leaves it unready for</span>
+<span class="sd">    its FIRST chunk, so the conductor seeds one with the request's inputs.</span>
+<span class="sd">    """</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">chunk_loop_name</span><span class="p">(</span><span class="n">node_name</span><span class="p">,</span><span class="w"> </span><span class="n">graph_walk</span><span class="p">)</span><span class="si">}</span><span class="s2">.next_chunk"</span></div>
+
+
+
+<div class="viewcode-block" id="InputSeqLenInfo">
+<a class="viewcode-back" href="../../../_autosummary/mstar.model.submodule_base.html#mstar.model.submodule_base.InputSeqLenInfo">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">InputSeqLenInfo</span><span class="p">(</span><span class="n">NamedTuple</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""A row's token count before ``prepare_inputs``, for admission."""</span>
+    <span class="n">seq_len</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="c1"># leading tokens the prefix cache already holds, not counted in ``seq_len``</span>
+    <span class="n">cached_prefix</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span></div>
+
 
 
 <div class="viewcode-block" id="ARNodeInputs">
@@ -1610,6 +1806,11 @@ window.runMermaid = runMermaid;</script>
     <span class="c1"># ``sampler``). Empty when the submodule opts into no piecewise graphs or</span>
     <span class="c1"># capture failed. See ``NodeSubmodule.get_piecewise_cuda_graph_configs``.</span>
     <span class="n">piecewise_runners</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="s2">"PiecewiseAcceleratorGraphRunner"</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+    <span class="c1"># label -&gt; the slot this step leased on that region (``lease_before_step``</span>
+    <span class="c1"># regions). A forward replays such a region exactly when its label is</span>
+    <span class="c1"># here: a bucket that fits is not enough, since ``can_lease`` may have</span>
+    <span class="c1"># refused the batch, and the step declared its own attention instead.</span>
+    <span class="n">piecewise_leases</span><span class="p">:</span> <span class="s2">"Mapping[str, SlotLease]"</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
 
     <span class="c1"># The batch's per-request states, injected by the engine (None on paths</span>
     <span class="c1"># that don't carry them, e.g. CUDA-graph capture with synthetic requests).</span>
@@ -1757,6 +1958,21 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">        None (the default) means the walk has a single capture.</span>
 <span class="sd">        """</span>
         <span class="k">del</span> <span class="n">graph_walk</span><span class="p">,</span> <span class="n">per_request_info</span><span class="p">,</span> <span class="n">per_request_input_metadata</span><span class="p">,</span> <span class="n">kwargs</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="NodeSubmodule.get_input_sequence_len">
+<a class="viewcode-back" href="../../../_autosummary/mstar.model.submodule_base.html#mstar.model.submodule_base.NodeSubmodule.get_input_sequence_len">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_input_sequence_len</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">graph_walk</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">fwd_info</span><span class="p">:</span> <span class="n">CurrentForwardPassInfo</span><span class="p">,</span>
+        <span class="n">inputs</span><span class="p">:</span> <span class="n">NameToTensorList</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">InputSeqLenInfo</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""This row's token count, read from input shapes alone; None when the</span>
+<span class="sd">        walk does not declare one. A chunkable walk's prompts are cut into</span>
+<span class="sd">        chunks by it, so it must equal ``prepare_inputs().input_seq_len`` of the</span>
+<span class="sd">        whole input (before any cached prefix is removed), or the row fails</span>
+<span class="sd">        at its first chunk."""</span>
+        <span class="k">del</span> <span class="n">graph_walk</span><span class="p">,</span> <span class="n">fwd_info</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">kwargs</span>
         <span class="k">return</span> <span class="kc">None</span></div>
 
 
@@ -1975,6 +2191,23 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">        declaring and admitting a second time."""</span>
         <span class="k">del</span> <span class="n">graph_walk</span>
         <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="NodeSubmodule.speculative_input_seq_len">
+<a class="viewcode-back" href="../../../_autosummary/mstar.model.submodule_base.html#mstar.model.submodule_base.NodeSubmodule.speculative_input_seq_len">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">speculative_input_seq_len</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">graph_walk</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">fwd_info</span><span class="p">:</span> <span class="n">CurrentForwardPassInfo</span><span class="p">,</span>
+        <span class="n">prev_seq_len</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""The span of a row continuing from the step in flight, estimated</span>
+<span class="sd">        before that step's outputs reach it. ``prev_seq_len`` is its span in</span>
+<span class="sd">        that step, or -1 if it ran on another node. The default repeats the</span>
+<span class="sd">        last span on this node and has no estimate otherwise; a walk that</span>
+<span class="sd">        fixes its span (one token a decode step) should say so. Only an</span>
+<span class="sd">        estimate, which sizes the token budget left for the rows merged in</span>
+<span class="sd">        beside it."""</span>
+        <span class="k">del</span> <span class="n">graph_walk</span><span class="p">,</span> <span class="n">fwd_info</span>
+        <span class="k">return</span> <span class="n">prev_seq_len</span> <span class="k">if</span> <span class="n">prev_seq_len</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="k">else</span> <span class="kc">None</span></div>
 
 
 <div class="viewcode-block" id="NodeSubmodule.device_loopback_signals">
@@ -2290,6 +2523,20 @@ window.runMermaid = runMermaid;</script>
         <span class="k">return</span> <span class="nb">set</span><span class="p">()</span></div>
 
 
+<div class="viewcode-block" id="NodeSubmodule.get_stop_policies">
+<a class="viewcode-back" href="../../../_autosummary/mstar.model.submodule_base.html#mstar.model.submodule_base.NodeSubmodule.get_stop_policies">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_stop_policies</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">graph_walk</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">StopPolicy</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""The stop check ``check_stop`` amounts to on ``graph_walk``, per</span>
+<span class="sd">        loop it can stop, if it is only these, so the graph runtime can run</span>
+<span class="sd">        them without calling it.</span>
+
+<span class="sd">        None (the default) means ``check_stop`` decides; an empty dict means</span>
+<span class="sd">        it never stops a loop on this walk. Asked once per walk, at startup.</span>
+<span class="sd">        Every policy must agree with ``check_stop`` for every row.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
 <div class="viewcode-block" id="NodeSubmodule.check_stop_batched">
 <a class="viewcode-back" href="../../../_autosummary/mstar.model.submodule_base.html#mstar.model.submodule_base.NodeSubmodule.check_stop_batched">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">check_stop_batched</span><span class="p">(</span>
@@ -2341,6 +2588,20 @@ window.runMermaid = runMermaid;</script>
     <span class="c1"># Set (in ``__init__``, where the stop ids are known) by a submodule whose</span>
     <span class="c1"># sampled token ends a dynamic loop; the stop checks below follow from it.</span>
     <span class="n">token_stop</span><span class="p">:</span> <span class="n">TokenStop</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="ARNodeSubmodule.get_stop_policies">
+<a class="viewcode-back" href="../../../_autosummary/mstar.model.submodule_base.html#mstar.model.submodule_base.ARNodeSubmodule.get_stop_policies">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_stop_policies</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">graph_walk</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">StopPolicy</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">stop</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">token_stop</span>
+        <span class="k">if</span> <span class="n">stop</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">stop</span><span class="o">.</span><span class="n">runtime_check</span> <span class="ow">or</span> <span class="n">graph_walk</span> <span class="ow">in</span> <span class="n">stop</span><span class="o">.</span><span class="n">prefill_walks</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_stop_policies</span><span class="p">(</span><span class="n">graph_walk</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">stop</span><span class="o">.</span><span class="n">walk</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">graph_walk</span> <span class="o">!=</span> <span class="n">stop</span><span class="o">.</span><span class="n">walk</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">{}</span>  <span class="c1"># as `_token_stops`: only a row of ``walk`` ends the loop</span>
+        <span class="c1"># the budget is the loop's cap, which the runtime enforces</span>
+        <span class="k">return</span> <span class="p">{</span><span class="n">stop</span><span class="o">.</span><span class="n">loop</span><span class="p">:</span> <span class="n">StopPolicy</span><span class="p">(</span>
+            <span class="n">StopKind</span><span class="o">.</span><span class="n">EOS</span><span class="p">,</span> <span class="n">token_signal</span><span class="o">=</span><span class="n">stop</span><span class="o">.</span><span class="n">buffer</span><span class="p">,</span> <span class="n">eos_tokens</span><span class="o">=</span><span class="n">stop</span><span class="o">.</span><span class="n">stop_ids</span><span class="p">,</span> <span class="n">sampler</span><span class="o">=</span><span class="n">stop</span><span class="o">.</span><span class="n">sampler</span><span class="p">,</span>
+        <span class="p">)}</span></div>
+
 
 <div class="viewcode-block" id="ARNodeSubmodule.check_stop">
 <a class="viewcode-back" href="../../../_autosummary/mstar.model.submodule_base.html#mstar.model.submodule_base.ARNodeSubmodule.check_stop">[docs]</a>

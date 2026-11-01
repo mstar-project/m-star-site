@@ -250,6 +250,7 @@
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.engine.accelerator_graph_backend.html">mstar.engine.accelerator_graph_backend</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.engine.accelerator_graph_config.html">mstar.engine.accelerator_graph_config</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.engine.accelerator_graph_runner.html">mstar.engine.accelerator_graph_runner</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.engine.chunking.html">mstar.engine.chunking</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.engine.fp32_precision.html">mstar.engine.fp32_precision</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.engine.node_dtype.html">mstar.engine.node_dtype</a></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="_autosummary/mstar.engine.resources.html">mstar.engine.resources</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -454,6 +455,7 @@
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="_autosummary/mstar.worker.html">mstar.worker</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.batch_builder.html">mstar.worker.batch_builder</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.chunk_loops.html">mstar.worker.chunk_loops</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.rid_table.html">mstar.worker.rid_table</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.spec_rows.html">mstar.worker.spec_rows</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.worker_metrics.html">mstar.worker.worker_metrics</a></li>
@@ -1198,7 +1200,9 @@ reply restores it. It replaces the request’s previous decode snapshot once the
 keys its page; a step whose token never reaches the chain, such as the one speculated
 past the reply’s end, leaves the previous one in place.</p></li>
 <li><p>A snapshot is keyed by the KV chain’s key at its page. A full set of slots evicts the
-least recently used snapshot that no request holds.</p></li>
+least recently used snapshot that no request holds, a decode snapshot before a prompt’s,
+so the slots hold about one prompt each. A decode snapshot that a later prompt restores
+is kept like a prompt’s from then on.</p></li>
 </ul>
 <p>Snapshots stay off without <code class="docutils literal notranslate"><span class="pre">prefix_slots</span></code>, and also above one rank, without a named KV
 cache, when that cache isn’t on every node of the pool, or when its <code class="docutils literal notranslate"><span class="pre">prefix_cache</span></code> is
@@ -1343,7 +1347,11 @@ workspace, taken at build.
 (default <code class="docutils literal notranslate"><span class="pre">True</span></code>) runs one-token decode rows on FlashInfer’s tensor-core
 kernel; <code class="docutils literal notranslate"><span class="pre">False</span></code> picks the CUDA-core decode kernel, which can be faster for
 MHA and narrow GQA (few query heads per KV head). Measure before changing it:
-Whisper and Qwen3-ASR declare <code class="docutils literal notranslate"><span class="pre">False</span></code>. <code class="docutils literal notranslate"><span class="pre">FLASHINFER_MLA</span></code> is
+Whisper and Qwen3-ASR declare <code class="docutils literal notranslate"><span class="pre">False</span></code>. <code class="docutils literal notranslate"><span class="pre">decode_fmha</span></code> (default <code class="docutils literal notranslate"><span class="pre">False</span></code>) runs
+captured one-token decode rows on FlashInfer’s trtllm-gen fmha kernel on Blackwell,
+with no FlashInfer plan per step; a geometry trtllm-gen has no kernel for keeps
+the paged kernel, with a warning. Eager steps and prompt rows stay on the paged
+kernels. Qwen3.5 declares <code class="docutils literal notranslate"><span class="pre">True</span></code>. <code class="docutils literal notranslate"><span class="pre">FLASHINFER_MLA</span></code> is
 Multi-head Latent Attention over a <code class="docutils literal notranslate"><span class="pre">KVLayout.MLA</span></code> cache. It needs <code class="docutils literal notranslate"><span class="pre">sm_scale</span></code>,
 the softmax scale of the model’s original qk head dim, which the other backends
 refuse. Its <code class="docutils literal notranslate"><span class="pre">run</span></code> takes the absorbed query (<code class="docutils literal notranslate"><span class="pre">[tokens,</span> <span class="pre">heads,</span> <span class="pre">kv_lora_rank]</span></code>)
@@ -1838,7 +1846,18 @@ from it. Leave it at 0 only when the submodule’s inputs are not sequence-shape
 <code class="docutils literal notranslate"><span class="pre">declare_step</span></code> needs a value that <code class="docutils literal notranslate"><span class="pre">forward</span></code> does not use, put that value in
 <code class="docutils literal notranslate"><span class="pre">resource_step_info</span></code>.</p>
 </dd>
-<dt><code class="docutils literal notranslate"><span class="pre">declare_step(self,</span> <span class="pre">graph_walk,</span> <span class="pre">request_ids,</span> <span class="pre">inputs,</span> <span class="pre">slot_lease=None,</span> <span class="pre">piecewise_leases=None,</span> <span class="pre">**kwargs)</span> <span class="pre">-&gt;</span> <span class="pre">SubmoduleStep</span> <span class="pre">|</span> <span class="pre">None</span></code></dt><dd><p>Declare what this batch’s step does to the node’s resources. See
+<dt><code class="docutils literal notranslate"><span class="pre">get_input_sequence_len(self,</span> <span class="pre">graph_walk,</span> <span class="pre">fwd_info,</span> <span class="pre">inputs,</span> <span class="pre">**kwargs)</span> <span class="pre">-&gt;</span> <span class="pre">InputSeqLenInfo</span> <span class="pre">|</span> <span class="pre">None</span></code> (optional)</dt><dd><p>Return the length of the row’s whole input, before any cached prefix is cut –
+the engine subtracts what the prefix cache already holds. Return <code class="docutils literal notranslate"><span class="pre">None</span></code> for a
+walk that declares no length, or when the inputs it would measure are absent.
+Read off input shapes alone: this runs before <code class="docutils literal notranslate"><span class="pre">prepare_inputs</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">speculative_input_seq_len(self,</span> <span class="pre">graph_walk,</span> <span class="pre">fwd_info,</span> <span class="pre">prev_seq_len)</span> <span class="pre">-&gt;</span> <span class="pre">int</span> <span class="pre">|</span> <span class="pre">None</span></code> (optional)</dt><dd><p>Estimate the length of a row continuing from the step in flight, before that step’s
+outputs reach it; <code class="docutils literal notranslate"><span class="pre">prev_seq_len</span></code> is its length in that step, or -1 if it ran on
+another node. The default repeats <code class="docutils literal notranslate"><span class="pre">prev_seq_len</span></code>. Only an estimate: it sizes the
+token budget left for the rows a speculation merges in beside it. A walk with a fixed
+length (one token a decode step) should return it.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">declare_step(self,</span> <span class="pre">graph_walk,</span> <span class="pre">request_ids,</span> <span class="pre">inputs,</span> <span class="pre">slot_lease=None,</span> <span class="pre">piecewise_leases=None,</span> <span class="pre">per_request_info=None,</span> <span class="pre">**kwargs)</span> <span class="pre">-&gt;</span> <span class="pre">SubmoduleStep</span> <span class="pre">|</span> <span class="pre">None</span></code></dt><dd><p>Declare what this batch’s step does to the node’s resources. See
 <a class="reference internal" href="#step-4a-declare-the-step">Step 4a — Declare the step</a> below.</p>
 </dd>
 <dt><code class="docutils literal notranslate"><span class="pre">preprocess(self,</span> <span class="pre">graph_walk,</span> <span class="pre">engine_inputs,</span> <span class="pre">inputs)</span> <span class="pre">-&gt;</span> <span class="pre">dict</span></code></dt><dd><p>Collate a list of <code class="docutils literal notranslate"><span class="pre">NodeInputs</span></code> into the keyword arguments that <code class="docutils literal notranslate"><span class="pre">forward</span></code> expects.
@@ -1914,6 +1933,24 @@ its steps, with the request’s first <code class="docutils literal notranslate"
 starting early on a thread of the submodule’s own; it must not touch the device. The
 DiT scaffold draws a request’s seeded noise here (<code class="docutils literal notranslate"><span class="pre">PREFETCH_SEEDS</span></code>).</p>
 </dd>
+<dt><code class="docutils literal notranslate"><span class="pre">get_stop_policies(self,</span> <span class="pre">graph_walk)</span> <span class="pre">-&gt;</span> <span class="pre">dict[str,</span> <span class="pre">StopPolicy]</span> <span class="pre">|</span> <span class="pre">None</span></code> (optional)</dt><dd><p>Declare what <code class="docutils literal notranslate"><span class="pre">check_stop</span></code> amounts to on a walk, per loop it can stop, when it is
+only the common checks; the graph runtime then runs them over the step’s token column
+without calling <code class="docutils literal notranslate"><span class="pre">check_stop</span></code>. That takes the batched output carrying the policies’
+<code class="docutils literal notranslate"><span class="pre">token_signal</span></code> as a stop buffer (<code class="docutils literal notranslate"><span class="pre">BatchedModelOutput(check_stop_buffers={...})</span></code>,
+as Qwen3.5 and Orpheus return); a step without one, or one that mixes walks,
+still calls <code class="docutils literal notranslate"><span class="pre">check_stop</span></code>. <code class="docutils literal notranslate"><span class="pre">StopPolicy(StopKind.AR,</span> <span class="pre">token_signal=...,</span>
+<span class="pre">eos_tokens=...,</span> <span class="pre">sampler=...)</span></code> stops its loop on an EOS token (unless the <code class="docutils literal notranslate"><span class="pre">sampler</span></code>
+resource’s request config sets <code class="docutils literal notranslate"><span class="pre">ignore_eos</span></code>) or when the loop’s iteration count plus
+one reaches <code class="docutils literal notranslate"><span class="pre">max_iters</span></code> (<code class="docutils literal notranslate"><span class="pre">info.max_tokens</span></code> unless given). <code class="docutils literal notranslate"><span class="pre">StopKind.ITER</span></code> checks
+only the count, and <code class="docutils literal notranslate"><span class="pre">StopKind.EOS</span></code> only the token, for a loop whose cap is its budget.
+The limits are computed from the request’s forward-pass info whenever
+the worker receives it, not per step. Return <code class="docutils literal notranslate"><span class="pre">{}</span></code> for a
+walk on which <code class="docutils literal notranslate"><span class="pre">check_stop</span></code> never stops a loop, and <code class="docutils literal notranslate"><span class="pre">None</span></code> (the default) to keep
+calling <code class="docutils literal notranslate"><span class="pre">check_stop</span></code>. The policies must agree with <code class="docutils literal notranslate"><span class="pre">check_stop</span></code> for every row;
+<code class="docutils literal notranslate"><span class="pre">test/modular/test_stop_policies.py</span></code> checks the models that declare them. A
+<code class="docutils literal notranslate"><span class="pre">TokenStop</span></code> with <code class="docutils literal notranslate"><span class="pre">runtime_check=True</span></code> declares them for you: its loop’s stop ids,
+as <code class="docutils literal notranslate"><span class="pre">StopKind.EOS</span></code>, on <code class="docutils literal notranslate"><span class="pre">walk</span></code>; its <code class="docutils literal notranslate"><span class="pre">prefill_walks</span></code> keep <code class="docutils literal notranslate"><span class="pre">check_stop</span></code>.</p>
+</dd>
 <dt><code class="docutils literal notranslate"><span class="pre">cleanup_request(self,</span> <span class="pre">request_id)</span></code> (optional)</dt><dd><p>Free per-request state held inside the submodule when a request finishes: buffers,
 per-request caches, counters. See Qwen3-Omni’s <code class="docutils literal notranslate"><span class="pre">Code2WavSubmodule</span></code> for an example.</p>
 </dd>
@@ -1942,6 +1979,54 @@ speculates into.</p>
 </dl>
 <p>Two more methods control batching and CUDA graphs: <code class="docutils literal notranslate"><span class="pre">can_batch</span></code> with
 <code class="docutils literal notranslate"><span class="pre">forward_batched</span></code>, and <code class="docutils literal notranslate"><span class="pre">get_cuda_graph_configs</span></code>. They are described in Step 5.</p>
+<p><strong>Chunked prefill (optional).</strong> A walk with long prompts can run each across several steps,
+at most a token budget per step, so the decode rows batched beside it keep running. Each
+chunk is one iteration of a Loop around the node, which counts the tokens its chunks ran
+and ends at the prompt’s length. To opt a walk in:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">Model.get_chunking_policies()</span></code> returns <code class="docutils literal notranslate"><span class="pre">{node:</span> <span class="pre">(ChunkingPolicy,</span> <span class="pre">...)}</span></code>, each policy
+naming the <code class="docutils literal notranslate"><span class="pre">walks</span></code> it covers. It is declared on the model, not the submodule, because
+the graph build reads it: <code class="docutils literal notranslate"><span class="pre">Model</span></code> wraps each chunkable node in its Loop wherever
+<code class="docutils literal notranslate"><span class="pre">get_graph_walk_graphs</span></code> is read, so the model returns its walks as usual. The fields:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">chunkable=True</span></code> lets the walk’s rows be cut.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">max_batch_tokens</span></code>: the most tokens a step runs. A combined walk that carries
+chunked rows sets one too, since its steps run under it.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">accumulated_outputs</span></code>: output edges a consumer needs every chunk of. They arrive as
+one item per chunk, all when the prompt finishes.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">per_chunk_outputs</span></code>: streaming edges sent on every chunk as it runs, for a consumer
+that can start on a prefix. Any edge in neither set carries the final chunk’s output
+alone.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">reuses_cached_prefix</span></code>: a callable saying whether a row may start past its cached
+prefix; <code class="docutils literal notranslate"><span class="pre">None</span></code> (the default) is always. Set it where a row may have to write its
+prefix again.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">reserve_whole_prefill</span></code> (default on): a row’s first chunk reserves the state its
+whole prefill needs, so a part-done row cannot wedge on a full pool. Turn it off for
+a walk whose state grows by something other than the tokens a step runs.</p></li>
+</ul>
+<p>A streaming consumer of an accumulated edge whose <code class="docutils literal notranslate"><span class="pre">ChunkPolicy</span></code> expects one item
+(<code class="docutils literal notranslate"><span class="pre">FixedChunkPolicy(1)</span></code>, say) sets <code class="docutils literal notranslate"><span class="pre">Connection.join_dim</span></code>, so its <code class="docutils literal notranslate"><span class="pre">StreamBuffer</span></code>
+joins the pieces into that item. A consumer that can take the pieces as they come says
+so with <code class="docutils literal notranslate"><span class="pre">ChunkPolicy.allow_partial_input</span></code> (<code class="docutils literal notranslate"><span class="pre">FixedChunkPolicy(allow_partial=True)</span></code>),
+and the producer then sends the edge per chunk, as Qwen3-Omni’s Thinker does into its
+Talker. A chunked stream its consumer would misread, each piece taken for the whole
+input, is refused at startup.</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">get_input_sequence_len(graph_walk,</span> <span class="pre">fwd_info,</span> <span class="pre">inputs)</span></code> gives a row’s length from its
+input shapes, before <code class="docutils literal notranslate"><span class="pre">prepare_inputs</span></code> runs. The scheduler cuts the row by it, and a
+row whose prepared input turns out another length fails.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">split_inputs(graph_walk,</span> <span class="pre">fwd_info,</span> <span class="pre">inputs,</span> <span class="pre">start,</span> <span class="pre">end)</span></code> cuts the whole prepared input
+to tokens <code class="docutils literal notranslate"><span class="pre">[start,</span> <span class="pre">end)</span></code>. <code class="docutils literal notranslate"><span class="pre">ARNodeSubmodule</span></code>’s default cuts the token ids or
+embeddings and any custom position ids, and refuses inputs it cannot see into
+(<code class="docutils literal notranslate"><span class="pre">tensor_inputs</span></code>, <code class="docutils literal notranslate"><span class="pre">kwargs</span></code>, <code class="docutils literal notranslate"><span class="pre">resource_step_info</span></code>).</p></li>
+</ul>
+<p>Each chunk is a full forward, so it samples a token, but only the final chunk’s token is
+real (<code class="docutils literal notranslate"><span class="pre">inputs.is_final_chunk</span></code>). The model need not handle that: the sampler commits no
+RNG offset or seen token for a row mid-prefill (it reads <code class="docutils literal notranslate"><span class="pre">StepContext.chunk_tokens_after</span></code>),
+the Loop carries only the final chunk’s outputs, and the worker takes no stop or prefix
+key from a non-final chunk. <code class="docutils literal notranslate"><span class="pre">test/modular/test_chunked_prefill.py</span></code> and
+<code class="docutils literal notranslate"><span class="pre">test/modular/test_bagel_chunked_prefill.py</span></code> show how to test a chunking model. A
+deployment can change the budgets (see <em>Chunked prefill budgets</em> in <a class="reference internal" href="serving.html"><span class="doc">Serving</span></a>).</p>
 <section id="step-4a-declare-the-step">
 <span id="id4"></span><h3>Step 4a — Declare the step<a class="headerlink" href="#step-4a-declare-the-step" title="Link to this heading">#</a></h3>
 <p><code class="docutils literal notranslate"><span class="pre">declare_step</span></code> tells the engine what one batched step does to the node’s resources:
@@ -2617,7 +2702,7 @@ that a misspelled setting is never silently ignored:</p>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">AttentionSpec</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">backend</span></code> (<code class="docutils literal notranslate"><span class="pre">auto</span></code> / <code class="docutils literal notranslate"><span class="pre">flashinfer</span></code> / <code class="docutils literal notranslate"><span class="pre">dense</span></code> / <code class="docutils literal notranslate"><span class="pre">flex</span></code> / <code class="docutils literal notranslate"><span class="pre">xpu_paged</span></code>),
 <code class="docutils literal notranslate"><span class="pre">flashinfer_backend</span></code> (<code class="docutils literal notranslate"><span class="pre">auto</span></code> / <code class="docutils literal notranslate"><span class="pre">fa2</span></code> / <code class="docutils literal notranslate"><span class="pre">fa3</span></code>), <code class="docutils literal notranslate"><span class="pre">decode_tensor_cores</span></code>
-(<code class="docutils literal notranslate"><span class="pre">true</span></code> / <code class="docutils literal notranslate"><span class="pre">false</span></code>)</p></td>
+(<code class="docutils literal notranslate"><span class="pre">true</span></code> / <code class="docutils literal notranslate"><span class="pre">false</span></code>), <code class="docutils literal notranslate"><span class="pre">decode_fmha</span></code> (<code class="docutils literal notranslate"><span class="pre">true</span></code> / <code class="docutils literal notranslate"><span class="pre">false</span></code>)</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">CrossAttentionSpec</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">backend</span></code> (<code class="docutils literal notranslate"><span class="pre">auto</span></code> / <code class="docutils literal notranslate"><span class="pre">flashinfer</span></code>), <code class="docutils literal notranslate"><span class="pre">flashinfer_backend</span></code>
