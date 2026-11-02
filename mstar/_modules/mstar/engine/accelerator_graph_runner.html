@@ -614,6 +614,7 @@ window.runMermaid = runMermaid;</script>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.engine.resources.base.html">mstar.engine.resources.base</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.engine.resources.dsa.html">mstar.engine.resources.dsa</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.engine.resources.kv.html">mstar.engine.resources.kv</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.engine.resources.lora.html">mstar.engine.resources.lora</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.engine.resources.position.html">mstar.engine.resources.position</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.engine.resources.rms_norm.html">mstar.engine.resources.rms_norm</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.engine.resources.runner.html">mstar.engine.resources.runner</a></li>
@@ -983,7 +984,7 @@ window.runMermaid = runMermaid;</script>
 <span class="kn">from</span><span class="w"> </span><span class="nn">contextlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">contextmanager</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="n">is_dataclass</span><span class="p">,</span> <span class="n">replace</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">cache</span><span class="p">,</span> <span class="n">partial</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Collection</span><span class="p">,</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">NamedTuple</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Collection</span><span class="p">,</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">NamedTuple</span><span class="p">,</span> <span class="n">Sequence</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">torch.distributed</span><span class="w"> </span><span class="kn">import</span> <span class="n">ReduceOp</span>
@@ -1005,7 +1006,16 @@ window.runMermaid = runMermaid;</script>
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">mstar.engine.node_dtype</span><span class="w"> </span><span class="kn">import</span> <span class="n">node_scope</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">mstar.engine.resources</span><span class="w"> </span><span class="kn">import</span> <span class="n">BucketKey</span><span class="p">,</span> <span class="n">CGSlotSpec</span><span class="p">,</span> <span class="n">Resource</span><span class="p">,</span> <span class="n">SlotLease</span><span class="p">,</span> <span class="n">StepContext</span><span class="p">,</span> <span class="n">StepRunner</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">mstar.model.submodule_base</span><span class="w"> </span><span class="kn">import</span> <span class="n">BatchedModelOutput</span><span class="p">,</span> <span class="n">ModelInputsFromEngine</span><span class="p">,</span> <span class="n">NodeInputs</span><span class="p">,</span> <span class="n">NodeSubmodule</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mstar.engine.resources.lora.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">LoraBaseOnly</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mstar.engine.resources.step</span><span class="w"> </span><span class="kn">import</span> <span class="n">PIECEWISE_WALK</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mstar.model.submodule_base</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">BatchedModelOutput</span><span class="p">,</span>
+    <span class="n">ModelInputsFromEngine</span><span class="p">,</span>
+    <span class="n">NodeInputs</span><span class="p">,</span>
+    <span class="n">NodeSubmodule</span><span class="p">,</span>
+    <span class="n">engine_step</span><span class="p">,</span>
+    <span class="n">lora_rows</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">mstar.platforms</span><span class="w"> </span><span class="kn">import</span> <span class="n">current_platform</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">mstar.platforms.compile</span><span class="w"> </span><span class="kn">import</span> <span class="n">with_inductor_overrides</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">mstar.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">profiler</span>
@@ -1830,21 +1840,28 @@ window.runMermaid = runMermaid;</script>
     <span class="k">def</span><span class="w"> </span><span class="nf">_get_slot_specs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">CGSlotSpec</span><span class="p">]:</span>
         <span class="n">specs</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">config_idx</span><span class="p">,</span> <span class="n">config</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_capture_configs</span><span class="p">):</span>
+            <span class="n">keys</span> <span class="o">=</span> <span class="p">[</span><span class="n">config</span><span class="o">.</span><span class="n">additional_key_info</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_submodule</span><span class="p">,</span> <span class="s2">"lora_keys"</span><span class="p">,</span> <span class="p">()):</span>
+                <span class="c1"># a node serving adapters also captures each bucket for steps with no</span>
+                <span class="c1"># adapter row, recording no LoRA kernel (see `LoraBaseOnly`); the two</span>
+                <span class="c1"># share the config's compiled forward, static buffers and padding rows</span>
+                <span class="n">keys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">LoraBaseOnly</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">additional_key_info</span><span class="p">))</span>
             <span class="k">for</span> <span class="n">bs</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_batch_sizes</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
                 <span class="k">for</span> <span class="n">num_tokens</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">get_total_tokens</span><span class="p">(</span><span class="n">bs</span><span class="p">):</span>
-                    <span class="n">bucket</span> <span class="o">=</span> <span class="n">BucketKey</span><span class="p">(</span>
-                        <span class="n">graph_walk</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">capture_graph_walk</span><span class="p">,</span>
-                        <span class="n">cg_key_info</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">additional_key_info</span><span class="p">,</span>
-                        <span class="n">bs</span><span class="o">=</span><span class="n">bs</span><span class="p">,</span>
-                        <span class="n">num_tokens</span><span class="o">=</span><span class="n">num_tokens</span><span class="p">,</span>
-                    <span class="p">)</span>
-                    <span class="k">for</span> <span class="n">slot</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_num_slots</span><span class="p">):</span>
-                        <span class="n">specs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">CGSlotSpec</span><span class="p">(</span>
-                            <span class="n">bucket</span><span class="o">=</span><span class="n">bucket</span><span class="p">,</span>
-                            <span class="n">slot</span><span class="o">=</span><span class="n">slot</span><span class="p">,</span>
-                            <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">,</span>
-                            <span class="n">config_idx</span><span class="o">=</span><span class="n">config_idx</span><span class="p">,</span>
-                        <span class="p">))</span>
+                    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
+                        <span class="n">bucket</span> <span class="o">=</span> <span class="n">BucketKey</span><span class="p">(</span>
+                            <span class="n">graph_walk</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">capture_graph_walk</span><span class="p">,</span>
+                            <span class="n">cg_key_info</span><span class="o">=</span><span class="n">key</span><span class="p">,</span>
+                            <span class="n">bs</span><span class="o">=</span><span class="n">bs</span><span class="p">,</span>
+                            <span class="n">num_tokens</span><span class="o">=</span><span class="n">num_tokens</span><span class="p">,</span>
+                        <span class="p">)</span>
+                        <span class="k">for</span> <span class="n">slot</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_num_slots</span><span class="p">):</span>
+                            <span class="n">specs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">CGSlotSpec</span><span class="p">(</span>
+                                <span class="n">bucket</span><span class="o">=</span><span class="n">bucket</span><span class="p">,</span>
+                                <span class="n">slot</span><span class="o">=</span><span class="n">slot</span><span class="p">,</span>
+                                <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">,</span>
+                                <span class="n">config_idx</span><span class="o">=</span><span class="n">config_idx</span><span class="p">,</span>
+                            <span class="p">))</span>
         <span class="k">return</span> <span class="n">specs</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_get_addtl_slot_specs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">:</span> <span class="n">CGSlotSpec</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">CGSlotSpec</span><span class="p">]:</span>
@@ -1875,7 +1892,8 @@ window.runMermaid = runMermaid;</script>
                     <span class="k">continue</span>
                 <span class="n">checked_configs</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">spec</span><span class="o">.</span><span class="n">config_idx</span><span class="p">)</span>
                 <span class="n">rids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dummy_rows</span><span class="o">.</span><span class="n">handles</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">spec</span><span class="o">.</span><span class="n">config_idx</span><span class="si">}</span><span class="s2">_slot0"</span><span class="p">,</span> <span class="n">spec</span><span class="o">.</span><span class="n">bs</span><span class="p">)</span>
-                <span class="n">step</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_submodule</span><span class="o">.</span><span class="n">declare_step</span><span class="p">(</span>
+                <span class="n">step</span> <span class="o">=</span> <span class="n">engine_step</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_submodule</span><span class="p">,</span>
                     <span class="n">graph_walk</span><span class="o">=</span><span class="n">spec</span><span class="o">.</span><span class="n">bucket</span><span class="o">.</span><span class="n">graph_walk</span><span class="p">,</span>
                     <span class="n">request_ids</span><span class="o">=</span><span class="n">rids</span><span class="p">,</span>
                     <span class="n">inputs</span><span class="o">=</span><span class="n">spec</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get_node_inputs</span><span class="p">(</span><span class="n">spec</span><span class="o">.</span><span class="n">bs</span><span class="p">,</span> <span class="n">spec</span><span class="o">.</span><span class="n">num_tokens</span><span class="p">),</span>
@@ -2189,7 +2207,8 @@ window.runMermaid = runMermaid;</script>
         <span class="n">engine_inputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dummy_engine_inputs</span><span class="p">(</span><span class="n">dummy_rids</span><span class="p">,</span> <span class="n">walk</span><span class="p">)</span>
 
         <span class="n">lease</span> <span class="o">=</span> <span class="n">SlotLease</span><span class="p">(</span><span class="n">slot</span><span class="o">=</span><span class="n">spec</span><span class="o">.</span><span class="n">slot</span><span class="p">,</span> <span class="n">bucket</span><span class="o">=</span><span class="n">spec</span><span class="o">.</span><span class="n">bucket</span><span class="p">)</span>
-        <span class="n">step</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_submodule</span><span class="o">.</span><span class="n">declare_step</span><span class="p">(</span>
+        <span class="n">step</span> <span class="o">=</span> <span class="n">engine_step</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_submodule</span><span class="p">,</span>
             <span class="n">graph_walk</span><span class="o">=</span><span class="n">walk</span><span class="p">,</span> <span class="n">request_ids</span><span class="o">=</span><span class="n">dummy_rids</span><span class="p">,</span> <span class="n">inputs</span><span class="o">=</span><span class="n">dummy_inputs</span><span class="p">,</span>
             <span class="n">slot_lease</span><span class="o">=</span><span class="n">lease</span><span class="p">,</span> <span class="n">per_request_info</span><span class="o">=</span><span class="n">engine_inputs</span><span class="o">.</span><span class="n">per_request_info</span><span class="p">,</span>
         <span class="p">)</span>
@@ -2698,8 +2717,8 @@ window.runMermaid = runMermaid;</script>
 <span class="c1"># Piecewise buckets share the resources' (bucket, slot, label) buffer space</span>
 <span class="c1"># with the full-forward captures. They never coexist on one node — a forward</span>
 <span class="c1"># either replays whole or runs eager around captured regions — so the walk name</span>
-<span class="c1"># below plus the region's label is enough to keep the keys apart.</span>
-<span class="n">PIECEWISE_WALK</span> <span class="o">=</span> <span class="s2">"__piecewise__"</span>
+<span class="c1"># (`PIECEWISE_WALK`, defined beside `StepContext`) plus the region's label is</span>
+<span class="c1"># enough to keep the keys apart.</span>
 
 
 <div class="viewcode-block" id="PiecewiseGraphData">
@@ -2824,9 +2843,12 @@ window.runMermaid = runMermaid;</script>
         <span class="n">node_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">memory_pool</span><span class="p">:</span> <span class="n">AcceleratorGraphPool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">device_capability</span><span class="p">:</span> <span class="n">DeviceCapability</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">lora_keys</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span>
     <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_label</span> <span class="o">=</span> <span class="n">label</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_config</span> <span class="o">=</span> <span class="n">config</span>
+        <span class="c1"># the node's LoRA pools (`_region_step`, `can_lease`)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_lora_keys</span> <span class="o">=</span> <span class="n">lora_keys</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_resources</span> <span class="o">=</span> <span class="n">resources</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_step_runner</span> <span class="o">=</span> <span class="n">step_runner</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_device</span> <span class="o">=</span> <span class="n">device</span>
@@ -2873,7 +2895,7 @@ window.runMermaid = runMermaid;</script>
         <span class="k">for</span> <span class="n">shape</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="o">.</span><span class="n">get_capture_shapes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_capture_batch_sizes</span><span class="p">):</span>
             <span class="c1"># handles, not `ensure`: the declaration only labels its rows, and</span>
             <span class="c1"># ingesting here would run before the buffers are built</span>
-            <span class="n">step</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="o">.</span><span class="n">region_step</span><span class="p">(</span>
+            <span class="n">step</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_region_step</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_dummy_rows</span><span class="o">.</span><span class="n">handles</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dummy_key</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">shape</span><span class="o">.</span><span class="n">bs</span><span class="p">),</span>
                 <span class="nb">list</span><span class="p">(</span><span class="n">shape</span><span class="o">.</span><span class="n">seq_lens</span><span class="p">),</span>
             <span class="p">)</span>
@@ -2900,11 +2922,16 @@ window.runMermaid = runMermaid;</script>
         <span class="k">return</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">shape</span><span class="o">.</span><span class="n">bs</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">shape</span><span class="o">.</span><span class="n">total_tokens</span><span class="si">}</span><span class="s2">_slot</span><span class="si">{</span><span class="n">slot</span><span class="si">}</span><span class="s2">"</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_bucket</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shape</span><span class="p">:</span> <span class="n">PiecewiseCaptureShape</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BucketKey</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""A ``one_row_per_step`` region on a LoRA node replays only base-only steps</span>
+<span class="sd">        (``can_lease``), so it is captured under ``LoraBaseOnly``, recording no LoRA kernel."""</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_label</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="o">.</span><span class="n">one_row_per_step</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lora_keys</span><span class="p">:</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="n">LoraBaseOnly</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">BucketKey</span><span class="p">(</span>
             <span class="n">graph_walk</span><span class="o">=</span><span class="n">PIECEWISE_WALK</span><span class="p">,</span>
             <span class="n">bs</span><span class="o">=</span><span class="n">shape</span><span class="o">.</span><span class="n">bs</span><span class="p">,</span>
             <span class="n">num_tokens</span><span class="o">=</span><span class="n">shape</span><span class="o">.</span><span class="n">total_tokens</span><span class="p">,</span>
-            <span class="n">cg_key_info</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_label</span><span class="p">,</span>
+            <span class="n">cg_key_info</span><span class="o">=</span><span class="n">key</span><span class="p">,</span>
         <span class="p">)</span>
 
     <span class="c1"># ── Capture ─────────────────────────────────────────────────────────</span>
@@ -2917,7 +2944,7 @@ window.runMermaid = runMermaid;</script>
             <span class="n">shapes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="o">.</span><span class="n">get_capture_shapes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_capture_batch_sizes</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">shapes</span><span class="p">:</span>
                 <span class="n">shape</span> <span class="o">=</span> <span class="n">shapes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-                <span class="n">step</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="o">.</span><span class="n">region_step</span><span class="p">(</span>
+                <span class="n">step</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_region_step</span><span class="p">(</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_dummy_rows</span><span class="o">.</span><span class="n">handles</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dummy_key</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">shape</span><span class="o">.</span><span class="n">bs</span><span class="p">),</span>
                     <span class="nb">list</span><span class="p">(</span><span class="n">shape</span><span class="o">.</span><span class="n">seq_lens</span><span class="p">),</span>
                 <span class="p">)</span>
@@ -3246,7 +3273,7 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">        ``ctx.request_ids``: counting the tail there makes it scatter padding</span>
 <span class="sd">        rows back over real state.</span>
 <span class="sd">        """</span>
-        <span class="n">step</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="o">.</span><span class="n">region_step</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">request_ids</span><span class="p">),</span> <span class="nb">list</span><span class="p">(</span><span class="n">seq_lens</span><span class="p">))</span>
+        <span class="n">step</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_region_step</span><span class="p">(</span><span class="n">request_ids</span><span class="p">,</span> <span class="n">seq_lens</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">step</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
         <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">request_ids</span><span class="p">)</span> <span class="k">if</span> <span class="n">real_bs</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">real_bs</span>
@@ -3261,6 +3288,11 @@ window.runMermaid = runMermaid;</script>
         <span class="n">ctx</span><span class="o">.</span><span class="n">set_padded_rids</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">request_ids</span><span class="p">))</span>
         <span class="n">step</span><span class="o">.</span><span class="n">set_ctx</span><span class="p">(</span><span class="n">ctx</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">step</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_region_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request_ids</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">seq_lens</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]):</span>
+<span class="w">        </span><span class="sd">"""The config's step for the region, with the node's LoRA rows laid out from its</span>
+<span class="sd">        own segments (``lora_rows``)."""</span>
+        <span class="k">return</span> <span class="n">lora_rows</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="o">.</span><span class="n">region_step</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">request_ids</span><span class="p">),</span> <span class="nb">list</span><span class="p">(</span><span class="n">seq_lens</span><span class="p">)),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lora_keys</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_plan</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">shape</span><span class="p">:</span> <span class="n">PiecewiseCaptureShape</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">step</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -3338,10 +3370,18 @@ window.runMermaid = runMermaid;</script>
 
 <div class="viewcode-block" id="PiecewiseAcceleratorGraphRunner.can_lease">
 <a class="viewcode-back" href="../../../_autosummary/mstar.engine.accelerator_graph_runner.html#mstar.engine.accelerator_graph_runner.PiecewiseAcceleratorGraphRunner.can_lease">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">can_lease</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">NodeInputs</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""The config's ``can_lease`` for this batch; True when it sets none."""</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">can_lease</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">NodeInputs</span><span class="p">],</span> <span class="n">request_ids</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""The config's ``can_lease`` for this batch; True when it sets none. A</span>
+<span class="sd">        ``one_row_per_step`` region on a LoRA node is captured base-only (``_bucket``),</span>
+<span class="sd">        so it is refused a batch any of whose rows runs an adapter (the pool's answer is</span>
+<span class="sd">        the same on every rank), which runs the region eagerly under the node's step."""</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="o">.</span><span class="n">one_row_per_step</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_runs_adapters</span><span class="p">(</span><span class="n">request_ids</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="o">.</span><span class="n">can_lease</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="o">.</span><span class="n">can_lease</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span></div>
 
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_runs_adapters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request_ids</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_resources</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">runs_adapters</span><span class="p">(</span><span class="n">request_ids</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lora_keys</span><span class="p">)</span>
 
 <div class="viewcode-block" id="PiecewiseAcceleratorGraphRunner.lease_slot">
 <a class="viewcode-back" href="../../../_autosummary/mstar.engine.accelerator_graph_runner.html#mstar.engine.accelerator_graph_runner.PiecewiseAcceleratorGraphRunner.lease_slot">[docs]</a>
@@ -3379,9 +3419,15 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">        is baked into the graph.</span>
 
 <span class="sd">        A ``one_row_per_step`` region replays the step as one row named by its</span>
-<span class="sd">        first request, however many requests or segments it is passed.</span>
+<span class="sd">        first request, however many requests or segments it is passed, and base-only</span>
+<span class="sd">        on a LoRA node (``can_lease``): no row may run an adapter.</span>
 <span class="sd">        """</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="o">.</span><span class="n">one_row_per_step</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">request_ids</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_runs_adapters</span><span class="p">(</span><span class="n">request_ids</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">"piecewise </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_label</span><span class="si">!r}</span><span class="s2"> replays one row per step, base-only, but a "</span>
+                    <span class="s2">"row of this step runs a LoRA adapter (can_lease refuses such a step)"</span>
+                <span class="p">)</span>
             <span class="n">real_bs</span> <span class="o">=</span> <span class="mi">1</span>
             <span class="k">if</span> <span class="n">request_ids</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">request_ids</span> <span class="o">=</span> <span class="n">request_ids</span><span class="p">[:</span><span class="mi">1</span><span class="p">]</span>
