@@ -410,7 +410,7 @@ window.runMermaid = runMermaid;</script>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="0.2.1" />
-    <meta name="docbuild:last-update" content="Nov 01, 2026"/>
+    <meta name="docbuild:last-update" content="Nov 02, 2026"/>
   
     
     <script src="../../../_static/searchtools.js"></script>
@@ -586,6 +586,7 @@ window.runMermaid = runMermaid;</script>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.communication.arena.html">mstar.communication.arena</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.communication.codec.html">mstar.communication.codec</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.communication.communicator.html">mstar.communication.communicator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.communication.edge_items.html">mstar.communication.edge_items</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.communication.event.html">mstar.communication.event</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.communication.rust_communicator.html">mstar.communication.rust_communicator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.communication.tensor_store.html">mstar.communication.tensor_store</a></li>
@@ -708,7 +709,6 @@ window.runMermaid = runMermaid;</script>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../_autosummary/mstar.model.omnivoice.html">mstar.model.omnivoice</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.omnivoice.components.html">mstar.model.omnivoice.components</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.omnivoice.config.html">mstar.model.omnivoice.config</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.omnivoice.submodules.html">mstar.model.omnivoice.submodules</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../_autosummary/mstar.model.orpheus.html">mstar.model.orpheus</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -1041,6 +1041,28 @@ window.runMermaid = runMermaid;</script>
 
 
 
+<div class="viewcode-block" id="cudnn_benchmark">
+<a class="viewcode-back" href="../../../_autosummary/mstar.engine.fp32_precision.html#mstar.engine.fp32_precision.cudnn_benchmark">[docs]</a>
+<span class="nd">@contextlib</span><span class="o">.</span><span class="n">contextmanager</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">cudnn_benchmark</span><span class="p">(</span><span class="n">enabled</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Within the block, let cuDNN time its conv algorithms per new shape</span>
+<span class="sd">    (once, then cached) instead of taking its heuristic pick; restores the</span>
+<span class="sd">    process-wide flag on exit. Not safe against convs on other threads, like</span>
+<span class="sd">    the scope below: the engine applies it around a node's capture sizing</span>
+<span class="sd">    (``NodeSubmodule.capture_cudnn_benchmark``), and the VAE decoders around</span>
+<span class="sd">    their forward on the worker's one GPU thread."""</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">enabled</span><span class="p">:</span>
+        <span class="k">yield</span>
+        <span class="k">return</span>
+    <span class="n">previous</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">backends</span><span class="o">.</span><span class="n">cudnn</span><span class="o">.</span><span class="n">benchmark</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">backends</span><span class="o">.</span><span class="n">cudnn</span><span class="o">.</span><span class="n">benchmark</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">yield</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">backends</span><span class="o">.</span><span class="n">cudnn</span><span class="o">.</span><span class="n">benchmark</span> <span class="o">=</span> <span class="n">previous</span></div>
+
+
+
 <div class="viewcode-block" id="fp32_precision_scope">
 <a class="viewcode-back" href="../../../_autosummary/mstar.engine.fp32_precision.html#mstar.engine.fp32_precision.fp32_precision_scope">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">fp32_precision_scope</span><span class="p">(</span><span class="n">precision</span><span class="p">:</span> <span class="n">Fp32Precision</span> <span class="o">|</span> <span class="kc">None</span><span class="p">):</span>
@@ -1157,7 +1179,7 @@ By M* Team
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Nov 01, 2026.
+  Last updated on Nov 02, 2026.
   <br/>
 </p>
   </div>

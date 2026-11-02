@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>mstar.model.omnilingual_asr.components.wav2vec2 &#8212; M* v0.2.1 Documentation</title>
+    <title>mstar.model.omnivoice.components.silence &#8212; M* v0.2.1 Documentation</title>
   
   
   
@@ -403,14 +403,14 @@ mermaid.initialize(
 
 window.addEventListener("load", load);
 window.runMermaid = runMermaid;</script>
-    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/mstar/model/omnilingual_asr/components/wav2vec2';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/mstar/model/omnivoice/components/silence';</script>
     <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
     <link rel="index" title="Index" href="../../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="0.2.1" />
-    <meta name="docbuild:last-update" content="Nov 01, 2026"/>
+    <meta name="docbuild:last-update" content="Nov 02, 2026"/>
   
     
     <script src="../../../../../_static/searchtools.js"></script>
@@ -586,6 +586,7 @@ window.runMermaid = runMermaid;</script>
 <li class="toctree-l3"><a class="reference internal" href="../../../../../_autosummary/mstar.communication.arena.html">mstar.communication.arena</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../../_autosummary/mstar.communication.codec.html">mstar.communication.codec</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../../_autosummary/mstar.communication.communicator.html">mstar.communication.communicator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../../_autosummary/mstar.communication.edge_items.html">mstar.communication.edge_items</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../../_autosummary/mstar.communication.event.html">mstar.communication.event</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../../_autosummary/mstar.communication.rust_communicator.html">mstar.communication.rust_communicator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../../_autosummary/mstar.communication.tensor_store.html">mstar.communication.tensor_store</a></li>
@@ -708,7 +709,6 @@ window.runMermaid = runMermaid;</script>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../../../_autosummary/mstar.model.omnivoice.html">mstar.model.omnivoice</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../_autosummary/mstar.model.omnivoice.components.html">mstar.model.omnivoice.components</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../_autosummary/mstar.model.omnivoice.config.html">mstar.model.omnivoice.config</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../../_autosummary/mstar.model.omnivoice.submodules.html">mstar.model.omnivoice.submodules</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../../../_autosummary/mstar.model.orpheus.html">mstar.model.orpheus</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -898,7 +898,7 @@ window.runMermaid = runMermaid;</script>
       
       
       
-      <li><a href="https://github.com/mstar-project/mstar/issues/new?title=Issue%20on%20page%20%2F_modules/mstar/model/omnilingual_asr/components/wav2vec2.html&body=Your%20issue%20content%20here." target="_blank"
+      <li><a href="https://github.com/mstar-project/mstar/issues/new?title=Issue%20on%20page%20%2F_modules/mstar/model/omnivoice/components/silence.html&body=Your%20issue%20content%20here." target="_blank"
    class="btn btn-sm btn-source-issues-button dropdown-item"
    title="Open an issue"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -975,296 +975,185 @@ window.runMermaid = runMermaid;</script>
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <h1>Source code for mstar.model.omnilingual_asr.components.wav2vec2</h1><div class="highlight"><pre>
-<span></span><span class="c1"># Copyright (c) Meta Platforms, Inc. and affiliates.</span>
-<span class="c1"># SPDX-License-Identifier: MIT</span>
-<span class="c1">#</span>
-<span class="c1"># This file has been modified for M* in 2026: the fairseq2 wav2vec 2.0 encoder</span>
-<span class="c1"># and CTC head that Omnilingual ASR runs, reimplemented in plain PyTorch with</span>
-<span class="c1"># the same operations in the same order. Inference only: no masking,</span>
-<span class="c1"># quantizer, dropout or LayerDrop.</span>
-<span class="c1">#</span>
-<span class="c1"># Original files (facebookresearch/fairseq2 v0.6.0, src/fairseq2/models/wav2vec2/</span>
-<span class="c1"># {feature_extractor,frontend,position_encoder}.py, asr/model.py and</span>
-<span class="c1"># src/fairseq2/models/transformer/) were released under the MIT license, with</span>
-<span class="c1"># the full license text available at</span>
-<span class="c1"># https://github.com/facebookresearch/fairseq2/blob/main/LICENSE.</span>
-<span class="c1">#</span>
-<span class="c1"># This modified file is released under the same license.</span>
+  <h1>Source code for mstar.model.omnivoice.components.silence</h1><div class="highlight"><pre>
+<span></span><span class="sd">"""The reference's silence trim (``omnivoice.utils.audio.remove_silence``),</span>
+<span class="sd">vectorized and sample-exact.</span>
 
-<span class="sd">"""The Omnilingual ASR CTC network: a wav2vec 2.0 encoder plus a linear head.</span>
-
-<span class="sd">    waveform (N, S), normalized per utterance, 16 kHz</span>
-<span class="sd">      -&gt; 7 strided convs, each LayerNorm (in fp32) + GELU     (x320: 50 frames/s)</span>
-<span class="sd">      -&gt; LayerNorm, Linear 512 -&gt; model_dim</span>
-<span class="sd">      -&gt; + GELU(grouped conv positional encoding)            (kernel 128, 16 groups)</span>
-<span class="sd">      -&gt; pre-norm Transformer encoder, final LayerNorm</span>
-<span class="sd">      -&gt; Linear model_dim -&gt; vocab                            (CTC logits)</span>
-
-<span class="sd">Module and parameter names follow the fairseq2 checkpoint (``encoder_frontend``,</span>
-<span class="sd">``encoder``, ``final_proj``), so the state dict loads with only the positional</span>
-<span class="sd">conv's weight norm folded. Every module here is plain torch with no M* imports,</span>
-<span class="sd">so the parity harness can run it inside the reference's own environment.</span>
-
-<span class="sd">Batches are right-padded. ``seq_lens`` gives each row's sample count; the</span>
-<span class="sd">padding never reaches a valid frame: the convolutions only look backwards</span>
-<span class="sd">from a valid output frame over valid samples, padded frames are zeroed before</span>
-<span class="sd">the positional convolution, and attention keys past a row's length are masked.</span>
+<span class="sd">The reference runs pydub: an RMS window every 10 ms, each a fresh</span>
+<span class="sd">``AudioSegment`` slice and an ``audioop.rms`` call, which costs about 14 ms of</span>
+<span class="sd">Python per second of audio and ran inside the code2wav forward, stalling the</span>
+<span class="sd">worker's loop for every finished request. This computes the same windows from</span>
+<span class="sd">one prefix sum of squared int16 samples and replays pydub's millisecond</span>
+<span class="sd">slicing (``int(ms * rate / 1000)`` samples, zero-filled past the end), its</span>
+<span class="sd">range merging and its edge trim, so the output is the reference's to the</span>
+<span class="sd">sample; ``test_omnivoice_silence`` checks it against pydub.</span>
 <span class="sd">"""</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">copy</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">itertools</span>
 
-<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">torch.nn.functional</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">F</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">nn</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">torch.nn.attention</span><span class="w"> </span><span class="kn">import</span> <span class="n">SDPBackend</span><span class="p">,</span> <span class="n">sdpa_kernel</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">mstar.utils.h2d</span><span class="w"> </span><span class="kn">import</span> <span class="n">to_device_nonblocking</span>
-
-<span class="n">_ATTENTION_BACKENDS</span> <span class="o">=</span> <span class="p">[</span><span class="n">SDPBackend</span><span class="o">.</span><span class="n">FLASH_ATTENTION</span><span class="p">,</span> <span class="n">SDPBackend</span><span class="o">.</span><span class="n">EFFICIENT_ATTENTION</span><span class="p">,</span> <span class="n">SDPBackend</span><span class="o">.</span><span class="n">MATH</span><span class="p">]</span>
+<span class="c1"># pydub's dBFS: amplitude relative to the int16 full scale</span>
+<span class="n">_FULL_SCALE</span> <span class="o">=</span> <span class="mf">32768.0</span>
 
 
-<div class="viewcode-block" id="FeatureExtractionLayer">
-<a class="viewcode-back" href="../../../../../_autosummary/mstar.model.omnilingual_asr.components.wav2vec2.html#mstar.model.omnilingual_asr.components.wav2vec2.FeatureExtractionLayer">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">FeatureExtractionLayer</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""Conv1d -&gt; LayerNorm over channels (computed in fp32) -&gt; GELU."""</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_Segment</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""An int16 mono signal addressed the way ``pydub.AudioSegment`` slices it.</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">in_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">out_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">kernel_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">stride</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">eps</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">conv</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Conv1d</span><span class="p">(</span><span class="n">in_dim</span><span class="p">,</span> <span class="n">out_dim</span><span class="p">,</span> <span class="n">kernel_size</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="n">stride</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">layer_norm</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">LayerNorm</span><span class="p">(</span><span class="n">out_dim</span><span class="p">,</span> <span class="n">eps</span><span class="o">=</span><span class="n">eps</span><span class="p">)</span>
+<span class="sd">    It reads ``samples[lo:lo + n]``, zeros past the end of ``samples``, and</span>
+<span class="sd">    backwards when ``flipped``, so a trimmed or reversed segment shares its</span>
+<span class="sd">    parent's prefix sums instead of building its own.</span>
+<span class="sd">    """</span>
 
-<div class="viewcode-block" id="FeatureExtractionLayer.forward">
-<a class="viewcode-back" href="../../../../../_autosummary/mstar.model.omnilingual_asr.components.wav2vec2.html#mstar.model.omnilingual_asr.components.wav2vec2.FeatureExtractionLayer.forward">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conv</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-        <span class="n">dtype</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">dtype</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">layer_norm</span><span class="p">(</span>
-            <span class="n">x</span><span class="o">.</span><span class="n">float</span><span class="p">(),</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">layer_norm</span><span class="o">.</span><span class="n">normalized_shape</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">layer_norm</span><span class="o">.</span><span class="n">weight</span><span class="o">.</span><span class="n">float</span><span class="p">(),</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">layer_norm</span><span class="o">.</span><span class="n">bias</span><span class="o">.</span><span class="n">float</span><span class="p">(),</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">layer_norm</span><span class="o">.</span><span class="n">eps</span><span class="p">,</span>
-        <span class="p">)</span><span class="o">.</span><span class="n">type</span><span class="p">(</span><span class="n">dtype</span><span class="p">)</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">gelu</span><span class="p">(</span><span class="n">x</span><span class="p">)</span></div>
-</div>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">samples</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">samples</span> <span class="o">=</span> <span class="n">samples</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rate</span> <span class="o">=</span> <span class="n">rate</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">per_ms</span> <span class="o">=</span> <span class="n">rate</span> <span class="o">/</span> <span class="mf">1000.0</span>
+        <span class="n">squares</span> <span class="o">=</span> <span class="n">samples</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prefix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([[</span><span class="mi">0</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">squares</span><span class="p">)])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lo</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">flipped</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">samples</span><span class="p">),</span> <span class="kc">False</span>
 
+    <span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="c1"># milliseconds, rounded as pydub rounds them</span>
+        <span class="k">return</span> <span class="nb">round</span><span class="p">(</span><span class="mi">1000</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">rate</span><span class="p">))</span>
 
+    <span class="k">def</span><span class="w"> </span><span class="nf">bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start_ms</span><span class="p">,</span> <span class="n">end_ms</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Sample bounds and zero-filled length of ``segment[start_ms:end_ms]``."""</span>
+        <span class="n">n_ms</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">start_ms</span><span class="p">,</span> <span class="n">n_ms</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">per_ms</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+        <span class="n">end</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">end_ms</span><span class="p">,</span> <span class="n">n_ms</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">per_ms</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span>
 
-<div class="viewcode-block" id="FeatureExtractor">
-<a class="viewcode-back" href="../../../../../_autosummary/mstar.model.omnilingual_asr.components.wav2vec2.html#mstar.model.omnilingual_asr.components.wav2vec2.FeatureExtractor">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">FeatureExtractor</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">layer_descs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]],</span> <span class="n">eps</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-        <span class="n">layers</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="n">in_dim</span> <span class="o">=</span> <span class="mi">1</span>
-        <span class="k">for</span> <span class="n">out_dim</span><span class="p">,</span> <span class="n">kernel_size</span><span class="p">,</span> <span class="n">stride</span> <span class="ow">in</span> <span class="n">layer_descs</span><span class="p">:</span>
-            <span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">FeatureExtractionLayer</span><span class="p">(</span><span class="n">in_dim</span><span class="p">,</span> <span class="n">out_dim</span><span class="p">,</span> <span class="n">kernel_size</span><span class="p">,</span> <span class="n">stride</span><span class="p">,</span> <span class="n">eps</span><span class="p">))</span>
-            <span class="n">in_dim</span> <span class="o">=</span> <span class="n">out_dim</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">layers</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span><span class="o">*</span><span class="n">layers</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">layer_descs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">layer_descs</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">reversed_tail</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start_ms</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"_Segment"</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""``segment[start_ms:].reverse()``, over the same prefix sums."""</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">flipped</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"reversed_tail of a reversed segment"</span><span class="p">)</span>
+        <span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">start_ms</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">))))</span>
+        <span class="n">tail</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">tail</span><span class="o">.</span><span class="n">lo</span><span class="p">,</span> <span class="n">tail</span><span class="o">.</span><span class="n">n</span><span class="p">,</span> <span class="n">tail</span><span class="o">.</span><span class="n">flipped</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lo</span> <span class="o">+</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="o">-</span> <span class="n">start</span><span class="p">,</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="n">tail</span>
 
-<div class="viewcode-block" id="FeatureExtractor.output_length">
-<a class="viewcode-back" href="../../../../../_autosummary/mstar.model.omnilingual_asr.components.wav2vec2.html#mstar.model.omnilingual_asr.components.wav2vec2.FeatureExtractor.output_length">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">output_length</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_samples</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Frames a row yields: ``floor((len - kernel) / stride) + 1`` per conv."""</span>
-        <span class="n">n</span> <span class="o">=</span> <span class="n">num_samples</span>
-        <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">kernel_size</span><span class="p">,</span> <span class="n">stride</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">layer_descs</span><span class="p">:</span>
-            <span class="n">n</span> <span class="o">=</span> <span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="n">kernel_size</span><span class="p">)</span> <span class="o">//</span> <span class="n">stride</span> <span class="o">+</span> <span class="mi">1</span>
-        <span class="k">return</span> <span class="n">n</span></div>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_span</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Where ``[start, end)`` of the segment, clipped to it, lies in ``samples``."""</span>
+        <span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">end</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">flipped</span><span class="p">:</span>
+            <span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">-</span> <span class="n">end</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">-</span> <span class="n">start</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">lo</span> <span class="o">+</span> <span class="n">start</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">lo</span> <span class="o">+</span> <span class="n">end</span>
 
+    <span class="k">def</span><span class="w"> </span><span class="nf">rms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start_ms</span><span class="p">,</span> <span class="n">end_ms</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""``audioop.rms`` of each ``[start_ms, end_ms)`` slice (an int, floored)."""</span>
+        <span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">start_ms</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">end_ms</span><span class="p">))</span>
+        <span class="n">lo</span><span class="p">,</span> <span class="n">hi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_span</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">samples</span><span class="p">)</span>
+        <span class="n">squares</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prefix</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">hi</span><span class="p">,</span> <span class="n">n</span><span class="p">)]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">prefix</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">lo</span><span class="p">,</span> <span class="n">n</span><span class="p">)])</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+        <span class="n">width</span> <span class="o">=</span> <span class="p">(</span><span class="n">end</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>  <span class="c1"># past the end pydub pads zeros</span>
+        <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">divide</span><span class="o">=</span><span class="s2">"ignore"</span><span class="p">,</span> <span class="n">invalid</span><span class="o">=</span><span class="s2">"ignore"</span><span class="p">):</span>
+            <span class="n">rms</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">squares</span> <span class="o">/</span> <span class="n">width</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">width</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="n">rms</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
 
-<div class="viewcode-block" id="FeatureExtractor.forward">
-<a class="viewcode-back" href="../../../../../_autosummary/mstar.model.omnilingual_asr.components.wav2vec2.html#mstar.model.omnilingual_asr.components.wav2vec2.FeatureExtractor.forward">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">waveforms</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-        <span class="c1"># (N, S) -&gt; (N, 1, S) -&gt; (N, C, T) -&gt; (N, T, C)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">(</span><span class="n">waveforms</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span></div>
-</div>
-
-
-
-<div class="viewcode-block" id="PositionEncoder">
-<a class="viewcode-back" href="../../../../../_autosummary/mstar.model.omnilingual_asr.components.wav2vec2.html#mstar.model.omnilingual_asr.components.wav2vec2.PositionEncoder">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">PositionEncoder</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""Adds ``GELU(conv(x))`` with a grouped, even-kernel conv (its last output</span>
-<span class="sd">    column dropped, so the output keeps the input length). The checkpoint's</span>
-<span class="sd">    weight norm (``weight_g``/``weight_v``) is folded into ``conv.weight`` at load."""</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">kernel_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">num_groups</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">conv</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Conv1d</span><span class="p">(</span>
-            <span class="n">model_dim</span><span class="p">,</span>
-            <span class="n">model_dim</span><span class="p">,</span>
-            <span class="n">kernel_size</span><span class="p">,</span>
-            <span class="n">padding</span><span class="o">=</span><span class="n">kernel_size</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span>
-            <span class="n">groups</span><span class="o">=</span><span class="n">num_groups</span><span class="p">,</span>
-            <span class="n">bias</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">remove_pad</span> <span class="o">=</span> <span class="n">kernel_size</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span>
-
-<div class="viewcode-block" id="PositionEncoder.forward">
-<a class="viewcode-back" href="../../../../../_autosummary/mstar.model.omnilingual_asr.components.wav2vec2.html#mstar.model.omnilingual_asr.components.wav2vec2.PositionEncoder.forward">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">frame_mask</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">frame_mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="c1"># padded frames must be zero, or they leak into the valid ones' encodings</span>
-            <span class="n">x</span> <span class="o">=</span> <span class="n">x</span> <span class="o">*</span> <span class="n">frame_mask</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
-        <span class="n">enc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conv</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">remove_pad</span><span class="p">:</span>
-            <span class="n">enc</span> <span class="o">=</span> <span class="n">enc</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-        <span class="k">return</span> <span class="n">x</span> <span class="o">+</span> <span class="n">F</span><span class="o">.</span><span class="n">gelu</span><span class="p">(</span><span class="n">enc</span><span class="p">)</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span></div>
-</div>
+    <span class="k">def</span><span class="w"> </span><span class="nf">slice</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start_ms</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">end_ms</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+        <span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">start_ms</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">end_ms</span><span class="p">)))</span>
+        <span class="n">lo</span><span class="p">,</span> <span class="n">hi</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_span</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">))</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">samples</span><span class="p">[</span><span class="n">lo</span><span class="p">:</span><span class="n">hi</span><span class="p">]</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">end</span> <span class="o">-</span> <span class="n">start</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">samples</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">flipped</span><span class="p">:</span>
+            <span class="c1"># the segment's [start, min(end, n)) is `samples[lo:hi]` backwards;</span>
+            <span class="c1"># what lies past the samples' end are its leading zeros</span>
+            <span class="n">last</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">end</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">)</span> <span class="o">-</span> <span class="n">start</span>
+            <span class="n">out</span><span class="p">[</span><span class="n">last</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">):</span><span class="n">last</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">out</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)]</span> <span class="o">=</span> <span class="n">data</span>
+        <span class="k">return</span> <span class="n">out</span>
 
 
-
-<div class="viewcode-block" id="Frontend">
-<a class="viewcode-back" href="../../../../../_autosummary/mstar.model.omnilingual_asr.components.wav2vec2.html#mstar.model.omnilingual_asr.components.wav2vec2.Frontend">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">Frontend</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cfg</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">feature_extractor</span> <span class="o">=</span> <span class="n">FeatureExtractor</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">feature_extractor_layer_descs</span><span class="p">,</span> <span class="n">cfg</span><span class="o">.</span><span class="n">layer_norm_eps</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">post_extract_layer_norm</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">LayerNorm</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">feature_dim</span><span class="p">,</span> <span class="n">eps</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">layer_norm_eps</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">model_dim_proj</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">feature_dim</span><span class="p">,</span> <span class="n">cfg</span><span class="o">.</span><span class="n">model_dim</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">pos_encoder</span> <span class="o">=</span> <span class="n">PositionEncoder</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">model_dim</span><span class="p">,</span> <span class="n">cfg</span><span class="o">.</span><span class="n">pos_conv_kernel_size</span><span class="p">,</span> <span class="n">cfg</span><span class="o">.</span><span class="n">num_pos_conv_groups</span><span class="p">)</span></div>
-
-
-
-<div class="viewcode-block" id="SelfAttention">
-<a class="viewcode-back" href="../../../../../_autosummary/mstar.model.omnilingual_asr.components.wav2vec2.html#mstar.model.omnilingual_asr.components.wav2vec2.SelfAttention">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">SelfAttention</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">num_heads</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">num_heads</span> <span class="o">=</span> <span class="n">num_heads</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">q_proj</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">model_dim</span><span class="p">,</span> <span class="n">model_dim</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">k_proj</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">model_dim</span><span class="p">,</span> <span class="n">model_dim</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">v_proj</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">model_dim</span><span class="p">,</span> <span class="n">model_dim</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">output_proj</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">model_dim</span><span class="p">,</span> <span class="n">model_dim</span><span class="p">)</span>
-
-<div class="viewcode-block" id="SelfAttention.forward">
-<a class="viewcode-back" href="../../../../../_autosummary/mstar.model.omnilingual_asr.components.wav2vec2.html#mstar.model.omnilingual_asr.components.wav2vec2.SelfAttention.forward">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">attn_mask</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-        <span class="c1"># (N, S, M) -&gt; (N, S, H, K) -&gt; (N, H, S, K)</span>
-        <span class="n">q</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">q_proj</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">unflatten</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_heads</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-        <span class="n">k</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">k_proj</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">unflatten</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_heads</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-        <span class="n">v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">v_proj</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">unflatten</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_heads</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-        <span class="n">attn</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">scaled_dot_product_attention</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">attn_mask</span><span class="o">=</span><span class="n">attn_mask</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_proj</span><span class="p">(</span><span class="n">attn</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">))</span></div>
-</div>
+<span class="k">def</span><span class="w"> </span><span class="nf">_silent_ranges</span><span class="p">(</span><span class="n">seg</span><span class="p">:</span> <span class="n">_Segment</span><span class="p">,</span> <span class="n">min_silence_len</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">threshold</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">seek_step</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">"""``pydub.silence.detect_silence``."""</span>
+    <span class="n">seg_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">seg</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">seg_len</span> <span class="o">&lt;</span> <span class="n">min_silence_len</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[]</span>
+    <span class="n">last</span> <span class="o">=</span> <span class="n">seg_len</span> <span class="o">-</span> <span class="n">min_silence_len</span>
+    <span class="n">starts</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">last</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">seek_step</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">last</span> <span class="o">%</span> <span class="n">seek_step</span><span class="p">:</span>
+        <span class="n">starts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">last</span><span class="p">)</span>
+    <span class="n">starts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">starts</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+    <span class="n">silent</span> <span class="o">=</span> <span class="n">starts</span><span class="p">[</span><span class="n">seg</span><span class="o">.</span><span class="n">rms</span><span class="p">(</span><span class="n">starts</span><span class="p">,</span> <span class="n">starts</span> <span class="o">+</span> <span class="n">min_silence_len</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">threshold</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">silent</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[]</span>
+    <span class="n">ranges</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">prev</span> <span class="o">=</span> <span class="n">range_start</span> <span class="o">=</span> <span class="n">silent</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">silent</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+        <span class="k">if</span> <span class="n">s</span> <span class="o">!=</span> <span class="n">prev</span> <span class="o">+</span> <span class="n">seek_step</span> <span class="ow">and</span> <span class="n">s</span> <span class="o">&gt;</span> <span class="n">prev</span> <span class="o">+</span> <span class="n">min_silence_len</span><span class="p">:</span>
+            <span class="n">ranges</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">range_start</span><span class="p">,</span> <span class="n">prev</span> <span class="o">+</span> <span class="n">min_silence_len</span><span class="p">])</span>
+            <span class="n">range_start</span> <span class="o">=</span> <span class="n">s</span>
+        <span class="n">prev</span> <span class="o">=</span> <span class="n">s</span>
+    <span class="n">ranges</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">range_start</span><span class="p">,</span> <span class="n">prev</span> <span class="o">+</span> <span class="n">min_silence_len</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">ranges</span>
 
 
-
-<div class="viewcode-block" id="FeedForward">
-<a class="viewcode-back" href="../../../../../_autosummary/mstar.model.omnilingual_asr.components.wav2vec2.html#mstar.model.omnilingual_asr.components.wav2vec2.FeedForward">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">FeedForward</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">inner_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">inner_proj</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">model_dim</span><span class="p">,</span> <span class="n">inner_dim</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">output_proj</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">inner_dim</span><span class="p">,</span> <span class="n">model_dim</span><span class="p">)</span>
-
-<div class="viewcode-block" id="FeedForward.forward">
-<a class="viewcode-back" href="../../../../../_autosummary/mstar.model.omnilingual_asr.components.wav2vec2.html#mstar.model.omnilingual_asr.components.wav2vec2.FeedForward.forward">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_proj</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">gelu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inner_proj</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span></div>
-</div>
-
-
-
-<div class="viewcode-block" id="EncoderLayer">
-<a class="viewcode-back" href="../../../../../_autosummary/mstar.model.omnilingual_asr.components.wav2vec2.html#mstar.model.omnilingual_asr.components.wav2vec2.EncoderLayer">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">EncoderLayer</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""Pre-norm Transformer layer (fairseq2 ``TransformerNormOrder.PRE``)."""</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cfg</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">self_attn_layer_norm</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">LayerNorm</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">model_dim</span><span class="p">,</span> <span class="n">eps</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">layer_norm_eps</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">self_attn</span> <span class="o">=</span> <span class="n">SelfAttention</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">model_dim</span><span class="p">,</span> <span class="n">cfg</span><span class="o">.</span><span class="n">num_heads</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ffn_layer_norm</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">LayerNorm</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">model_dim</span><span class="p">,</span> <span class="n">eps</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">layer_norm_eps</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ffn</span> <span class="o">=</span> <span class="n">FeedForward</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">model_dim</span><span class="p">,</span> <span class="n">cfg</span><span class="o">.</span><span class="n">ffn_inner_dim</span><span class="p">)</span>
-
-<div class="viewcode-block" id="EncoderLayer.forward">
-<a class="viewcode-back" href="../../../../../_autosummary/mstar.model.omnilingual_asr.components.wav2vec2.html#mstar.model.omnilingual_asr.components.wav2vec2.EncoderLayer.forward">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">attn_mask</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">self_attn</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">self_attn_layer_norm</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">attn_mask</span><span class="p">)</span> <span class="o">+</span> <span class="n">x</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ffn</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ffn_layer_norm</span><span class="p">(</span><span class="n">x</span><span class="p">))</span> <span class="o">+</span> <span class="n">x</span></div>
-</div>
+<span class="k">def</span><span class="w"> </span><span class="nf">_nonsilent_ranges</span><span class="p">(</span><span class="n">seg</span><span class="p">:</span> <span class="n">_Segment</span><span class="p">,</span> <span class="n">min_silence_len</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">threshold</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">seek_step</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">"""``pydub.silence.detect_nonsilent``."""</span>
+    <span class="n">silent</span> <span class="o">=</span> <span class="n">_silent_ranges</span><span class="p">(</span><span class="n">seg</span><span class="p">,</span> <span class="n">min_silence_len</span><span class="p">,</span> <span class="n">threshold</span><span class="p">,</span> <span class="n">seek_step</span><span class="p">)</span>
+    <span class="n">seg_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">seg</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">silent</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="n">seg_len</span><span class="p">]]</span>
+    <span class="k">if</span> <span class="n">silent</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">silent</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">seg_len</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[]</span>
+    <span class="n">ranges</span><span class="p">,</span> <span class="n">prev_end</span> <span class="o">=</span> <span class="p">[],</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="ow">in</span> <span class="n">silent</span><span class="p">:</span>
+        <span class="n">ranges</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">prev_end</span><span class="p">,</span> <span class="n">start</span><span class="p">])</span>
+        <span class="n">prev_end</span> <span class="o">=</span> <span class="n">end</span>
+    <span class="k">if</span> <span class="n">end</span> <span class="o">!=</span> <span class="n">seg_len</span><span class="p">:</span>
+        <span class="n">ranges</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">prev_end</span><span class="p">,</span> <span class="n">seg_len</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">ranges</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]:</span>
+        <span class="n">ranges</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ranges</span>
 
 
-
-<div class="viewcode-block" id="Encoder">
-<a class="viewcode-back" href="../../../../../_autosummary/mstar.model.omnilingual_asr.components.wav2vec2.html#mstar.model.omnilingual_asr.components.wav2vec2.Encoder">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">Encoder</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cfg</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">layers</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">ModuleList</span><span class="p">(</span><span class="n">EncoderLayer</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">num_layers</span><span class="p">))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">layer_norm</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">LayerNorm</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">model_dim</span><span class="p">,</span> <span class="n">eps</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">layer_norm_eps</span><span class="p">)</span>
-
-<div class="viewcode-block" id="Encoder.forward">
-<a class="viewcode-back" href="../../../../../_autosummary/mstar.model.omnilingual_asr.components.wav2vec2.html#mstar.model.omnilingual_asr.components.wav2vec2.Encoder.forward">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">attn_mask</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-        <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">:</span>
-            <span class="n">x</span> <span class="o">=</span> <span class="n">layer</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">attn_mask</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">layer_norm</span><span class="p">(</span><span class="n">x</span><span class="p">)</span></div>
-</div>
+<span class="k">def</span><span class="w"> </span><span class="nf">_split_on_silence</span><span class="p">(</span><span class="n">seg</span><span class="p">:</span> <span class="n">_Segment</span><span class="p">,</span> <span class="n">min_silence_len</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">threshold</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">keep</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">seek_step</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""``pydub.silence.split_on_silence``, its pieces joined back together."""</span>
+    <span class="n">ranges</span> <span class="o">=</span> <span class="p">[[</span><span class="n">s</span> <span class="o">-</span> <span class="n">keep</span><span class="p">,</span> <span class="n">e</span> <span class="o">+</span> <span class="n">keep</span><span class="p">]</span> <span class="k">for</span> <span class="n">s</span><span class="p">,</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">_nonsilent_ranges</span><span class="p">(</span><span class="n">seg</span><span class="p">,</span> <span class="n">min_silence_len</span><span class="p">,</span> <span class="n">threshold</span><span class="p">,</span> <span class="n">seek_step</span><span class="p">)]</span>
+    <span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">itertools</span><span class="o">.</span><span class="n">pairwise</span><span class="p">(</span><span class="n">ranges</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">//</span> <span class="mi">2</span>
+            <span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">n_ms</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">seg</span><span class="p">)</span>
+    <span class="n">pieces</span> <span class="o">=</span> <span class="p">[</span><span class="n">seg</span><span class="o">.</span><span class="n">slice</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="nb">min</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">n_ms</span><span class="p">))</span> <span class="k">for</span> <span class="n">s</span><span class="p">,</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">ranges</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">pieces</span><span class="p">)</span> <span class="k">if</span> <span class="n">pieces</span> <span class="k">else</span> <span class="n">seg</span><span class="o">.</span><span class="n">samples</span><span class="p">[:</span><span class="mi">0</span><span class="p">]</span>
 
 
-
-<div class="viewcode-block" id="attention_mask">
-<a class="viewcode-back" href="../../../../../_autosummary/mstar.model.omnilingual_asr.components.wav2vec2.html#mstar.model.omnilingual_asr.components.wav2vec2.attention_mask">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">attention_mask</span><span class="p">(</span><span class="n">frame_mask</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">"""``(N, 1, T, T)`` boolean mask: a valid frame attends to its row's valid</span>
-<span class="sd">    frames only. A padded frame attends to every frame, which keeps its</span>
-<span class="sd">    (discarded) output finite instead of a fully masked NaN row."""</span>
-    <span class="k">return</span> <span class="p">(</span><span class="n">frame_mask</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">:]</span> <span class="o">|</span> <span class="o">~</span><span class="n">frame_mask</span><span class="p">[:,</span> <span class="p">:,</span> <span class="kc">None</span><span class="p">])</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span></div>
-
-
-
-<div class="viewcode-block" id="Wav2Vec2CTC">
-<a class="viewcode-back" href="../../../../../_autosummary/mstar.model.omnilingual_asr.components.wav2vec2.html#mstar.model.omnilingual_asr.components.wav2vec2.Wav2Vec2CTC">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">Wav2Vec2CTC</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""Omnilingual ASR CTC model (fairseq2 ``Wav2Vec2AsrModel`` at inference)."""</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cfg</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">cfg</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">encoder_frontend</span> <span class="o">=</span> <span class="n">Frontend</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span> <span class="o">=</span> <span class="n">Encoder</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">final_proj</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">model_dim</span><span class="p">,</span> <span class="n">cfg</span><span class="o">.</span><span class="n">vocab_size</span><span class="p">)</span>
-
-<div class="viewcode-block" id="Wav2Vec2CTC.frame_lengths">
-<a class="viewcode-back" href="../../../../../_autosummary/mstar.model.omnilingual_asr.components.wav2vec2.html#mstar.model.omnilingual_asr.components.wav2vec2.Wav2Vec2CTC.frame_lengths">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">frame_lengths</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">seq_lens</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
-        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">encoder_frontend</span><span class="o">.</span><span class="n">feature_extractor</span><span class="o">.</span><span class="n">output_length</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">seq_lens</span><span class="p">]</span></div>
+<span class="k">def</span><span class="w"> </span><span class="nf">_leading_silence</span><span class="p">(</span><span class="n">seg</span><span class="p">:</span> <span class="n">_Segment</span><span class="p">,</span> <span class="n">threshold_db</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">chunk</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""``pydub.silence.detect_leading_silence``."""</span>
+    <span class="n">n_ms</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">seg</span><span class="p">)</span>
+    <span class="n">starts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n_ms</span><span class="p">,</span> <span class="n">chunk</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+    <span class="n">rms</span> <span class="o">=</span> <span class="n">seg</span><span class="o">.</span><span class="n">rms</span><span class="p">(</span><span class="n">starts</span><span class="p">,</span> <span class="n">starts</span> <span class="o">+</span> <span class="n">chunk</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">divide</span><span class="o">=</span><span class="s2">"ignore"</span><span class="p">):</span>
+        <span class="n">db</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">rms</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">20</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">rms</span> <span class="o">/</span> <span class="n">_FULL_SCALE</span><span class="p">),</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
+    <span class="n">loud</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flatnonzero</span><span class="p">(</span><span class="n">db</span> <span class="o">&gt;=</span> <span class="n">threshold_db</span><span class="p">)</span>
+    <span class="n">trim</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">starts</span><span class="p">[</span><span class="n">loud</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">loud</span><span class="p">)</span> <span class="k">else</span> <span class="nb">len</span><span class="p">(</span><span class="n">starts</span><span class="p">)</span> <span class="o">*</span> <span class="n">chunk</span>
+    <span class="k">return</span> <span class="nb">min</span><span class="p">(</span><span class="n">trim</span><span class="p">,</span> <span class="n">n_ms</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="Wav2Vec2CTC.forward">
-<a class="viewcode-back" href="../../../../../_autosummary/mstar.model.omnilingual_asr.components.wav2vec2.html#mstar.model.omnilingual_asr.components.wav2vec2.Wav2Vec2CTC.forward">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">waveforms</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
-        <span class="n">seq_lens</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]]:</span>
-<span class="w">        </span><span class="sd">"""``(N, S)`` waveforms (and each row's sample count, for a padded batch) -&gt;</span>
-<span class="sd">        ``(N, T, vocab)`` logits and each row's valid frame count.</span>
+<div class="viewcode-block" id="remove_silence">
+<a class="viewcode-back" href="../../../../../_autosummary/mstar.model.omnivoice.components.silence.html#mstar.model.omnivoice.components.silence.remove_silence">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">remove_silence</span><span class="p">(</span>
+    <span class="n">audio</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">sampling_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">mid_sil</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">300</span><span class="p">,</span> <span class="n">lead_sil</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span> <span class="n">trail_sil</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">300</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""``omnivoice.utils.audio.remove_silence`` for mono ``(1, T)`` float audio."""</span>
+    <span class="k">if</span> <span class="n">audio</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"expected mono (1, T) audio, got </span><span class="si">{</span><span class="n">audio</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="n">samples</span> <span class="o">=</span> <span class="p">(</span><span class="n">audio</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="mf">32768.0</span><span class="p">)</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="o">-</span><span class="mi">32768</span><span class="p">,</span> <span class="mi">32767</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int16</span><span class="p">)</span>
+    <span class="n">threshold_db</span> <span class="o">=</span> <span class="o">-</span><span class="mf">50.0</span>
+    <span class="n">threshold</span> <span class="o">=</span> <span class="mi">10</span> <span class="o">**</span> <span class="p">(</span><span class="n">threshold_db</span> <span class="o">/</span> <span class="mi">20</span><span class="p">)</span> <span class="o">*</span> <span class="n">_FULL_SCALE</span>
+    <span class="k">if</span> <span class="n">mid_sil</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">samples</span> <span class="o">=</span> <span class="n">_split_on_silence</span><span class="p">(</span><span class="n">_Segment</span><span class="p">(</span><span class="n">samples</span><span class="p">,</span> <span class="n">sampling_rate</span><span class="p">),</span> <span class="n">mid_sil</span><span class="p">,</span> <span class="n">threshold</span><span class="p">,</span> <span class="n">mid_sil</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
 
-<span class="sd">        The lengths are host ints, so a padded batch is masked without reading</span>
-<span class="sd">        anything back from the device."""</span>
-        <span class="n">front</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder_frontend</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="n">front</span><span class="o">.</span><span class="n">feature_extractor</span><span class="p">(</span><span class="n">waveforms</span><span class="p">)</span>
-        <span class="n">n</span><span class="p">,</span> <span class="n">t</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span>
-        <span class="n">frame_lens</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span><span class="p">]</span> <span class="o">*</span> <span class="n">n</span> <span class="k">if</span> <span class="n">seq_lens</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">frame_lengths</span><span class="p">(</span><span class="n">seq_lens</span><span class="p">)</span>
-        <span class="n">frame_mask</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">f</span> <span class="o">&lt;</span> <span class="n">t</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">frame_lens</span><span class="p">):</span>
-            <span class="n">lens</span> <span class="o">=</span> <span class="n">to_device_nonblocking</span><span class="p">(</span><span class="n">frame_lens</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
-            <span class="n">frame_mask</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">x</span><span class="o">.</span><span class="n">device</span><span class="p">)[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:]</span> <span class="o">&lt;</span> <span class="n">lens</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="n">front</span><span class="o">.</span><span class="n">model_dim_proj</span><span class="p">(</span><span class="n">front</span><span class="o">.</span><span class="n">post_extract_layer_norm</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="n">front</span><span class="o">.</span><span class="n">pos_encoder</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">frame_mask</span><span class="p">)</span>
-        <span class="c1"># cuDNN attention builds a plan per new sequence length, and nearly</span>
-        <span class="c1"># every upload has its own length</span>
-        <span class="k">with</span> <span class="n">sdpa_kernel</span><span class="p">(</span><span class="n">_ATTENTION_BACKENDS</span><span class="p">):</span>
-            <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">frame_mask</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">attention_mask</span><span class="p">(</span><span class="n">frame_mask</span><span class="p">))</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">final_proj</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">frame_lens</span></div>
-</div>
+    <span class="n">seg</span> <span class="o">=</span> <span class="n">_Segment</span><span class="p">(</span><span class="n">samples</span><span class="p">,</span> <span class="n">sampling_rate</span><span class="p">)</span>
+    <span class="c1"># the trailing trim is the leading one of the lead-trimmed signal reversed</span>
+    <span class="n">tail</span> <span class="o">=</span> <span class="n">seg</span><span class="o">.</span><span class="n">reversed_tail</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">_leading_silence</span><span class="p">(</span><span class="n">seg</span><span class="p">,</span> <span class="n">threshold_db</span><span class="p">)</span> <span class="o">-</span> <span class="n">lead_sil</span><span class="p">))</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">_leading_silence</span><span class="p">(</span><span class="n">tail</span><span class="p">,</span> <span class="n">threshold_db</span><span class="p">)</span> <span class="o">-</span> <span class="n">trail_sil</span><span class="p">)</span>
+    <span class="n">samples</span> <span class="o">=</span> <span class="n">tail</span><span class="o">.</span><span class="n">slice</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">tail</span><span class="p">))[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">samples</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span> <span class="o">/</span> <span class="mf">32768.0</span><span class="p">)[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:]</span></div>
 
 </pre></div>
 
@@ -1313,7 +1202,7 @@ By M* Team
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Nov 01, 2026.
+  Last updated on Nov 02, 2026.
   <br/>
 </p>
   </div>

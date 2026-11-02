@@ -55,7 +55,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="0.2.1" />
-    <meta name="docbuild:last-update" content="Nov 01, 2026"/>
+    <meta name="docbuild:last-update" content="Nov 02, 2026"/>
   
     
     <script src="../_static/searchtools.js"></script>
@@ -233,6 +233,7 @@
 <li class="toctree-l3"><a class="reference internal" href="mstar.communication.arena.html">mstar.communication.arena</a></li>
 <li class="toctree-l3"><a class="reference internal" href="mstar.communication.codec.html">mstar.communication.codec</a></li>
 <li class="toctree-l3"><a class="reference internal" href="mstar.communication.communicator.html">mstar.communication.communicator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mstar.communication.edge_items.html">mstar.communication.edge_items</a></li>
 <li class="toctree-l3"><a class="reference internal" href="mstar.communication.event.html">mstar.communication.event</a></li>
 <li class="toctree-l3"><a class="reference internal" href="mstar.communication.rust_communicator.html">mstar.communication.rust_communicator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="mstar.communication.tensor_store.html">mstar.communication.tensor_store</a></li>
@@ -355,7 +356,6 @@
 <li class="toctree-l3 has-children"><a class="reference internal" href="mstar.model.omnivoice.html">mstar.model.omnivoice</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="mstar.model.omnivoice.components.html">mstar.model.omnivoice.components</a></li>
 <li class="toctree-l4"><a class="reference internal" href="mstar.model.omnivoice.config.html">mstar.model.omnivoice.config</a></li>
-<li class="toctree-l4"><a class="reference internal" href="mstar.model.omnivoice.submodules.html">mstar.model.omnivoice.submodules</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="mstar.model.orpheus.html">mstar.model.orpheus</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -771,6 +771,7 @@
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.communication.tensors.TensorCommunicationManager.get_ready_tensors"><code class="docutils literal notranslate"><span class="pre">TensorCommunicationManager.get_ready_tensors()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.communication.tensors.TensorCommunicationManager.get_rx_info"><code class="docutils literal notranslate"><span class="pre">TensorCommunicationManager.get_rx_info()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.communication.tensors.TensorCommunicationManager.get_tensor"><code class="docutils literal notranslate"><span class="pre">TensorCommunicationManager.get_tensor()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.communication.tensors.TensorCommunicationManager.get_tensors"><code class="docutils literal notranslate"><span class="pre">TensorCommunicationManager.get_tensors()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.communication.tensors.TensorCommunicationManager.get_tx_info"><code class="docutils literal notranslate"><span class="pre">TensorCommunicationManager.get_tx_info()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.communication.tensors.TensorCommunicationManager.has_inflight_reads"><code class="docutils literal notranslate"><span class="pre">TensorCommunicationManager.has_inflight_reads()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.communication.tensors.TensorCommunicationManager.increment_ref"><code class="docutils literal notranslate"><span class="pre">TensorCommunicationManager.increment_ref()</span></code></a></li>
@@ -784,6 +785,7 @@
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.communication.tensors.TensorCommunicationManager.register_for_send"><code class="docutils literal notranslate"><span class="pre">TensorCommunicationManager.register_for_send()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.communication.tensors.TensorCommunicationManager.register_for_send_uuids"><code class="docutils literal notranslate"><span class="pre">TensorCommunicationManager.register_for_send_uuids()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.communication.tensors.TensorCommunicationManager.register_request"><code class="docutils literal notranslate"><span class="pre">TensorCommunicationManager.register_request()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.communication.tensors.TensorCommunicationManager.replaced_slice_uuids"><code class="docutils literal notranslate"><span class="pre">TensorCommunicationManager.replaced_slice_uuids</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.communication.tensors.TensorCommunicationManager.req_rx_info"><code class="docutils literal notranslate"><span class="pre">TensorCommunicationManager.req_rx_info</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.communication.tensors.TensorCommunicationManager.req_tx_info"><code class="docutils literal notranslate"><span class="pre">TensorCommunicationManager.req_tx_info</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.communication.tensors.TensorCommunicationManager.rid_to_str"><code class="docutils literal notranslate"><span class="pre">TensorCommunicationManager.rid_to_str</span></code></a></li>
@@ -794,6 +796,7 @@
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.communication.tensors.TensorCommunicationManager.slice_uuids"><code class="docutils literal notranslate"><span class="pre">TensorCommunicationManager.slice_uuids</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.communication.tensors.TensorCommunicationManager.stamps_shm_placement"><code class="docutils literal notranslate"><span class="pre">TensorCommunicationManager.stamps_shm_placement</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.communication.tensors.TensorCommunicationManager.start_read_tensors"><code class="docutils literal notranslate"><span class="pre">TensorCommunicationManager.start_read_tensors()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.communication.tensors.TensorCommunicationManager.start_read_tensors_multi"><code class="docutils literal notranslate"><span class="pre">TensorCommunicationManager.start_read_tensors_multi()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.communication.tensors.TensorCommunicationManager.store_and_return_tensor_info"><code class="docutils literal notranslate"><span class="pre">TensorCommunicationManager.store_and_return_tensor_info()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.communication.tensors.TensorCommunicationManager.store_and_return_tensor_info_batch"><code class="docutils literal notranslate"><span class="pre">TensorCommunicationManager.store_and_return_tensor_info_batch()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.communication.tensors.TensorCommunicationManager.store_row_outputs_batch"><code class="docutils literal notranslate"><span class="pre">TensorCommunicationManager.store_row_outputs_batch()</span></code></a></li>
@@ -1531,17 +1534,13 @@ identity on strings.</p>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="mstar.communication.tensors.TensorCommunicationManager.ack_unread_tensors">
-<span class="sig-name descname"><span class="pre">ack_unread_tensors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph_edges</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mstar/communication/tensors.html#TensorCommunicationManager.ack_unread_tensors"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mstar.communication.tensors.TensorCommunicationManager.ack_unread_tensors" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">ack_unread_tensors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">graph_edges</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mstar/communication/tensors.html#TensorCommunicationManager.ack_unread_tensors"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mstar.communication.tensors.TensorCommunicationManager.ack_unread_tensors" title="Link to this definition">#</a></dt>
 <dd><p>Ack tensors for an already-removed request without reading them.</p>
 <p>The producer holds these buffers until it gets the TENSOR_RECEIVED ack;
-emit it here so it can reclaim them. <code class="docutils literal notranslate"><span class="pre">request_id</span></code> is the wire string:
-a removed request has no handle on a worker.</p>
+emit it here so it can reclaim them.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>request_id</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>)</p></li>
-<li><p><strong>graph_edges</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#list" title="(in Python v3.12)"><em>list</em></a><em>[</em><a class="reference internal" href="mstar.graph.base.html#mstar.graph.base.GraphEdge" title="mstar.graph.base.GraphEdge"><em>GraphEdge</em></a><em>]</em>)</p></li>
-</ul>
+<dd class="field-odd"><p><strong>graph_edges</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#list" title="(in Python v3.12)"><em>list</em></a><em>[</em><a class="reference internal" href="mstar.graph.base.html#mstar.graph.base.GraphEdge" title="mstar.graph.base.GraphEdge"><em>GraphEdge</em></a><em>]</em>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1556,7 +1555,9 @@ a removed request has no handle on a worker.</p>
 <span class="sig-name descname"><span class="pre">cleanup_collectable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">collectable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">registered</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mstar/communication/tensors.html#TensorCommunicationManager.cleanup_collectable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mstar.communication.tensors.TensorCommunicationManager.cleanup_collectable" title="Link to this definition">#</a></dt>
 <dd><p>Transport-side teardown for tensors the bookkeeper has already
 dereferenced to zero and forgotten – what a batched dereference, or
-the graph runtime releasing a node’s consumed inputs, hands back.</p>
+the graph runtime releasing a node’s consumed inputs, hands back.
+Under a store that <code class="docutils literal notranslate"><span class="pre">frees_in_place</span></code> that is only the ones with
+something to tear down here; the rest are already gone.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -1711,6 +1712,21 @@ before ACKing (which the soft path would otherwise defer forever).</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.15)"><em>Tensor</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mstar.communication.tensors.TensorCommunicationManager.get_tensors">
+<span class="sig-name descname"><span class="pre">get_tensors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">uuids</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mstar/communication/tensors.html#TensorCommunicationManager.get_tensors"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mstar.communication.tensors.TensorCommunicationManager.get_tensors" title="Link to this definition">#</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">get_tensor</span></code> over a column in one store call, None for a uuid the
+store does not hold.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>uuids</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#list" title="(in Python v3.12)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.12/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a><em>]</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#list" title="(in Python v3.12)">list</a>[<a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.15)"><em>Tensor</em></a> | None]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1897,6 +1913,11 @@ other requests’ tensors are registered all the same.</p>
 </dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="mstar.communication.tensors.TensorCommunicationManager.replaced_slice_uuids">
+<span class="sig-name descname"><span class="pre">replaced_slice_uuids</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#dict" title="(in Python v3.12)"><span class="pre">dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.12/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#list" title="(in Python v3.12)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.12/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#mstar.communication.tensors.TensorCommunicationManager.replaced_slice_uuids" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="mstar.communication.tensors.TensorCommunicationManager.req_rx_info">
 <span class="sig-name descname"><span class="pre">req_rx_info</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#dict" title="(in Python v3.12)"><span class="pre">dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.12/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#dict" title="(in Python v3.12)"><span class="pre">dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#tuple" title="(in Python v3.12)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">RxInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#mstar.communication.tensors.TensorCommunicationManager.req_rx_info" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
@@ -1956,7 +1977,7 @@ holds alive until routing and persist marking have finished.</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="mstar.communication.tensors.TensorCommunicationManager.slice_origins">
-<span class="sig-name descname"><span class="pre">slice_origins</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#dict" title="(in Python v3.12)"><span class="pre">dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.12/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#dict" title="(in Python v3.12)"><span class="pre">dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.12/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.12/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#mstar.communication.tensors.TensorCommunicationManager.slice_origins" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">slice_origins</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#dict" title="(in Python v3.12)"><span class="pre">dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.12/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.12/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#mstar.communication.tensors.TensorCommunicationManager.slice_origins" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -1984,6 +2005,22 @@ and <code class="docutils literal notranslate"><span class="pre">refresh_shm_pla
 <li><p><strong>graph_edges</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#list" title="(in Python v3.12)"><em>list</em></a><em>[</em><a class="reference internal" href="mstar.graph.base.html#mstar.graph.base.GraphEdge" title="mstar.graph.base.GraphEdge"><em>GraphEdge</em></a><em>]</em>)</p></li>
 <li><p><strong>graph_walk</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a><em> | </em><em>None</em>)</p></li>
 </ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#list" title="(in Python v3.12)">list</a>[<em>Future</em>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mstar.communication.tensors.TensorCommunicationManager.start_read_tensors_multi">
+<span class="sig-name descname"><span class="pre">start_read_tensors_multi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reads</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mstar/communication/tensors.html#TensorCommunicationManager.start_read_tensors_multi"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mstar.communication.tensors.TensorCommunicationManager.start_read_tensors_multi" title="Link to this definition">#</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">start_read_tensors</span></code> for several requests’ edges at once (a
+EDGE_ITEMS frame); a transport with per-call setup overrides it to
+pay that once.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>reads</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#list" title="(in Python v3.12)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#tuple" title="(in Python v3.12)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.12/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#list" title="(in Python v3.12)"><em>list</em></a><em>[</em><a class="reference internal" href="mstar.graph.base.html#mstar.graph.base.GraphEdge" title="mstar.graph.base.GraphEdge"><em>GraphEdge</em></a><em>]</em><em>]</em><em>]</em>)</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#list" title="(in Python v3.12)">list</a>[<em>Future</em>]</p>
@@ -2466,6 +2503,7 @@ worker of the old one may still unlink.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.communication.tensors.TensorCommunicationManager.get_ready_tensors"><code class="docutils literal notranslate"><span class="pre">TensorCommunicationManager.get_ready_tensors()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.communication.tensors.TensorCommunicationManager.get_rx_info"><code class="docutils literal notranslate"><span class="pre">TensorCommunicationManager.get_rx_info()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.communication.tensors.TensorCommunicationManager.get_tensor"><code class="docutils literal notranslate"><span class="pre">TensorCommunicationManager.get_tensor()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.communication.tensors.TensorCommunicationManager.get_tensors"><code class="docutils literal notranslate"><span class="pre">TensorCommunicationManager.get_tensors()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.communication.tensors.TensorCommunicationManager.get_tx_info"><code class="docutils literal notranslate"><span class="pre">TensorCommunicationManager.get_tx_info()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.communication.tensors.TensorCommunicationManager.has_inflight_reads"><code class="docutils literal notranslate"><span class="pre">TensorCommunicationManager.has_inflight_reads()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.communication.tensors.TensorCommunicationManager.increment_ref"><code class="docutils literal notranslate"><span class="pre">TensorCommunicationManager.increment_ref()</span></code></a></li>
@@ -2479,6 +2517,7 @@ worker of the old one may still unlink.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.communication.tensors.TensorCommunicationManager.register_for_send"><code class="docutils literal notranslate"><span class="pre">TensorCommunicationManager.register_for_send()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.communication.tensors.TensorCommunicationManager.register_for_send_uuids"><code class="docutils literal notranslate"><span class="pre">TensorCommunicationManager.register_for_send_uuids()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.communication.tensors.TensorCommunicationManager.register_request"><code class="docutils literal notranslate"><span class="pre">TensorCommunicationManager.register_request()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.communication.tensors.TensorCommunicationManager.replaced_slice_uuids"><code class="docutils literal notranslate"><span class="pre">TensorCommunicationManager.replaced_slice_uuids</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.communication.tensors.TensorCommunicationManager.req_rx_info"><code class="docutils literal notranslate"><span class="pre">TensorCommunicationManager.req_rx_info</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.communication.tensors.TensorCommunicationManager.req_tx_info"><code class="docutils literal notranslate"><span class="pre">TensorCommunicationManager.req_tx_info</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.communication.tensors.TensorCommunicationManager.rid_to_str"><code class="docutils literal notranslate"><span class="pre">TensorCommunicationManager.rid_to_str</span></code></a></li>
@@ -2489,6 +2528,7 @@ worker of the old one may still unlink.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.communication.tensors.TensorCommunicationManager.slice_uuids"><code class="docutils literal notranslate"><span class="pre">TensorCommunicationManager.slice_uuids</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.communication.tensors.TensorCommunicationManager.stamps_shm_placement"><code class="docutils literal notranslate"><span class="pre">TensorCommunicationManager.stamps_shm_placement</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.communication.tensors.TensorCommunicationManager.start_read_tensors"><code class="docutils literal notranslate"><span class="pre">TensorCommunicationManager.start_read_tensors()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.communication.tensors.TensorCommunicationManager.start_read_tensors_multi"><code class="docutils literal notranslate"><span class="pre">TensorCommunicationManager.start_read_tensors_multi()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.communication.tensors.TensorCommunicationManager.store_and_return_tensor_info"><code class="docutils literal notranslate"><span class="pre">TensorCommunicationManager.store_and_return_tensor_info()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.communication.tensors.TensorCommunicationManager.store_and_return_tensor_info_batch"><code class="docutils literal notranslate"><span class="pre">TensorCommunicationManager.store_and_return_tensor_info_batch()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.communication.tensors.TensorCommunicationManager.store_row_outputs_batch"><code class="docutils literal notranslate"><span class="pre">TensorCommunicationManager.store_row_outputs_batch()</span></code></a></li>
@@ -2554,7 +2594,7 @@ By M* Team
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Nov 01, 2026.
+  Last updated on Nov 02, 2026.
   <br/>
 </p>
   </div>

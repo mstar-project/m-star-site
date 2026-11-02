@@ -410,7 +410,7 @@ window.runMermaid = runMermaid;</script>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="0.2.1" />
-    <meta name="docbuild:last-update" content="Nov 01, 2026"/>
+    <meta name="docbuild:last-update" content="Nov 02, 2026"/>
   
     
     <script src="../../../../_static/searchtools.js"></script>
@@ -586,6 +586,7 @@ window.runMermaid = runMermaid;</script>
 <li class="toctree-l3"><a class="reference internal" href="../../../../_autosummary/mstar.communication.arena.html">mstar.communication.arena</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../_autosummary/mstar.communication.codec.html">mstar.communication.codec</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../_autosummary/mstar.communication.communicator.html">mstar.communication.communicator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../_autosummary/mstar.communication.edge_items.html">mstar.communication.edge_items</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../_autosummary/mstar.communication.event.html">mstar.communication.event</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../_autosummary/mstar.communication.rust_communicator.html">mstar.communication.rust_communicator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../_autosummary/mstar.communication.tensor_store.html">mstar.communication.tensor_store</a></li>
@@ -708,7 +709,6 @@ window.runMermaid = runMermaid;</script>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../../_autosummary/mstar.model.omnivoice.html">mstar.model.omnivoice</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../../_autosummary/mstar.model.omnivoice.components.html">mstar.model.omnivoice.components</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../_autosummary/mstar.model.omnivoice.config.html">mstar.model.omnivoice.config</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../_autosummary/mstar.model.omnivoice.submodules.html">mstar.model.omnivoice.submodules</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../../_autosummary/mstar.model.orpheus.html">mstar.model.orpheus</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -1067,6 +1067,12 @@ window.runMermaid = runMermaid;</script>
     <span class="c1"># own compiled graph, on top of the shapes above.</span>
     <span class="n">dit_max_batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span>
 
+    <span class="c1"># The DiT's self-attention kernel: "flashinfer" runs it through the engine's</span>
+    <span class="c1"># ragged resource (FlashInfer's ragged prefill, FA3 on Hopper); "sdpa" runs</span>
+    <span class="c1"># torch SDPA, the reference pipeline's kernel. The cross-attention always</span>
+    <span class="c1"># runs SDPA.</span>
+    <span class="n">attention_backend</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"flashinfer"</span>
+
     <span class="c1"># VAE-decode tiling policy: "auto" decodes untiled when free VRAM comfortably</span>
     <span class="c1"># exceeds the estimated untiled peak for the output size and tiles otherwise;</span>
     <span class="c1"># "tiled"/"untiled" force a path. WAN22_VAE_DECODE_TILING overrides at runtime.</span>
@@ -1087,6 +1093,10 @@ window.runMermaid = runMermaid;</script>
         <span class="c1"># rather than read as on.</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vae_decode_fast</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Wan2.2 vae_decode_fast must be true or false, got </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">vae_decode_fast</span><span class="si">!r}</span><span class="s2">."</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">attention_backend</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"flashinfer"</span><span class="p">,</span> <span class="s2">"sdpa"</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"Wan2.2 attention_backend must be 'flashinfer' or 'sdpa', got </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">attention_backend</span><span class="si">!r}</span><span class="s2">."</span>
+            <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fast_decode_sizes</span><span class="p">()</span>
 
 <div class="viewcode-block" id="Wan22Config.fast_decode_sizes">
@@ -1211,7 +1221,7 @@ By M* Team
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Nov 01, 2026.
+  Last updated on Nov 02, 2026.
   <br/>
 </p>
   </div>
