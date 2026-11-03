@@ -250,7 +250,6 @@
 <li class="toctree-l2 has-children"><a class="reference internal" href="_autosummary/mstar.engine.html">mstar.engine</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.engine.accelerator_graph_backend.html">mstar.engine.accelerator_graph_backend</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.engine.accelerator_graph_config.html">mstar.engine.accelerator_graph_config</a></li>
-<li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.engine.accelerator_graph_runner.html">mstar.engine.accelerator_graph_runner</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.engine.chunking.html">mstar.engine.chunking</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.engine.fp32_precision.html">mstar.engine.fp32_precision</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.engine.node_dtype.html">mstar.engine.node_dtype</a></li>
@@ -262,6 +261,7 @@
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.engine.resources.kv.html">mstar.engine.resources.kv</a></li>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.engine.resources.lora.html">mstar.engine.resources.lora</a></li>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.engine.resources.position.html">mstar.engine.resources.position</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.engine.resources.resident_hooks.html">mstar.engine.resources.resident_hooks</a></li>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.engine.resources.rms_norm.html">mstar.engine.resources.rms_norm</a></li>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.engine.resources.runner.html">mstar.engine.resources.runner</a></li>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.engine.resources.sampler.html">mstar.engine.resources.sampler</a></li>
@@ -402,7 +402,6 @@
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.model.waypoint.components.html">mstar.model.waypoint.components</a></li>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.model.waypoint.config.html">mstar.model.waypoint.config</a></li>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.model.waypoint.ring_geometry.html">mstar.model.waypoint.ring_geometry</a></li>
-<li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.model.waypoint.submodules.html">mstar.model.waypoint.submodules</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="_autosummary/mstar.model.whisper.html">mstar.model.whisper</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -459,6 +458,7 @@
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.chunk_loops.html">mstar.worker.chunk_loops</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.node_manager_utils.html">mstar.worker.node_manager_utils</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.rid_table.html">mstar.worker.rid_table</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.side_steps.html">mstar.worker.side_steps</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.spec_rows.html">mstar.worker.spec_rows</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.stream_buffers.html">mstar.worker.stream_buffers</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.worker_metrics.html">mstar.worker.worker_metrics</a></li>
@@ -725,6 +725,7 @@
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#preprocessing-threads">Preprocessing threads</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#tensor-parallelism-sharding">Tensor parallelism (sharding)</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#expert-parallelism-moe">Expert parallelism (MoE)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#tuned-kernel-configs">Tuned kernel configs</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#worked-example-orpheus">Worked example: Orpheus</a></li>
@@ -929,8 +930,9 @@ the Dynamo frontend will silently lose it.</p>
 value that <code class="docutils literal notranslate"><span class="pre">process_prompt</span></code> moves onto a tensor edge must not travel there
 too. List those kwargs in <code class="docutils literal notranslate"><span class="pre">PREPROCESS_ONLY_KWARGS</span></code>: the data worker keeps the
 originals for <code class="docutils literal notranslate"><span class="pre">postprocess</span></code> and leaves them out of the conductor’s copy. Pi0.5
-lists <code class="docutils literal notranslate"><span class="pre">robot_state</span></code>, and Cosmos3 lists <code class="docutils literal notranslate"><span class="pre">action</span></code> (it passes only the shape on as
-<code class="docutils literal notranslate"><span class="pre">action_shape</span></code> metadata). A tensor left in <code class="docutils literal notranslate"><span class="pre">model_kwargs</span></code> fails at send
+lists <code class="docutils literal notranslate"><span class="pre">robot_state</span></code>, and Cosmos3 lists <code class="docutils literal notranslate"><span class="pre">action</span></code> and <code class="docutils literal notranslate"><span class="pre">robot_state</span></code> (it passes
+only their sizes on, as <code class="docutils literal notranslate"><span class="pre">action_shape</span></code> and <code class="docutils literal notranslate"><span class="pre">robot_state_dim</span></code> metadata). A tensor
+left in <code class="docutils literal notranslate"><span class="pre">model_kwargs</span></code> fails at send
 with an error that names the kwarg.</p>
 </div>
 <div class="admonition note">
@@ -1445,9 +1447,10 @@ missing. By default the heads are split across all TP × SP ranks of the node;
 <code class="docutils literal notranslate"><span class="pre">shard_over_sp=False</span></code> splits them across the TP ranks only, for an attention
 each sequence-parallel rank runs whole over its own tokens (one over a
 replicated stream, or a cross-attention from the rank’s query shard).
-<code class="docutils literal notranslate"><span class="pre">workspace_mb</span></code> sizes each label’s FlashInfer workspace per slot (default
-<code class="docutils literal notranslate"><span class="pre">MSTAR_WORKSPACE_BUFFER_MB</span></code>, 512); a node with many labels can declare less,
-since a ragged prefill only uses it for split-KV partials. <code class="docutils literal notranslate"><span class="pre">compile_op</span></code>,
+<code class="docutils literal notranslate"><span class="pre">workspace_mb</span></code> is the floor of each label’s FlashInfer workspace per slot (default
+<code class="docutils literal notranslate"><span class="pre">MSTAR_WORKSPACE_BUFFER_MB</span></code>, 512, which doesn’t apply once it is declared): a plan that
+asks for more at startup grows it. A node with many labels can declare less, since a
+ragged prefill only uses it for split-KV partials. <code class="docutils literal notranslate"><span class="pre">compile_op</span></code>,
 <code class="docutils literal notranslate"><span class="pre">shard_over_sp</span></code> and <code class="docutils literal notranslate"><span class="pre">workspace_mb</span></code> are the model’s declaration; the serving
 config’s <code class="docutils literal notranslate"><span class="pre">resources:</span></code> overrides take only the backends and the ceilings. See
 <a class="reference internal" href="#cacheless-attention-encoder-towers">Cacheless attention (encoder towers)</a> for <code class="docutils literal notranslate"><span class="pre">compile_op</span></code>.</p></td>
@@ -2315,6 +2318,17 @@ and evict other requests. Without a declaration, the same situation raises a
 <code class="docutils literal notranslate"><span class="pre">RuntimeError</span></code> inside the forward.</p>
 <p>Returning <code class="docutils literal notranslate"><span class="pre">None</span></code> means that the submodule manages its own resources. This is the legacy
 path, kept for submodules that have not been migrated.</p>
+<p>A walk named in <code class="docutils literal notranslate"><span class="pre">resident_walks()</span></code> runs its captured steps off per-request tables on the
+device instead of a plan rebuilt per step (<code class="docutils literal notranslate"><span class="pre">mstar/engine/resources/resident.py</span></code>). The
+walk must declare, for each resource, one stream that takes one token per row, or one
+it only reads at span 0 (a cross-attention context), with no forks, retention or sink,
+and its <code class="docutils literal notranslate"><span class="pre">preprocess</span></code> must read no planned position or KV location, because the
+captured graph fills those in first. Each KV pool of the node keeps its own block table
+and lengths; positions read the pool their <code class="docutils literal notranslate"><span class="pre">PositionConfig.kv_cache</span></code> names. Capture raises on a declaration that breaks this. The engine
+turns it on only if every resource of the node can (<code class="docutils literal notranslate"><span class="pre">Resource.resident_refusal</span></code>) and
+the deployment left <code class="docutils literal notranslate"><span class="pre">knobs:</span> <span class="pre">resident_planning</span></code> at <code class="docutils literal notranslate"><span class="pre">auto</span></code>; the worker log says why
+otherwise. Steps of other walks, and eager steps, keep the host plan and leave the row
+stale, so the first resident step after them writes it.</p>
 <p>A <code class="docutils literal notranslate"><span class="pre">SubmoduleStep</span></code> contains a list of <code class="docutils literal notranslate"><span class="pre">Segment</span></code> objects and one <code class="docutils literal notranslate"><span class="pre">ResourceStep</span></code> per
 resource key:</p>
 <ul class="simple">
@@ -2404,8 +2418,9 @@ while replaying a graph sized by its few prompt tokens.</p></li>
 rather than through <code class="docutils literal notranslate"><span class="pre">write_kv</span></code>, asks the KV resource where the step’s tokens go:
 <code class="docutils literal notranslate"><span class="pre">kv.write_target(layer_idx,</span> <span class="pre">label)</span></code> returns <code class="docutils literal notranslate"><span class="pre">(layer</span> <span class="pre">cache,</span> <span class="pre">page</span> <span class="pre">of</span> <span class="pre">each</span> <span class="pre">token,</span> <span class="pre">slot</span> <span class="pre">in</span>
 <span class="pre">page</span> <span class="pre">of</span> <span class="pre">each</span> <span class="pre">token,</span> <span class="pre">number</span> <span class="pre">of</span> <span class="pre">tokens</span> <span class="pre">to</span> <span class="pre">write)</span></code> for the current plan (NHD layout only).
-Tokens past that number are the plan’s padding and must not be written. Qwen3-ASR’s
-fused q/k norm, RoPE and KV-write kernel (<code class="docutils literal notranslate"><span class="pre">Qwen3Attention</span></code>) is the example.</p>
+Tokens past that number are the plan’s padding and must not be written. The fused q/k
+norm, RoPE and KV-write kernels that Qwen3-ASR and Qwen3-Omni’s Thinker call through
+<code class="docutils literal notranslate"><span class="pre">AttentionCallable.norm_rope_attend</span></code> and <code class="docutils literal notranslate"><span class="pre">norm_rope_table_attend</span></code> are the example.</p>
 <p><strong>Testing.</strong> <code class="docutils literal notranslate"><span class="pre">declare_step</span></code> performs only host-side bookkeeping, so you can unit-test it
 on CPU without model weights. <code class="docutils literal notranslate"><span class="pre">test/modular/vjepa2/fake_resources.py</span></code> shows how to stub
 the resources, and <code class="docutils literal notranslate"><span class="pre">test/modular/test_resource_runner.py</span></code> tests the runner’s lifecycle
@@ -2595,6 +2610,20 @@ which is what the engine reads, and resources of one node must agree on a walk�
 <code class="docutils literal notranslate"><span class="pre">prefill_walks</span></code>. The engine then orders that walk’s steps with the <code class="docutils literal notranslate"><span class="pre">prefill_walks</span></code>
 rows last, so the kernels read the decode rows as the step’s first tokens, in place. Every
 other walk of the combined walk must be one token per row.</p>
+<p><strong>Steps beside the chain.</strong> A worker’s main loop runs one chain of steps, and any step on it
+costs a pass of the loop and holds the next one behind its kernels. A node that shares a
+worker with a heavier one can set <code class="docutils literal notranslate"><span class="pre">side_stream_walks</span></code> on its submodule to the walks that
+may run beside the chain instead, and a deployment turns that on with <code class="docutils literal notranslate"><span class="pre">side_stream:</span> <span class="pre">true</span></code>
+on the node’s group (see <a class="reference internal" href="serving.html"><span class="doc">Serving</span></a>). Such a step neither takes a turn on the chain nor
+makes it yield, runs on a second stream, and the windows that come ready while it runs
+batch into the next one (see <code class="docutils literal notranslate"><span class="pre">mstar/worker/side_steps.py</span></code>). Its graphs capture on a stream
+of their own, since graphs captured on one stream must not overlap. It suits a stream-fed
+walk that nothing on the chain reads, such as a codec. Where the config asks,
+<code class="docutils literal notranslate"><span class="pre">EngineManager.build</span></code> refuses what the lane can’t serve, since a side step is neither
+speculated nor planned ahead and lands between two chain steps: a TP or SP node, a node
+alone on its worker, a device without streams, a node with chain walks or resources, and a
+side walk that is not the node’s alone, sits in a combined walk, or has output spans or a
+stop check. A config without the field keeps the node on the chain, whatever it declares.</p>
 <p><code class="docutils literal notranslate"><span class="pre">ARNodeSubmodule</span></code> declares <code class="docutils literal notranslate"><span class="pre">preprocess</span></code> abstract because autoregressive nodes are
 expected to collate a batch. You can still disable batching for one node, or for specific
 walks, by returning <code class="docutils literal notranslate"><span class="pre">False</span></code> from <code class="docutils literal notranslate"><span class="pre">can_batch</span></code> in those cases.</p>
@@ -2700,6 +2729,11 @@ per-label span.</p>
     <span class="p">]</span>
 </pre></div>
 </div>
+<p>An <code class="docutils literal notranslate"><span class="pre">ARNodeSubmodule</span></code> takes a <code class="docutils literal notranslate"><span class="pre">prefill_token_buckets</span></code> constructor argument, which
+replaces its class’s <code class="docutils literal notranslate"><span class="pre">PREFILL_TOKEN_BUCKETS</span></code> for that instance: a model passes a
+deployment’s <code class="docutils literal notranslate"><span class="pre">model_kwargs.prefill_token_buckets</span></code> through to it (Qwen3.5, Qwen3-Omni
+and GLM-5.2 do). It must be a non-empty list of distinct positive token counts, or the
+submodule raises <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> when it is built.</p>
 <p>BAGEL shows the case of two captures for one walk. It captures <code class="docutils literal notranslate"><span class="pre">decode</span></code> twice, once with
 <code class="docutils literal notranslate"><span class="pre">additional_key_info=False</span></code> and once with <code class="docutils literal notranslate"><span class="pre">additional_key_info=True</span></code>. A decode step
 with guidance enabled and a decode step with guidance disabled declare different segments
@@ -2977,7 +3011,9 @@ that a misspelled setting is never silently ignored:</p>
 <td><p><code class="docutils literal notranslate"><span class="pre">max_slots</span></code></p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">RecurrentStateSpec</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">max_slots</span></code>, <code class="docutils literal notranslate"><span class="pre">state_dtype</span></code>, <code class="docutils literal notranslate"><span class="pre">prefix_slots</span></code> (see <strong>Cross-request prefix reuse</strong>)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">max_slots</span></code>, <code class="docutils literal notranslate"><span class="pre">state_dtype</span></code>, <code class="docutils literal notranslate"><span class="pre">prefix_slots</span></code> (see <strong>Cross-request prefix reuse</strong>).
+<code class="docutils literal notranslate"><span class="pre">max_slots</span></code> counts the sink unless <code class="docutils literal notranslate"><span class="pre">disable_sink_slot</span></code>; a value that leaves no
+slot for a request is refused at startup.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">AttentionSpec</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">backend</span></code> (<code class="docutils literal notranslate"><span class="pre">auto</span></code> / <code class="docutils literal notranslate"><span class="pre">flashinfer</span></code> / <code class="docutils literal notranslate"><span class="pre">dense</span></code> / <code class="docutils literal notranslate"><span class="pre">flex</span></code> / <code class="docutils literal notranslate"><span class="pre">xpu_paged</span></code>),
@@ -3091,8 +3127,10 @@ in arrival order. A deployment sets the pool at the top level of its config; 1 t
 <span class="nt">preprocess_workers</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
 </pre></div>
 </div>
-<p>The pool only helps work that releases the GIL, so measure each stage first. A model with
-client streams always prepares inline, since an append has to follow its request.</p>
+<p>The pool only helps work that releases the GIL, so measure each stage first. Qwen3-Omni and
+V-JEPA2 declare it (<code class="docutils literal notranslate"><span class="pre">configs/vjepa2.yaml</span></code> and <code class="docutils literal notranslate"><span class="pre">configs/vjepa2_ac.yaml</span></code> set 8 and 4, the
+sizes measured for their video decode). A model with client streams always prepares inline,
+since an append has to follow its request.</p>
 <p>A pool that small is slow for a large copy, and a 121-frame 832x480 video is 145 MB. A
 video decoder should therefore emit its clip in the layout the encoder takes, transposed
 on the GPU inside its forward, so <code class="docutils literal notranslate"><span class="pre">postprocess</span></code> hands the tensor it reads straight to the
@@ -3207,6 +3245,19 @@ as a static input, so a replay can update it; fill it from
 </ol>
 <p>The shared-expert block (<code class="docutils literal notranslate"><span class="pre">ParallelSparseMoeBlockWithSharedExpert</span></code>) has no EP variant, so
 a node built from it stays TP-only.</p>
+</section>
+<section id="tuned-kernel-configs">
+<h3>Tuned kernel configs<a class="headerlink" href="#tuned-kernel-configs" title="Link to this heading">#</a></h3>
+<p>Launch configs that depend on the GPU and the shapes, such as the fused MoE’s tiles, are data,
+not code. Each kernel op (<code class="docutils literal notranslate"><span class="pre">mstar/kernels</span></code>) names the dimensions its configs are keyed by, and
+its tuned configs live in one JSON table per GPU under <code class="docutils literal notranslate"><span class="pre">mstar/kernels/tables/&lt;op&gt;/</span></code>. A model
+on a shared component gets them without code of its own: the component looks its shape up once
+per process and keeps the default config where no table has it, and the server logs the sweep
+command for that shape (<code class="docutils literal notranslate"><span class="pre">kernel</span> <span class="pre">table:</span> <span class="pre">no</span> <span class="pre">moe_gemm</span> <span class="pre">bfloat16</span> <span class="pre">E=128,N=1536,K=2048,top_k=8</span> <span class="pre">...</span></code>).</p>
+<p><code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">benchmark.kernels.sweep</span></code> times the candidates at those shapes on one GPU, checks
+each against a reference output, and writes the winners with where they were measured.
+<code class="docutils literal notranslate"><span class="pre">--out</span> <span class="pre">DIR</span></code> with <code class="docutils literal notranslate"><span class="pre">MSTAR_KERNEL_TABLES=DIR</span></code> serves a sweep before it is committed;
+<code class="docutils literal notranslate"><span class="pre">benchmark/kernels/README.md</span></code> has the workflow and how to add an op.</p>
 </section>
 </section>
 <section id="worked-example-orpheus">
@@ -3820,6 +3871,7 @@ for a full omni-modal model.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#preprocessing-threads">Preprocessing threads</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#tensor-parallelism-sharding">Tensor parallelism (sharding)</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#expert-parallelism-moe">Expert parallelism (MoE)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#tuned-kernel-configs">Tuned kernel configs</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#worked-example-orpheus">Worked example: Orpheus</a></li>

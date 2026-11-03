@@ -607,7 +607,6 @@ window.runMermaid = runMermaid;</script>
 <li class="toctree-l2 has-children"><a class="reference internal" href="_autosummary/mstar.engine.html">mstar.engine</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.engine.accelerator_graph_backend.html">mstar.engine.accelerator_graph_backend</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.engine.accelerator_graph_config.html">mstar.engine.accelerator_graph_config</a></li>
-<li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.engine.accelerator_graph_runner.html">mstar.engine.accelerator_graph_runner</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.engine.chunking.html">mstar.engine.chunking</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.engine.fp32_precision.html">mstar.engine.fp32_precision</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.engine.node_dtype.html">mstar.engine.node_dtype</a></li>
@@ -619,6 +618,7 @@ window.runMermaid = runMermaid;</script>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.engine.resources.kv.html">mstar.engine.resources.kv</a></li>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.engine.resources.lora.html">mstar.engine.resources.lora</a></li>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.engine.resources.position.html">mstar.engine.resources.position</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.engine.resources.resident_hooks.html">mstar.engine.resources.resident_hooks</a></li>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.engine.resources.rms_norm.html">mstar.engine.resources.rms_norm</a></li>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.engine.resources.runner.html">mstar.engine.resources.runner</a></li>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.engine.resources.sampler.html">mstar.engine.resources.sampler</a></li>
@@ -759,7 +759,6 @@ window.runMermaid = runMermaid;</script>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.model.waypoint.components.html">mstar.model.waypoint.components</a></li>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.model.waypoint.config.html">mstar.model.waypoint.config</a></li>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.model.waypoint.ring_geometry.html">mstar.model.waypoint.ring_geometry</a></li>
-<li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.model.waypoint.submodules.html">mstar.model.waypoint.submodules</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="_autosummary/mstar.model.whisper.html">mstar.model.whisper</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -816,6 +815,7 @@ window.runMermaid = runMermaid;</script>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.chunk_loops.html">mstar.worker.chunk_loops</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.node_manager_utils.html">mstar.worker.node_manager_utils</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.rid_table.html">mstar.worker.rid_table</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.side_steps.html">mstar.worker.side_steps</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.spec_rows.html">mstar.worker.spec_rows</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.stream_buffers.html">mstar.worker.stream_buffers</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.worker_metrics.html">mstar.worker.worker_metrics</a></li>
@@ -1166,11 +1166,6 @@ window.runMermaid = runMermaid;</script>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="_autosummary/mstar.engine.accelerator_graph_runner.html#module-mstar.engine.accelerator_graph_runner"><code class="xref">mstar.engine.accelerator_graph_runner</code></a></td><td>
-       <em></em></td></tr>
-     <tr class="cg-1">
-       <td></td>
-       <td>&#160;&#160;&#160;
        <a href="_autosummary/mstar.engine.chunking.html#module-mstar.engine.chunking"><code class="xref">mstar.engine.chunking</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
@@ -1201,47 +1196,12 @@ window.runMermaid = runMermaid;</script>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="_autosummary/mstar.engine.resources.attn.base.html#module-mstar.engine.resources.attn.base"><code class="xref">mstar.engine.resources.attn.base</code></a></td><td>
-       <em></em></td></tr>
-     <tr class="cg-1">
-       <td></td>
-       <td>&#160;&#160;&#160;
        <a href="_autosummary/mstar.engine.resources.attn.config.html#module-mstar.engine.resources.attn.config"><code class="xref">mstar.engine.resources.attn.config</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="_autosummary/mstar.engine.resources.attn.cross.html#module-mstar.engine.resources.attn.cross"><code class="xref">mstar.engine.resources.attn.cross</code></a></td><td>
-       <em></em></td></tr>
-     <tr class="cg-1">
-       <td></td>
-       <td>&#160;&#160;&#160;
-       <a href="_autosummary/mstar.engine.resources.attn.dense.html#module-mstar.engine.resources.attn.dense"><code class="xref">mstar.engine.resources.attn.dense</code></a></td><td>
-       <em></em></td></tr>
-     <tr class="cg-1">
-       <td></td>
-       <td>&#160;&#160;&#160;
-       <a href="_autosummary/mstar.engine.resources.attn.flashinfer.html#module-mstar.engine.resources.attn.flashinfer"><code class="xref">mstar.engine.resources.attn.flashinfer</code></a></td><td>
-       <em></em></td></tr>
-     <tr class="cg-1">
-       <td></td>
-       <td>&#160;&#160;&#160;
-       <a href="_autosummary/mstar.engine.resources.attn.flashinfer_mla.html#module-mstar.engine.resources.attn.flashinfer_mla"><code class="xref">mstar.engine.resources.attn.flashinfer_mla</code></a></td><td>
-       <em></em></td></tr>
-     <tr class="cg-1">
-       <td></td>
-       <td>&#160;&#160;&#160;
-       <a href="_autosummary/mstar.engine.resources.attn.flex.html#module-mstar.engine.resources.attn.flex"><code class="xref">mstar.engine.resources.attn.flex</code></a></td><td>
-       <em></em></td></tr>
-     <tr class="cg-1">
-       <td></td>
-       <td>&#160;&#160;&#160;
        <a href="_autosummary/mstar.engine.resources.attn.ragged.html#module-mstar.engine.resources.attn.ragged"><code class="xref">mstar.engine.resources.attn.ragged</code></a></td><td>
-       <em></em></td></tr>
-     <tr class="cg-1">
-       <td></td>
-       <td>&#160;&#160;&#160;
-       <a href="_autosummary/mstar.engine.resources.attn.ragged.base.html#module-mstar.engine.resources.attn.ragged.base"><code class="xref">mstar.engine.resources.attn.ragged.base</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
@@ -1256,22 +1216,12 @@ window.runMermaid = runMermaid;</script>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="_autosummary/mstar.engine.resources.attn.ragged.flashinfer.html#module-mstar.engine.resources.attn.ragged.flashinfer"><code class="xref">mstar.engine.resources.attn.ragged.flashinfer</code></a></td><td>
-       <em></em></td></tr>
-     <tr class="cg-1">
-       <td></td>
-       <td>&#160;&#160;&#160;
        <a href="_autosummary/mstar.engine.resources.attn.ragged.wrappers.html#module-mstar.engine.resources.attn.ragged.wrappers"><code class="xref">mstar.engine.resources.attn.ragged.wrappers</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="_autosummary/mstar.engine.resources.attn.wrappers.html#module-mstar.engine.resources.attn.wrappers"><code class="xref">mstar.engine.resources.attn.wrappers</code></a></td><td>
-       <em></em></td></tr>
-     <tr class="cg-1">
-       <td></td>
-       <td>&#160;&#160;&#160;
-       <a href="_autosummary/mstar.engine.resources.attn.xpu.html#module-mstar.engine.resources.attn.xpu"><code class="xref">mstar.engine.resources.attn.xpu</code></a></td><td>
+       <a href="_autosummary/mstar.engine.resources.attn.workspace.html#module-mstar.engine.resources.attn.workspace"><code class="xref">mstar.engine.resources.attn.workspace</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
@@ -1297,11 +1247,6 @@ window.runMermaid = runMermaid;</script>
        <td></td>
        <td>&#160;&#160;&#160;
        <a href="_autosummary/mstar.engine.resources.kv.html#module-mstar.engine.resources.kv"><code class="xref">mstar.engine.resources.kv</code></a></td><td>
-       <em></em></td></tr>
-     <tr class="cg-1">
-       <td></td>
-       <td>&#160;&#160;&#160;
-       <a href="_autosummary/mstar.engine.resources.kv.arena.html#module-mstar.engine.resources.kv.arena"><code class="xref">mstar.engine.resources.kv.arena</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
@@ -1366,11 +1311,6 @@ window.runMermaid = runMermaid;</script>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="_autosummary/mstar.engine.resources.kv.routing.html#module-mstar.engine.resources.kv.routing"><code class="xref">mstar.engine.resources.kv.routing</code></a></td><td>
-       <em></em></td></tr>
-     <tr class="cg-1">
-       <td></td>
-       <td>&#160;&#160;&#160;
        <a href="_autosummary/mstar.engine.resources.lora.html#module-mstar.engine.resources.lora"><code class="xref">mstar.engine.resources.lora</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
@@ -1426,12 +1366,12 @@ window.runMermaid = runMermaid;</script>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="_autosummary/mstar.engine.resources.position.manager.html#module-mstar.engine.resources.position.manager"><code class="xref">mstar.engine.resources.position.manager</code></a></td><td>
+       <a href="_autosummary/mstar.engine.resources.position.rope.html#module-mstar.engine.resources.position.rope"><code class="xref">mstar.engine.resources.position.rope</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="_autosummary/mstar.engine.resources.position.rope.html#module-mstar.engine.resources.position.rope"><code class="xref">mstar.engine.resources.position.rope</code></a></td><td>
+       <a href="_autosummary/mstar.engine.resources.resident_hooks.html#module-mstar.engine.resources.resident_hooks"><code class="xref">mstar.engine.resources.resident_hooks</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
@@ -2086,11 +2026,6 @@ window.runMermaid = runMermaid;</script>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="_autosummary/mstar.model.waypoint.submodules.html#module-mstar.model.waypoint.submodules"><code class="xref">mstar.model.waypoint.submodules</code></a></td><td>
-       <em></em></td></tr>
-     <tr class="cg-1">
-       <td></td>
-       <td>&#160;&#160;&#160;
        <a href="_autosummary/mstar.model.whisper.html#module-mstar.model.whisper"><code class="xref">mstar.model.whisper</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
@@ -2122,6 +2057,11 @@ window.runMermaid = runMermaid;</script>
        <td></td>
        <td>&#160;&#160;&#160;
        <a href="_autosummary/mstar.model.z_image.components.html#module-mstar.model.z_image.components"><code class="xref">mstar.model.z_image.components</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_autosummary/mstar.model.z_image.components.qk_norm_rope.html#module-mstar.model.z_image.components.qk_norm_rope"><code class="xref">mstar.model.z_image.components.qk_norm_rope</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
@@ -2307,6 +2247,11 @@ window.runMermaid = runMermaid;</script>
        <td></td>
        <td>&#160;&#160;&#160;
        <a href="_autosummary/mstar.worker.rid_table.html#module-mstar.worker.rid_table"><code class="xref">mstar.worker.rid_table</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_autosummary/mstar.worker.side_steps.html#module-mstar.worker.side_steps"><code class="xref">mstar.worker.side_steps</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>

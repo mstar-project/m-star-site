@@ -604,7 +604,6 @@ window.runMermaid = runMermaid;</script>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../../_autosummary/mstar.engine.html">mstar.engine</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../../_autosummary/mstar.engine.accelerator_graph_backend.html">mstar.engine.accelerator_graph_backend</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../_autosummary/mstar.engine.accelerator_graph_config.html">mstar.engine.accelerator_graph_config</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../../_autosummary/mstar.engine.accelerator_graph_runner.html">mstar.engine.accelerator_graph_runner</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../_autosummary/mstar.engine.chunking.html">mstar.engine.chunking</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../_autosummary/mstar.engine.fp32_precision.html">mstar.engine.fp32_precision</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../_autosummary/mstar.engine.node_dtype.html">mstar.engine.node_dtype</a></li>
@@ -616,6 +615,7 @@ window.runMermaid = runMermaid;</script>
 <li class="toctree-l4"><a class="reference internal" href="../../../../_autosummary/mstar.engine.resources.kv.html">mstar.engine.resources.kv</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../_autosummary/mstar.engine.resources.lora.html">mstar.engine.resources.lora</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../_autosummary/mstar.engine.resources.position.html">mstar.engine.resources.position</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../_autosummary/mstar.engine.resources.resident_hooks.html">mstar.engine.resources.resident_hooks</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../_autosummary/mstar.engine.resources.rms_norm.html">mstar.engine.resources.rms_norm</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../_autosummary/mstar.engine.resources.runner.html">mstar.engine.resources.runner</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../_autosummary/mstar.engine.resources.sampler.html">mstar.engine.resources.sampler</a></li>
@@ -756,7 +756,6 @@ window.runMermaid = runMermaid;</script>
 <li class="toctree-l4"><a class="reference internal" href="../../../../_autosummary/mstar.model.waypoint.components.html">mstar.model.waypoint.components</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../_autosummary/mstar.model.waypoint.config.html">mstar.model.waypoint.config</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../_autosummary/mstar.model.waypoint.ring_geometry.html">mstar.model.waypoint.ring_geometry</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../_autosummary/mstar.model.waypoint.submodules.html">mstar.model.waypoint.submodules</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../../_autosummary/mstar.model.whisper.html">mstar.model.whisper</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -813,6 +812,7 @@ window.runMermaid = runMermaid;</script>
 <li class="toctree-l3"><a class="reference internal" href="../../../../_autosummary/mstar.worker.chunk_loops.html">mstar.worker.chunk_loops</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../_autosummary/mstar.worker.node_manager_utils.html">mstar.worker.node_manager_utils</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../_autosummary/mstar.worker.rid_table.html">mstar.worker.rid_table</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../_autosummary/mstar.worker.side_steps.html">mstar.worker.side_steps</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../_autosummary/mstar.worker.spec_rows.html">mstar.worker.spec_rows</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../_autosummary/mstar.worker.stream_buffers.html">mstar.worker.stream_buffers</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../_autosummary/mstar.worker.worker_metrics.html">mstar.worker.worker_metrics</a></li>
@@ -989,11 +989,18 @@ window.runMermaid = runMermaid;</script>
 <span class="n">SAMPLER</span> <span class="o">=</span> <span class="s2">"sampler"</span>
 <span class="n">ROPE</span> <span class="o">=</span> <span class="s2">"rope"</span>
 
-<span class="c1"># SNAC captures one CUDA graph per window size at every capture batch size,</span>
-<span class="c1"># and every size from 1 frame up to the widest window occurs (final flushes),</span>
-<span class="c1"># so the widest window (left + right context + largest chunk) bounds startup</span>
-<span class="c1"># and graph memory.</span>
+<span class="c1"># SNAC captures one CUDA graph per window size ``snac_window_frames`` lists, at</span>
+<span class="c1"># every capture batch size, so the widest window (left + right context +</span>
+<span class="c1"># largest chunk) bounds startup and graph memory. Some of those sizes never</span>
+<span class="c1"># replay: a window past the decoder's left reach is padded to the widest.</span>
 <span class="n">SNAC_MAX_WINDOW_FRAMES</span> <span class="o">=</span> <span class="mi">16</span>
+
+<span class="c1"># A decoded frame's audio depends on fewer than this many frames to its left:</span>
+<span class="c1"># the snac_24khz decoder's receptive field reaches about 2.5 frames, and</span>
+<span class="c1"># frames 3 or more into a window decode the same audio (to float rounding) with</span>
+<span class="c1"># any frames prepended. So it is also the default left context</span>
+<span class="c1"># (``snac_left_context_frames``): more adds nothing to a window's audio.</span>
+<span class="n">SNAC_LEFT_REACH_FRAMES</span> <span class="o">=</span> <span class="mi">3</span>
 
 <div class="viewcode-block" id="OrpheusModelConfig">
 <a class="viewcode-back" href="../../../../_autosummary/mstar.model.orpheus.config.html#mstar.model.orpheus.config.OrpheusModelConfig">[docs]</a>
@@ -1048,7 +1055,7 @@ window.runMermaid = runMermaid;</script>
     <span class="c1"># plus the largest chunk may be at most ``SNAC_MAX_WINDOW_FRAMES``.</span>
     <span class="n">snac_chunk_schedule</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
     <span class="n">snac_chunk_frames</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span>
-    <span class="n">snac_left_context_frames</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">snac_left_context_frames</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">SNAC_LEFT_REACH_FRAMES</span>
     <span class="n">snac_right_context_frames</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span>
 
     <span class="c1"># Generation defaults</span>

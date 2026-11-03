@@ -251,7 +251,6 @@
 <li class="toctree-l2 has-children"><a class="reference internal" href="_autosummary/mstar.engine.html">mstar.engine</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.engine.accelerator_graph_backend.html">mstar.engine.accelerator_graph_backend</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.engine.accelerator_graph_config.html">mstar.engine.accelerator_graph_config</a></li>
-<li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.engine.accelerator_graph_runner.html">mstar.engine.accelerator_graph_runner</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.engine.chunking.html">mstar.engine.chunking</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.engine.fp32_precision.html">mstar.engine.fp32_precision</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.engine.node_dtype.html">mstar.engine.node_dtype</a></li>
@@ -263,6 +262,7 @@
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.engine.resources.kv.html">mstar.engine.resources.kv</a></li>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.engine.resources.lora.html">mstar.engine.resources.lora</a></li>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.engine.resources.position.html">mstar.engine.resources.position</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.engine.resources.resident_hooks.html">mstar.engine.resources.resident_hooks</a></li>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.engine.resources.rms_norm.html">mstar.engine.resources.rms_norm</a></li>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.engine.resources.runner.html">mstar.engine.resources.runner</a></li>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.engine.resources.sampler.html">mstar.engine.resources.sampler</a></li>
@@ -403,7 +403,6 @@
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.model.waypoint.components.html">mstar.model.waypoint.components</a></li>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.model.waypoint.config.html">mstar.model.waypoint.config</a></li>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.model.waypoint.ring_geometry.html">mstar.model.waypoint.ring_geometry</a></li>
-<li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.model.waypoint.submodules.html">mstar.model.waypoint.submodules</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="_autosummary/mstar.model.whisper.html">mstar.model.whisper</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -460,6 +459,7 @@
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.chunk_loops.html">mstar.worker.chunk_loops</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.node_manager_utils.html">mstar.worker.node_manager_utils</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.rid_table.html">mstar.worker.rid_table</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.side_steps.html">mstar.worker.side_steps</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.spec_rows.html">mstar.worker.spec_rows</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.stream_buffers.html">mstar.worker.stream_buffers</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.worker_metrics.html">mstar.worker.worker_metrics</a></li>
@@ -767,7 +767,7 @@ sliding-window attention. Tested on 4x GB200 at TP4; see the notes below.</p></t
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">cosmos3_droid</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">nvidia/Cosmos3-Nano-Policy-DROID</span></code></p></td>
 <td><p>Cosmos3 action-policy fine-tune for the DROID platform (<code class="docutils literal notranslate"><span class="pre">domain_name</span></code>
-<code class="docutils literal notranslate"><span class="pre">droid_lerobot</span></code>, 10-dim raw actions); no sound pathway. The config
+<code class="docutils literal notranslate"><span class="pre">droid_lerobot</span></code>, 8-dim raw actions); no sound pathway. The config
 serves the released policy sampling defaults (4 steps, guidance 3.0).</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">cosmos3_edge</span></code></p></td>
@@ -995,10 +995,10 @@ performance-optimized; treat their throughput/latency as provisional.</p></li>
 <li><p>The IDs above are representative. You may use local paths or compatible variants.</p></li>
 <li><p>Some families accept multimodal input (image/audio/video); see the model’s
 <code class="docutils literal notranslate"><span class="pre">process_prompt</span></code> for the inputs it expects.</p></li>
-<li><p>Models on the fused MoE kernel (Qwen3-Omni, Command A+) use a tuned tile table
-from <code class="docutils literal notranslate"><span class="pre">mstar/utils/fused_moe/configs/</span></code> when one matches the expert shape and
-GPU, and default tiles otherwise. <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">mstar.utils.fused_moe.tune</span></code>
-writes a table for the local GPU.</p></li>
+<li><p>Models on the fused MoE kernel (Qwen3-Omni, Command A+) take their tiles from the
+<code class="docutils literal notranslate"><span class="pre">moe_gemm</span></code> table for the GPU (<code class="docutils literal notranslate"><span class="pre">mstar/kernels/tables/moe_gemm/</span></code>) when it has
+the expert shape, and default tiles otherwise. The server logs the sweep command
+for each shape it serves untuned; see “Tuned kernel configs” in <a class="reference internal" href="adding_models.html"><span class="doc">Adding a New Model</span></a>.</p></li>
 <li><p>To add a new family, see <a class="reference internal" href="adding_models.html"><span class="doc">Adding a New Model</span></a>.</p></li>
 </ul>
 <section id="omnivoice-notes">
@@ -1017,20 +1017,22 @@ extra — see <a class="reference internal" href="installation.html"><span class
 rows over a few unmasking steps, so there is no KV cache and no per-token
 sampling loop. Serve it with <code class="docutils literal notranslate"><span class="pre">mstar</span> <span class="pre">serve</span> <span class="pre">omnivoice</span> <span class="pre">--gpus</span> <span class="pre">0</span></code>.</p></li>
 <li><p>The backbone’s layer stack replays CUDA graphs per (requests, packed-token
-bucket up to 4096 tokens) with attention through a ragged attention resource;
-larger steps are GPU-bound and run eagerly. The layer loop is mstar’s own over
+bucket up to 8192 tokens) with attention through a ragged attention resource;
+larger steps run the same layer loop eagerly. The layer loop is mstar’s own over
 the reference’s fused weights: q/k norms read the fused QKV output in place
 and each residual add folds into the next RMSNorm (flashinfer
 <code class="docutils literal notranslate"><span class="pre">fused_add_rmsnorm</span></code>), so logits match the reference to half-precision
 rounding rather than bit for bit. <code class="docutils literal notranslate"><span class="pre">model_kwargs:</span> <span class="pre">{backbone_graphs:</span> <span class="pre">false}</span></code>
 runs the same layer loop eagerly, and <code class="docutils literal notranslate"><span class="pre">backbone_token_buckets</span></code> sets the
 packed-token buckets (256 to 4096 by default).</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">configs/omnivoice_split.yaml</span></code> runs code2wav (codec decode and the
-host-side silence trim) on a second worker sharing GPU 0, so the unmask loop
-no longer stops for each finished request, and sets <code class="docutils literal notranslate"><span class="pre">mps:</span> <span class="pre">true</span></code> (see
+<li><p><code class="docutils literal notranslate"><span class="pre">configs/omnivoice_split.yaml</span></code> runs code2wav (the codec decode) on a
+second worker sharing GPU 0, so the unmask loop no longer stops for each
+finished request’s decode; the silence trim and the rest of the output
+shaping run on the API side in either config. It sets <code class="docutils literal notranslate"><span class="pre">mps:</span> <span class="pre">true</span></code> (see
 <a class="reference internal" href="serving.html"><span class="doc">Serving</span></a>) so the two workers’ kernels overlap. On an H200 it raised
 concurrency-32 throughput from ~153 to 176-184 audio-s/s and cut TTFA p95
-from ~9 s to ~3 s; concurrency 1 is ~10% slower.</p></li>
+from ~9 s to ~3 s, measured while code2wav still did the shaping on its
+worker; concurrency 1 was ~10% slower.</p></li>
 </ul>
 </section>
 <section id="higgs-audio-notes">
@@ -1212,6 +1214,11 @@ after another in that step. While the block loop is captured, a request too
 large for a replay alone (a long video) gets a step of its own. The packed
 GEMMs’ shapes follow the step’s total patches, so an image’s
 embeddings can differ at the last bit with what it is batched beside.</p></li>
+<li><p>On two GPUs, <code class="docutils literal notranslate"><span class="pre">configs/qwen3_5_9b_dp2.yaml</span></code> (a whole replica per GPU)
+serves video traffic faster than <code class="docutils literal notranslate"><span class="pre">configs/qwen3_5_9b_tp2.yaml</span></code>, whose
+vision encoder runs on one rank while the other waits for it in the lockstep
+LLM: 9B on 2xH200 with TP-async on, DP2 gave 12.5-44% more output tok/s on
+30 s and 60 s videos at c=16 and c=32.</p></li>
 <li><p>A long video is one wide prefill: one 1-3 minute video is ~11-12k tokens,
 beyond the largest captured <code class="docutils literal notranslate"><span class="pre">prefill_vision</span></code> bucket (4096), so it runs
 eagerly.</p></li>
@@ -1234,6 +1241,16 @@ not the 256-slot default. The state defaults to the checkpoint’s
 <code class="docutils literal notranslate"><span class="pre">mamba_ssm_dtype</span></code> (fp32 for the released checkpoints);
 <code class="docutils literal notranslate"><span class="pre">gdn_state.state_dtype:</span> <span class="pre">bfloat16</span></code> halves state traffic at some precision and
 needs FlashInfer’s fused bf16 decode kernel (K = V = 128).</p>
+<p>Text prefill and mixed steps replay captured graphs by total tokens, on the
+ladder <code class="docutils literal notranslate"><span class="pre">32</span> <span class="pre">...</span> <span class="pre">8704</span></code> (powers of two, plus 2176, 4352 and 8704 for a mixed
+step’s decode rows and batches a few tokens over; a mixed step keeps only the
+powers of two past 2176); a step pads to its bucket and a longer one runs
+eagerly. <code class="docutils literal notranslate"><span class="pre">model_kwargs:</span> <span class="pre">prefill_token_buckets:</span> <span class="pre">[...]</span></code> sets a
+deployment’s own ladder (distinct positive token counts, checked when the
+worker loads): <code class="docutils literal notranslate"><span class="pre">configs/qwen3_5_9b*.yaml</span></code> take the powers of two to 2048
+and 2176 for a mixed step, since the LLM’s 2048-token step budget
+(<code class="docutils literal notranslate"><span class="pre">MAX_BATCH_TOKENS</span></code>) caps prefill and mixed steps and no bucket past 2176 is
+reached. Each bucket adds captures and startup time.</p>
 <p>A captured decode step builds its rotary tables inside the graph from the
 planned positions, rather than staging tables built eagerly before the replay
 (that build sat on the per-step critical path: +13% output tok/s at c=32 on
@@ -1369,6 +1386,30 @@ voices for a picker: the bundled voices whose G2P extra is installed on the serv
 <section id="qwen3-omni-notes">
 <h2>Qwen3-Omni notes<a class="headerlink" href="#qwen3-omni-notes" title="Link to this heading">#</a></h2>
 <ul class="simple">
+<li><p>The default <code class="docutils literal notranslate"><span class="pre">configs/qwen3omni_2gpu.yaml</span></code> holds 1,024 GPU pages (128k tokens)
+of Thinker KV plus 1,024 host pages it offloads to. On H200-class GPUs, when
+concurrent requests hold more than 128k tokens of Thinker KV, serve
+<code class="docutils literal notranslate"><span class="pre">configs/qwen3omni_2gpu_large_kv.yaml</span></code>, which keeps 2,048 pages (256k tokens)
+on the GPU and no host pages; it should fit beside its captures on an H200.
+On 80 GB GPUs such as the H100, serve <code class="docutils literal notranslate"><span class="pre">configs/qwen3omni_2gpu_h100.yaml</span></code>.
+Its 512-page Thinker pool (64k tokens) was sized on an H100 when the encoders shared the Thinker’s GPU and its
+text ladder ran to 8192: beside 1,024 pages 27 Thinker captures, all among those
+of 4096 tokens and more (text and vision), ran eagerly, and 640 pages still left
+two vision buckets out. Chunked prefill now caps a Thinker step at 1,024
+tokens, so those large buckets no longer replay, but they are still captured
+and still take that memory; whether 1,024 pages fit with today’s ladders and
+encoder placement is unmeasured. The config runs the audio and vision encoders on the Talker’s GPU,
+so an encoder step doesn’t wait behind a Thinker step.</p></li>
+<li><p>None of the three configs sets <code class="docutils literal notranslate"><span class="pre">max_concurrent_requests</span></code>. With the Thinker’s
+prefix cache on, a decode step that finds the GPU pool full offloads a running
+request to the host pages. Only when that frees nothing does it hold requests
+until they time out: with no host pages (<code class="docutils literal notranslate"><span class="pre">large_kv</span></code>), with the host pages full,
+or when the running requests’ pages are mostly a prefix they share (see the
+prefix cache under “Config files” in <a class="reference internal" href="serving.html"><span class="doc">Serving</span></a>). Where one of those can
+happen and concurrent requests can together hold more Thinker KV than the GPU
+pool, set the cap to the GPU pages divided by the pages of the longest request
+served, prompt and output together, at 128 tokens a page: at the full 32k
+context, 8 for <code class="docutils literal notranslate"><span class="pre">large_kv</span></code>, 4 for the default and 2 for the H100 config.</p></li>
 <li><p>The audio and vision encoders attend through ragged attention resources
 (<code class="docutils literal notranslate"><span class="pre">audio_attn</span></code> within each 8 s window, <code class="docutils literal notranslate"><span class="pre">vision_attn</span></code> within each image or
 video frame group), FlashInfer by default, so no <code class="docutils literal notranslate"><span class="pre">flash-attn</span></code> install is
@@ -1376,10 +1417,20 @@ needed. A deployment can pick the kernel under <code class="docutils literal not
 e.g. <code class="docutils literal notranslate"><span class="pre">vision_attn:</span> <span class="pre">{flashinfer_backend:</span> <span class="pre">cutlass}</span></code>. Each encoder’s block stack
 is captured as a CUDA graph per token-count bucket; a request past the
 largest bucket (32768 patches, about 5 minutes of audio) runs it eagerly.</p></li>
+<li><p>A request with no audio output decodes on its own walk, <code class="docutils literal notranslate"><span class="pre">thinker_text_decode</span></code>:
+its token stays on the device between steps and reaches the client inline, as
+Qwen3.5’s does, and nothing goes to the Talker. A request with audio output
+keeps <code class="docutils literal notranslate"><span class="pre">thinker_decode</span></code>, which streams every step’s states to the Talker. A
+captured step of either walk takes token ids and builds its embeds and rotary
+tables in the graph.</p></li>
 <li><p>The audio encoder is the AuT node Qwen3-ASR runs, fed the API server’s
 log-mel features: a step’s clips (up to 8 requests) go through one packed
 forward, up to 4096 tokens. A step over 4096 tokens runs its clips one by
-one, each replayed if it fits a bucket. A clip’s embeddings can differ at
+one, each replayed if it fits a bucket. A clip’s last 1 s chunk is
+zero-padded to a full chunk before the convolutions, as HF’s encoder pads
+it whenever its batch holds a full chunk, so a clip under 1 s encoded alone
+differs from HF’s: in its last conv row and, through the windowed
+attention, in every embedding of the clip. A clip’s embeddings can differ at
 the last bit with what it is batched beside, since the step’s total tokens
 pick the captured bucket (or the eager GEMMs’ shapes), and a prefix-cached
 audio prefix keeps the embeddings it was first computed with, so a later
@@ -1395,14 +1446,24 @@ requests, so requests past that queue and can fall below it and pause. Set
 <code class="docutils literal notranslate"><span class="pre">codec_chunk_schedule:</span> <span class="pre">[]</span></code> under the deployment YAML’s <code class="docutils literal notranslate"><span class="pre">model_kwargs</span></code> to
 start with a 25-frame chunk instead: first audio comes later, and the
 Talker needs only about 1.0 to 1.3x real time.</p></li>
-<li><p>Numerics: the code predictor’s residual adds fold into the next RMSNorm
-(FlashInfer’s fused add + norm) and its attention is a Triton kernel
-(<code class="docutils literal notranslate"><span class="pre">cp_attention</span></code>), neither bit-exact with the unfused ops. Its 15 depth
-steps feed each sampled code into the next, so small differences can change
-later codes at near-ties.</p></li>
+<li><p>Numerics: the Thinker’s q/k RMSNorm and multimodal RoPE run in one kernel
+with the KV write, in fp32 throughout and rounded once, where the unfused ops
+(and Hugging Face) round to bf16 after the norm and after each step of the
+rotation: no less accurate, but not bit-exact. The code predictor (shared
+with Qwen3-TTS, see its notes) runs each projection with its RMSNorm folded
+in and its residual add in the same Triton kernel (<code class="docutils literal notranslate"><span class="pre">cp_linear</span></code>), and its
+attention as another (<code class="docutils literal notranslate"><span class="pre">cp_attend</span></code>), neither bit-exact with the unfused
+ops. Its 15 depth steps feed each sampled code into the next, so small
+differences can change later codes at near-ties.</p></li>
+<li><p>The Thinker’s text and audio prefill replay captured graphs on the ladder
+<code class="docutils literal notranslate"><span class="pre">128</span> <span class="pre">...</span> <span class="pre">2048</span></code> tokens, and a longer step runs eagerly.
+<code class="docutils literal notranslate"><span class="pre">model_kwargs:</span> <span class="pre">prefill_token_buckets:</span> <span class="pre">[...]</span></code> sets a deployment’s own
+ladder. Each bucket adds captures, graph memory and startup time.</p></li>
 <li><p>The MoE layers route through the fused softmax-top-k kernel
 (<code class="docutils literal notranslate"><span class="pre">TopKRouter(fused_softmax_topk=True)</span></code>), which gives equal probabilities to
-the lower expert id where <code class="docutils literal notranslate"><span class="pre">torch.topk</span></code> may pick another.</p></li>
+the lower expert id where <code class="docutils literal notranslate"><span class="pre">torch.topk</span></code> may pick another. On one GPU a
+decode batch of 8 to 16 tokens also gets its block alignment from that
+kernel; a smaller one runs its experts as per-pair GEMVs, which need none.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">configs/qwen3omni_pd_2gpu.yaml</span></code> runs <code class="docutils literal notranslate"><span class="pre">qwen3omni_pd_disaggregated.yaml</span></code>’s
 prefill/decode split on two GPUs: the prefill Thinker shares rank 0 with the
 encoders, the Talker and Code2Wav, and rank 1 runs the Thinker’s decode. At
@@ -1466,28 +1527,34 @@ ordered sentence chunks of about 400 characters (one Talker request each,
 two kept in flight while the current one streams); set
 <code class="docutils literal notranslate"><span class="pre">sentence_chunking:</span> <span class="pre">false</span></code> (or <code class="docutils literal notranslate"><span class="pre">true</span></code> for shorter texts) per request.</p></li>
 <li><p>Audio streams in a ramp of codec chunks: the first frame is decoded on its
-own (first audio one Talker step after prefill), the next windows add 3, 8
-and 16 frames, then 25 new frames behind up to 72 frames of already decoded
-left context, the decoder transformer’s sliding window. The
-transformer stacks 8 such layers, so a window still differs slightly from a
-whole-utterance decode once an utterance outgrows the context; 25 frames of
-context differed far more. Each window size is a CUDA-graph bucket captured
-for batch sizes 1 to 32 (densely: the codec’s cost is per row, so a padding
-row costs as much as a real one); the stream buffer reports how many leading
-frames of a window are repeated context, and the codec trims their audio. The
-scheduler batches each window size apart, so a stream’s small first windows
-are not padded to a full window’s width or queued behind a batch of them. A
-voice clone’s reference tail (its last 72 frames) is the first window’s context.</p></li>
-<li><p>The codec runs its transformer over the whole window but its conv stack (all
-but a few percent of the codec’s time) only over the new frames plus the
-stack’s causal receptive field, derived from the decoder’s modules at load
-(10 frames for the 12 Hz decoder; the new frames’ audio equals the
-whole-window decode). It also fuses the SnakeBeta activations into one kernel.</p></li>
+own (first audio one Talker step after prefill), the next chunks add 3, 8
+and 16 frames, then 25 frames a chunk. The decoder is causal, so the codec
+decodes every frame once: per stream it keeps each causal conv’s last input
+samples, the transformer’s sliding-window keys and values (71 per layer) and
+the frame count, about 5 MiB in float32, in the <code class="docutils literal notranslate"><span class="pre">codec_state</span></code> recurrent
+pool. <code class="docutils literal notranslate"><span class="pre">resources:</span> <span class="pre">{codec_state:</span> <span class="pre">{max_slots:</span> <span class="pre">N}}</span></code> sizes it for N - 1
+streams (one slot is the pool’s sink); 256 streams by default. Each chunk
+width is a CUDA-graph bucket captured for batch sizes 1 to 32 (densely: the
+codec’s cost is per row, so a padding row costs as much as a real one); the
+scheduler batches each width apart, so a stream’s small first chunks are not
+padded to a full chunk’s width or queued behind a batch of them. A voice
+clone’s stream leads with the reference’s last 72 frames, decoded with the
+first chunk to warm the state on the voice and trimmed from its audio.
+The SnakeBeta activations run as one fused kernel. A deployment sets the
+ramp and the steady chunk with <code class="docutils literal notranslate"><span class="pre">model_kwargs:</span> <span class="pre">{codec_chunk_schedule:</span> <span class="pre">[1,</span> <span class="pre">3,</span>
+<span class="pre">8,</span> <span class="pre">16],</span> <span class="pre">codec_chunk_frames:</span> <span class="pre">25}</span></code>. <code class="docutils literal notranslate"><span class="pre">configs/qwen3tts_1p7b.yaml</span></code> opens with
+4 frames ([4, 8, 16]): on an H200 the streaming SLO (first audio within 200
+ms, under 10 ms of pauses) then holds 101 Seed-TTS sentences a second
+against 90 with [1, 3, 8, 16], which halves idle first audio (15 vs 31 ms
+p50 at 1 req/s).</p></li>
 <li><p>Talker prefill, the clone prefill included, replays a packed CUDA Graph for
 the smallest token bucket (32 to 1024 tokens) that holds the batch; a clone’s
-reference frames join the codec stream in <code class="docutils literal notranslate"><span class="pre">postprocess</span></code>. Decode
-always uses the whole-walk CUDA Graph (up to 64 rows a step), with the 15-step
-CodePredictor loop captured inside it; request-local EOS suppression is
+reference frames join the codec stream in <code class="docutils literal notranslate"><span class="pre">postprocess</span></code>. Prefill and decode
+are one combined walk (<code class="docutils literal notranslate"><span class="pre">talker_mixed</span></code>): up to four new prompts ride a decode
+step instead of a prefill-only step every decode row waits behind, replaying
+a packed capture sized to the decode batch. A decode-only step uses the
+whole-walk CUDA Graph (up to 128 rows a step), with the 15-step CodePredictor
+loop captured inside it; request-local EOS suppression is
 carried as a graph tensor input so replay does not consult capture-slot dummy
 request state. Residual <code class="docutils literal notranslate"><span class="pre">subtalker_*</span></code> sampling is per-request through the
 <code class="docutils literal notranslate"><span class="pre">code_predictor</span></code> aux sampler, so custom values neither block batching nor
@@ -1496,12 +1563,22 @@ Talker-width inputs through <code class="docutils literal notranslate"><span cla
 It is the same component as Qwen3-Omni’s code predictor
 (<code class="docutils literal notranslate"><span class="pre">ResidualCodePredictor</span></code> in <code class="docutils literal notranslate"><span class="pre">mstar.model.components.code_predictor_kernels</span></code>):
 the depth sequence opens with the Talker hidden state in a one-token pass
-and takes one token per group after it, each layer’s q/k norm, RoPE and KV write
-run in one launch and attention in <code class="docutils literal notranslate"><span class="pre">cp_attention</span></code>, and the frame’s 16 codec
-embeddings are summed in one launch per group. Each Talker keeps the sum it
-had before the two shared the component: Qwen3-TTS accumulates in the model
-dtype, rounding after every add (the reference sums in fp32 and rounds once),
-and Qwen3-Omni in fp32, rounded once.</p></li>
+and takes one token per group after it, five launches a layer. Each
+projection is one <code class="docutils literal notranslate"><span class="pre">cp_linear</span></code> launch with the RMSNorm folded into its
+weight (a row scale from partial sums of squares its producer recorded) and
+the residual add or the SwiGLU in its epilogue; the q/k norm, RoPE, KV write
+and attention are one <code class="docutils literal notranslate"><span class="pre">cp_attend</span></code> launch, and the frame’s 16 codec
+embeddings are summed in one launch per group. Where the predictor projects
+its inputs (<code class="docutils literal notranslate"><span class="pre">small_to_mtp_projection</span></code>, the 1.7B), every embedding table a
+later depth step reads is kept projected. None of this is bit-exact with the
+unfused ops: the sampled residual codes can differ at near-ties. Each Talker
+keeps the sum it had before the two shared the component: Qwen3-TTS
+accumulates in the model dtype, rounding after every add (the reference sums
+in fp32 and rounds once), and Qwen3-Omni in fp32, rounded once.</p></li>
+<li><p>The Codec does not run beside the Talker on a side stream (<code class="docutils literal notranslate"><span class="pre">side_stream</span></code>,
+see <a class="reference internal" href="serving.html"><span class="doc">Serving</span></a>): its windows read and write their streams’ <code class="docutils literal notranslate"><span class="pre">codec_state</span></code>
+rows, and the side lane only takes a node that holds no resources, since it
+neither admits nor plans a step ahead. No Qwen3-TTS config sets the field.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">configs/qwen3tts_1p7b_split.yaml</span></code> (and <code class="docutils literal notranslate"><span class="pre">configs/qwen3tts_split.yaml</span></code>
 for the 0.6B) runs the Codec on a second worker that
 shares GPU 0 (<code class="docutils literal notranslate"><span class="pre">rank_devices</span></code>) and caps the Talker KV pool so both fit.
@@ -1509,11 +1586,22 @@ On its own it lowers first-audio latency at high concurrency; with
 <code class="docutils literal notranslate"><span class="pre">mps:</span> <span class="pre">true</span></code> in the YAML (see <a class="reference internal" href="serving.html"><span class="doc">Serving</span></a>; <code class="docutils literal notranslate"><span class="pre">qwen3tts_split.yaml</span></code> sets
 it) the two workers’ kernels also overlap, which raised c=32 throughput by
 about a fifth on an H100.</p></li>
-<li><p>The codec decoder runs in float32 by default, reproducing the reference
-decoder bit for bit. <code class="docutils literal notranslate"><span class="pre">model_kwargs:</span> <span class="pre">{codec_dtype:</span> <span class="pre">bfloat16}</span></code> in the
-deployment YAML selects a bf16 codec (the Talker is bf16 either way). On a
-B300 that is slower, not faster: cuDNN’s heuristics run several of its
-convs on a kernel without tensor cores, so measure before switching.</p></li>
+<li><p>The Talker’s layers run <code class="docutils literal notranslate"><span class="pre">Qwen3Attention</span></code>, so each layer’s q/k norm, RoPE and
+KV write are one kernel (<code class="docutils literal notranslate"><span class="pre">qk_norm_rope_kv_write</span></code>). It reads the RoPE theta off
+the position resource, which declares the checkpoint’s.</p></li>
+<li><p>The codec decoder runs in float32 by default: a stream’s audio is the
+reference decoder’s whole decode within 1 LSB of PCM16. <code class="docutils literal notranslate"><span class="pre">model_kwargs:</span>
+<span class="pre">{codec_dtype:</span> <span class="pre">bfloat16}</span></code> selects a bf16 codec (RMSNorm and RoPE stay
+float32), which <code class="docutils literal notranslate"><span class="pre">configs/qwen3tts_1p7b.yaml</span></code> serves. Against the float32
+whole decode of the 1.7B’s frames it gives 35 dB SNR median (20 dB worst),
+1.0 dB mel cepstral distortion, 0.9999 speaker cosine and the same WER, and
+the streaming SLO holds 101 Seed-TTS req/s against float32’s 90 (H200). Its
+dilated convs run as undilated ones over their interleaved subsequences:
+cuDNN takes some bfloat16 dilated convs (384 and 768 channels) through a
+direct kernel without tensor cores, about 100x slower on an H100. On a B300
+the bf16 codec measured slower while those convs still ran dilated; measure
+there before switching. The decode is compiled (Inductor) twice per chunk
+width, batch 1 apart: its batch dimension is dynamic.</p></li>
 <li><p>Opt-in AudioSeal watermark on the codec’s output (off by default; install
 <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-e</span> <span class="pre">'.[audioseal]'</span></code>). Turn it on in the deployment YAML:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">model_kwargs</span><span class="p">:</span>
@@ -1602,10 +1690,13 @@ boundary differs as well: M*’s sampler (FlashInfer) keeps the token whose
 probability carries the running total past top-p, while the reference drops
 it unless it is the most likely token. <code class="docutils literal notranslate"><span class="pre">max_new_tokens</span></code> (default 2048, at most
 4096 frames of 2048 samples at 44.1 kHz) and <code class="docutils literal notranslate"><span class="pre">ignore_eos</span></code> pass through.</p></li>
-<li><p>Each codec window carries the decoder’s whole receptive field as context.
-The codec decodes with TF32 by default: TF32 halves its conv stack, most of
-the GPU time under concurrency (c=32 throughput +35% on an H200), and the
-audio stays within ~60 dB SNR of the exact decode. With
+<li><p>The codec decodes each chunk’s new frames from its stream’s decoder state
+(the <code class="docutils literal notranslate"><span class="pre">codec_state</span></code> recurrent pool, 64 streams by default, as many as the AR
+decodes in a step, about 0.55 GiB; size it with
+<code class="docutils literal notranslate"><span class="pre">resources:</span> <span class="pre">{codec_state:</span> <span class="pre">{max_slots:</span> <span class="pre">...}}</span></code>), so every frame is decoded
+once. It decodes with TF32 by default: TF32 roughly halves its conv stack
+and the audio stays within ~60 dB SNR of the exact decode, both measured on
+the earlier windowed codec, not yet on the frame-once codec. With
 <code class="docutils literal notranslate"><span class="pre">model_kwargs:</span> <span class="pre">{codec_exact_fp32:</span> <span class="pre">true}</span></code> it runs in fp32 with TF32 off and
 the streamed audio matches the whole-utterance decode to within one int16 step.</p></li>
 </ul>
@@ -2046,8 +2137,14 @@ with each other. Short answers (128 tokens) came out identical in 8 of 8 runs;
 into one denoise pass too, which is the same maths but not the same bf16
 arithmetic — under classifier-free guidance the branch rounding is amplified,
 so an image or clip produced alongside other requests differs from its solo
-result at the kernel-drift level (~30 dB PSNR at guidance 6). Serve with one
-request at a time when outputs must be bitwise repeatable.</p>
+result at the kernel-drift level (~30 dB PSNR at guidance 6). A generation
+step whose requests total more than <code class="docutils literal notranslate"><span class="pre">max_batched_vision_tokens</span></code> (a
+<code class="docutils literal notranslate"><span class="pre">model_kwargs</span></code> key, off by default since it is a per-GPU number; 16384 on an
+H100 is, at 832x480, more than 42 latent frames across the step’s requests,
+e.g. two clips of 85 or more frames each; a windowed request counts its current
+window) runs every request in it alone, since batching such steps cost more
+than it saved on an H100, so those outputs match their solo results. Serve with one request at a time
+when outputs must be bitwise repeatable.</p>
 <p>The denoise step is compiled (<code class="docutils literal notranslate"><span class="pre">compile_denoise</span></code>) in Inductor’s deterministic
 mode by default (<code class="docutils literal notranslate"><span class="pre">denoise_compile_mode:</span> <span class="pre">deterministic</span></code>, the engine’s compile
 mode of that name): kernel configs are picked by rule, so a seed gives the same
@@ -2074,12 +2171,30 @@ steps: batching keeps requests in step rather than adding throughput.</p>
 <p>The action policy (<code class="docutils literal notranslate"><span class="pre">cosmos3_edge_droid</span></code>, or <code class="docutils literal notranslate"><span class="pre">cosmos3_edge</span></code> with an action
 <code class="docutils literal notranslate"><span class="pre">domain_name</span></code>) predicts a chunk of robot actions from the current observation:
 <code class="docutils literal notranslate"><span class="pre">output_modalities=action</span></code> with <code class="docutils literal notranslate"><span class="pre">model_kwargs</span></code>
-<code class="docutils literal notranslate"><span class="pre">{&quot;action_mode&quot;:</span> <span class="pre">&quot;policy&quot;,</span> <span class="pre">&quot;domain_name&quot;:</span> <span class="pre">&quot;droid_lerobot&quot;,</span> <span class="pre">&quot;raw_action_dim&quot;:</span> <span class="pre">10,</span>
+<code class="docutils literal notranslate"><span class="pre">{&quot;action_mode&quot;:</span> <span class="pre">&quot;policy&quot;,</span> <span class="pre">&quot;domain_name&quot;:</span> <span class="pre">&quot;droid_lerobot&quot;,</span> <span class="pre">&quot;raw_action_dim&quot;:</span> <span class="pre">8,</span>
 <span class="pre">&quot;action_chunk_size&quot;:</span> <span class="pre">32}</span></code>; the reply’s <code class="docutils literal notranslate"><span class="pre">action</span></code> payload is float32
 <code class="docutils literal notranslate"><span class="pre">[chunk,</span> <span class="pre">action_dim_padded]</span></code> and the first <code class="docutils literal notranslate"><span class="pre">raw_action_dim</span></code> columns are the
-embodiment’s actions. For a control loop use <code class="docutils literal notranslate"><span class="pre">/generate/ws</span></code> (one connection,
-pipelined observations): <code class="docutils literal notranslate"><span class="pre">examples/cosmos3_action_ws_client.py</span></code> runs it and
-reports chunks/s, actions/s and latency percentiles.</p>
+embodiment’s actions. A policy request may also send the robot’s current state
+as <code class="docutils literal notranslate"><span class="pre">robot_state</span></code>, one row of <code class="docutils literal notranslate"><span class="pre">raw_action_dim</span></code> finite numbers (a NaN or inf is
+a 400), as pi0.5 takes it. The state is one more action token, kept clean at
+video frame 0 in front of the chunk, so <code class="docutils literal notranslate"><span class="pre">num_frames</span></code> is <code class="docutils literal notranslate"><span class="pre">action_chunk_size</span> <span class="pre">+</span> <span class="pre">1</span></code>
+and the reply carries only the predicted rows. The released DROID policies were
+trained this way. A request that sends a <code class="docutils literal notranslate"><span class="pre">robot_state</span></code> is a policy request, and
+its chunk, fps and domain default to the checkpoint’s <code class="docutils literal notranslate"><span class="pre">checkpoint.json</span></code> (Edge
+DROID: 32 rows, 15 fps, <code class="docutils literal notranslate"><span class="pre">droid_lerobot</span></code>; <code class="docutils literal notranslate"><span class="pre">configs/cosmos3_droid.yaml</span></code> sets the
+same for Nano, whose file is empty), so NVIDIA’s RoboLab request is the image, the
+prompt, the state and <code class="docutils literal notranslate"><span class="pre">size=&quot;736x544&quot;</span></code>: the wrist frame above the two exterior
+frames reflection-padded to 736x544, the 7 joint positions and the gripper as
+DROID records them, and the task with view, duration and resolution text (a JSON
+caption for Edge). The DROID configs map the gripper to the checkpoint’s
+<code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">-</span> <span class="pre">gripper</span></code> in every action a request sends and back in every action it
+gets (<code class="docutils literal notranslate"><span class="pre">inverted_action_dims</span></code>),
+and <code class="docutils literal notranslate"><span class="pre">cosmos3_edge_droid</span></code> guides only inside the cookbook’s interval
+<code class="docutils literal notranslate"><span class="pre">[960,</span> <span class="pre">1001]</span></code> (<code class="docutils literal notranslate"><span class="pre">guidance_interval_action</span></code>; outside it the conditional branch
+runs alone, batched requests too). For a control loop use <code class="docutils literal notranslate"><span class="pre">/generate/ws</span></code> (one
+connection, pipelined observations): <code class="docutils literal notranslate"><span class="pre">examples/cosmos3_action_ws_client.py</span></code>
+builds that request, runs the loop and reports chunks/s, actions/s and latency
+percentiles.</p>
 </section>
 <section id="cosmos3-streaming-rollout-windowed-video">
 <h2>Cosmos3 streaming rollout (windowed video)<a class="headerlink" href="#cosmos3-streaming-rollout-windowed-video" title="Link to this heading">#</a></h2>
@@ -2187,7 +2302,9 @@ windowed mode; non-windowed clips are not affected.</p>
 <p>The schedule is padded up to whole windows and the video trimmed back to
 <code class="docutils literal notranslate"><span class="pre">num_frames</span></code>; a seeded request is deterministic end to end (later windows draw
 their noise from the same generator). Windowed requests batch with each other
-and with plain requests at the same walk. <code class="docutils literal notranslate"><span class="pre">gen_capture_video</span></code> lists (height,
+and with plain requests at the same walk, under the same 16384-vision-token
+cap on the step (each windowed request counts its current window).
+<code class="docutils literal notranslate"><span class="pre">gen_capture_video</span></code> lists (height,
 width, frames) tiers whose denoise steps replay a per-step CUDA graph (one graph per
 latent shape, the clean/noisy frame layout carried as a mask input; plain t2v/i2v and
 <code class="docutils literal notranslate"><span class="pre">chained</span></code> windows, never <code class="docutils literal notranslate"><span class="pre">kv</span></code> windows). It is empty by default: at 832x480 the
@@ -2441,29 +2558,38 @@ trajectories and PSNR against a recorded pipeline run
 conditioning tokens, in order).</p>
 <p>Deployment knobs live under <code class="docutils literal notranslate"><span class="pre">model_kwargs</span></code> in <code class="docutils literal notranslate"><span class="pre">configs/flux2_klein.yaml</span></code>:</p>
 <dl class="simple">
-<dt><code class="docutils literal notranslate"><span class="pre">attention_backend</span></code></dt><dd><p><code class="docutils literal notranslate"><span class="pre">sdpa</span></code> (default) is the reference kernel, cuDNN on an H100 and measured as fast as
-FlashInfer in the served path. <code class="docutils literal notranslate"><span class="pre">flashinfer</span></code> runs the DiT’s joint attention on the
-engine’s ragged FlashInfer resource; both are CUDA-graph replayable.</p>
+<dt><code class="docutils literal notranslate"><span class="pre">attention_backend</span></code></dt><dd><p><code class="docutils literal notranslate"><span class="pre">sdpa</span></code> (default) is the reference kernel, cuDNN on an H100. <code class="docutils literal notranslate"><span class="pre">flashinfer</span></code> runs the
+DiT’s joint attention on the engine’s ragged FlashInfer resource; both are CUDA-graph
+replayable.</p>
 </dd>
 <dt><code class="docutils literal notranslate"><span class="pre">compile</span></code></dt><dd><p><code class="docutils literal notranslate"><span class="pre">torch.compile</span></code> of the transformer, one trace per shape.</p>
 </dd>
 <dt><code class="docutils literal notranslate"><span class="pre">compile_eager_rounding</span></code></dt><dd><p>Inductor rounds intermediates where eager PyTorch does, and fuses no FMAs.</p>
 </dd>
 <dt><code class="docutils literal notranslate"><span class="pre">compile_exact_ops</span></code></dt><dd><p><code class="docutils literal notranslate"><span class="pre">true</span></code>, or a list of op classes among <code class="docutils literal notranslate"><span class="pre">norms</span></code> and <code class="docutils literal notranslate"><span class="pre">activations</span></code>: those modules
-stay on the eager kernels inside the compiled forward, so inductor only fuses the
-chains around the GEMMs and attention. Each excluded module is a graph break, so this
-is a latency-for-exactness trade:</p>
+keep the eager result inside the compiled forward, so inductor only fuses the chains
+around the GEMMs and attention. Each kept module other than a 1-D <code class="docutils literal notranslate"><span class="pre">torch.nn.RMSNorm</span></code>
+is a graph break, so this is a latency-for-exactness trade:</p>
 <ul class="simple">
 <li><p>The norms alone make the transformer bit-exact with eager (measured on klein-4B and
-9B). The shipped <code class="docutils literal notranslate"><span class="pre">[norms]</span></code> costs klein-4B 4% of its B=1 latency (0.371 vs
-0.356 s); excluding the activations too adds cost and nothing else.</p></li>
-<li><p>Z-Image’s 180 norms per step cost 45% (1.25 vs 0.86 s at B=1), so it ships <code class="docutils literal notranslate"><span class="pre">false</span></code>
-and lands at a median 34 dB. <code class="docutils literal notranslate"><span class="pre">[norms]</span></code> turns it reference-faithful (at least
-55.9 dB on every prompt).</p></li>
-<li><p>Without it, the plain compile — even with eager rounding — lands at a median 35 to
-38 dB PSNR from eager over the 100 protocol prompts, because a 4- or 8-step
-distilled sampler amplifies the last bit of inductor’s own reductions and activation
-decompositions.</p></li>
+9B while the q/k norms were graph breaks), so klein-4B and 9B ship <code class="docutils literal notranslate"><span class="pre">[norms]</span></code>.
+Klein’s per-head q/k norms (1-D <code class="docutils literal notranslate"><span class="pre">RMSNorm</span></code>) run as an op the compiled graph keeps
+whole. On NVIDIA GPUs that op is a Triton replica of torch’s kernel with the same
+arithmetic order: bit-identical and faster than torch’s one-block-per-row launch.
+Kept norms of one class share a class-level forward, so the blocks share one
+compiled frame: with a forward per module, dynamo hit its recompile limit and the
+small batches ran the blocks eagerly (klein-4B 2.86 / 3.10 / 3.69 against 3.33 /
+3.75 / 3.80 img/s at concurrency 1 / 4 / 16, H200). Keeping the activations too
+adds cost and nothing else.</p></li>
+<li><p>Z-Image’s 180 norms per step cost 45% of its B=1 latency, so it ships <code class="docutils literal notranslate"><span class="pre">false</span></code>
+and lands at a median 34 dB (the <code class="docutils literal notranslate"><span class="pre">false</span></code> figures were measured before its compiled
+forward fused the q/k norms and rotary into one kernel). <code class="docutils literal notranslate"><span class="pre">[norms]</span></code>, which keeps
+that fusion off, turns it reference-faithful (at least 55.9 dB on every prompt).</p></li>
+<li><p>Without <code class="docutils literal notranslate"><span class="pre">[norms]</span></code>, the plain compile — even with eager rounding — lands at a
+median 37.6 dB (klein-4B) and 35.6 dB (9B) PSNR from eager over the 100 protocol
+prompts (measured with the earlier compiled VAE decode), because a 4- or 8-step
+distilled sampler amplifies the last bit of inductor’s own reductions and
+activation decompositions.</p></li>
 </ul>
 </dd>
 <dt><code class="docutils literal notranslate"><span class="pre">cuda_graph</span></code>, <code class="docutils literal notranslate"><span class="pre">capture_sizes</span></code>, <code class="docutils literal notranslate"><span class="pre">capture_batch_sizes</span></code></dt><dd><p>The denoise step, Euler update included, is captured per listed <code class="docutils literal notranslate"><span class="pre">[height,</span> <span class="pre">width]</span></code>
@@ -2486,10 +2612,12 @@ denoise phase is compute-bound either way.</p>
 </dd>
 <dt><code class="docutils literal notranslate"><span class="pre">max_batch_size</span></code></dt><dd><p>Rows batched per denoise step.</p>
 </dd>
-<dt><code class="docutils literal notranslate"><span class="pre">vae_compile</span></code></dt><dd><p><code class="docutils literal notranslate"><span class="pre">torch.compile</span></code> of the VAE decode with inductor autotuning: 89 to 29 ms at 1024² on
-an H100. Its fused reductions move the image by about 55 dB PSNR from the eager decode
-on every prompt, and the autotuner may pick different conv kernels in another server
-process, so set it to <code class="docutils literal notranslate"><span class="pre">false</span></code> for bit-exact, repeatable output — which is how the
+<dt><code class="docutils literal notranslate"><span class="pre">vae_compile</span></code></dt><dd><p><code class="docutils literal notranslate"><span class="pre">torch.compile</span></code> of the VAE decode with inductor autotuning, each nearest-x2 upsample
+folded into its conv and the GroupNorms (with their SiLU) on a split-reduction kernel.
+Before those two it measured 89 to 29 ms at 1024² on an H100 and about 55 dB PSNR from
+the eager decode on every prompt; neither figure is re-measured since. The compiled
+decode is not bit-exact, and the autotuner may pick different conv kernels in another
+server process, so set it to <code class="docutils literal notranslate"><span class="pre">false</span></code> for bit-exact, repeatable output — which is how the
 parity suite runs. The compiled decode is warmed at load for the <code class="docutils literal notranslate"><span class="pre">capture_sizes</span></code>
 grids and the decode batch sizes; any other latent shape decodes eagerly rather than
 paying a 40 to 100 s autotune inside a request. Memory cuts the other way: the eager
@@ -2502,10 +2630,11 @@ are rejected with a 400 before scheduling instead of occupying the worker for mi
 (an 8192² request means 262k tokens of quadratic attention).</p>
 </dd>
 </dl>
-<p>With the klein defaults every served image is within 53 dB of the eager path on all 100
-protocol prompts, and with <code class="docutils literal notranslate"><span class="pre">vae_compile:</span> <span class="pre">false</span></code> it is bit-exact. For scale, the served
-images of the other engines are 10 to 16 dB from the diffusers reference for the same
-seeds.
+<p>With the klein defaults every served image was within 53 dB of the eager path on all 100
+protocol prompts, and with <code class="docutils literal notranslate"><span class="pre">vae_compile:</span> <span class="pre">false</span></code> it was bit-exact; both were measured while
+the q/k norms were graph breaks, and the 53 dB before the folded, split-GroupNorm VAE decode.
+For scale, SGLang 0.5.22’s images sit at a median 23.8 dB (minimum 13.1) on klein-4B and
+24.0 dB (14.5) on 9B from klein’s output at the same seeds.
 Requests at the same output size batch across users in every node, including the
 text encoder, whose input is always 512 tokens. <code class="docutils literal notranslate"><span class="pre">lora</span></code> lists adapters to fold into the
 transformer weights at load time (<code class="docutils literal notranslate"><span class="pre">[{path:</span> <span class="pre">...,</span> <span class="pre">scale:</span> <span class="pre">...}]</span></code>; diffusers/PEFT-format or

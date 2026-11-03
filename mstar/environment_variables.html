@@ -251,7 +251,6 @@
 <li class="toctree-l2 has-children"><a class="reference internal" href="_autosummary/mstar.engine.html">mstar.engine</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.engine.accelerator_graph_backend.html">mstar.engine.accelerator_graph_backend</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.engine.accelerator_graph_config.html">mstar.engine.accelerator_graph_config</a></li>
-<li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.engine.accelerator_graph_runner.html">mstar.engine.accelerator_graph_runner</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.engine.chunking.html">mstar.engine.chunking</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.engine.fp32_precision.html">mstar.engine.fp32_precision</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.engine.node_dtype.html">mstar.engine.node_dtype</a></li>
@@ -263,6 +262,7 @@
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.engine.resources.kv.html">mstar.engine.resources.kv</a></li>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.engine.resources.lora.html">mstar.engine.resources.lora</a></li>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.engine.resources.position.html">mstar.engine.resources.position</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.engine.resources.resident_hooks.html">mstar.engine.resources.resident_hooks</a></li>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.engine.resources.rms_norm.html">mstar.engine.resources.rms_norm</a></li>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.engine.resources.runner.html">mstar.engine.resources.runner</a></li>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.engine.resources.sampler.html">mstar.engine.resources.sampler</a></li>
@@ -403,7 +403,6 @@
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.model.waypoint.components.html">mstar.model.waypoint.components</a></li>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.model.waypoint.config.html">mstar.model.waypoint.config</a></li>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.model.waypoint.ring_geometry.html">mstar.model.waypoint.ring_geometry</a></li>
-<li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.model.waypoint.submodules.html">mstar.model.waypoint.submodules</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="_autosummary/mstar.model.whisper.html">mstar.model.whisper</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -460,6 +459,7 @@
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.chunk_loops.html">mstar.worker.chunk_loops</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.node_manager_utils.html">mstar.worker.node_manager_utils</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.rid_table.html">mstar.worker.rid_table</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.side_steps.html">mstar.worker.side_steps</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.spec_rows.html">mstar.worker.spec_rows</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.stream_buffers.html">mstar.worker.stream_buffers</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.worker_metrics.html">mstar.worker.worker_metrics</a></li>
@@ -728,22 +728,7 @@ documented here as they are introduced.</p>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_RUST_ZMQ</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">AUTO</span></code></p></td>
-<td><p>Transport selection for the ZeroMQ control mesh (see
-<a class="reference internal" href="_autosummary/mstar.communication.communicator.html#mstar.communication.communicator.make_communicator" title="mstar.communication.communicator.make_communicator"><code class="xref py py-func docutils literal notranslate"><span class="pre">mstar.communication.communicator.make_communicator()</span></code></a>).
-<code class="docutils literal notranslate"><span class="pre">AUTO</span></code>: the Rust-backed <code class="docutils literal notranslate"><span class="pre">RustZMQCommunicator</span></code> when the vendored
-<code class="docutils literal notranslate"><span class="pre">rust/</span></code> extension imports successfully, pyzmq otherwise.
-<code class="docutils literal notranslate"><span class="pre">1</span></code>: the Rust communicator, raising if the extension is missing.
-<code class="docutils literal notranslate"><span class="pre">0</span></code>: pyzmq. A worker cannot run on it any more, because the graph
-runtime holds a share of the Rust transport: the conductor refuses the
-setting before it starts any worker. An extension built before 0.1.1
-has no non-blocking <code class="docutils literal notranslate"><span class="pre">try_send</span></code>, which the API server’s preprocess
-thread sends with: for that thread alone, <code class="docutils literal notranslate"><span class="pre">AUTO</span></code> then uses pyzmq
-with a warning and <code class="docutils literal notranslate"><span class="pre">1</span></code> raises, asking for a rebuild. The conductor,
-the workers and the rest of the API server keep the Rust transport.</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_WIRE_CODEC</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_WIRE_CODEC</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">msgpack</span></code></p></td>
 <td><p>How messages are encoded on every communicator edge (see
 <a class="reference internal" href="_autosummary/mstar.communication.codec.html#mstar.communication.codec.default_codec" title="mstar.communication.codec.default_codec"><code class="xref py py-func docutils literal notranslate"><span class="pre">mstar.communication.codec.default_codec()</span></code></a>). <code class="docutils literal notranslate"><span class="pre">msgpack</span></code>: the
@@ -754,28 +739,28 @@ extensions instead of pickle. Upgrade all processes in a deployment
 together: older processes cannot decode the new extensions, and
 updated processes reject legacy pickle messages and metadata.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_ZMQ_TRANSPORT</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_ZMQ_TRANSPORT</span></code></p></td>
 <td><p>constructor’s protocol</p></td>
 <td><p>Overrides the communicator protocol (<code class="docutils literal notranslate"><span class="pre">IPC</span></code> or <code class="docutils literal notranslate"><span class="pre">TCP</span></code>) for a
 process, e.g. to run entities on separate hosts.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_ZMQ_TCP_HOST</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_ZMQ_TCP_HOST</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">127.0.0.1</span></code></p></td>
 <td><p>Host used to build peer endpoints when the protocol is <code class="docutils literal notranslate"><span class="pre">TCP</span></code>.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_ZMQ_TCP_BASE_PORT</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_ZMQ_TCP_BASE_PORT</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">19000</span></code></p></td>
 <td><p>Base of the deterministic entity-id → TCP port map (<code class="docutils literal notranslate"><span class="pre">api_server</span></code>
 = base, <code class="docutils literal notranslate"><span class="pre">conductor</span></code> = base+1, <code class="docutils literal notranslate"><span class="pre">worker_&lt;rank&gt;</span></code> = base+100+rank).</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_REQUIRE_ACCELERATOR_GRAPHS</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_REQUIRE_ACCELERATOR_GRAPHS</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">0</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">1</span></code> makes a worker fail at startup when any accelerator graph bucket
 could not be captured, instead of serving that bucket eagerly at
 10-20x the latency. Off by default: a failed capture is logged at
 ERROR with a per-runner summary and the rest keeps running.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_SHM_ARENA</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_SHM_ARENA</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">0</span></code></p></td>
 <td><p>SHM tensor-transport implementation. <code class="docutils literal notranslate"><span class="pre">0</span></code>: per-uuid files.
 <code class="docutils literal notranslate"><span class="pre">1</span></code>: the Rust shared-memory arena (requires the <code class="docutils literal notranslate"><span class="pre">rust/</span></code>
@@ -783,7 +768,7 @@ extension; raises if missing). <code class="docutils literal notranslate"><span 
 extension imports, files otherwise. Must match across the
 deployment — arena locations ride in the tensor descriptors.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_DEPLOYMENT_TOKEN</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_DEPLOYMENT_TOKEN</span></code></p></td>
 <td><p>random per launch</p></td>
 <td><p>Mixed into the namespace of the SHM tensor files and arena segments,
 so no two launches share names: not a restart on the same socket
@@ -800,7 +785,7 @@ a reused value would let it do to the next launch’s files).
 The API server logs a warning whenever it keeps a value the launcher
 set.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_KV_SHM_DIR</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_KV_SHM_DIR</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">/dev/shm</span></code> (or <code class="docutils literal notranslate"><span class="pre">/tmp</span></code> if unavailable)</p></td>
 <td><p>Base directory for host-staged KV snapshots when remote KV transfer
 uses SHM (<code class="docutils literal notranslate"><span class="pre">make_deployment_kv_shm_dir</span></code>). Each deployment creates a
@@ -814,7 +799,7 @@ filesystem. The lock is <code class="docutils literal notranslate"><span class="
 different nodes at one shared directory there: each would sweep the
 other’s live directories.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_SHM_ARENA_SEGMENT_MB</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_SHM_ARENA_SEGMENT_MB</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">256</span></code></p></td>
 <td><p>Size of each arena segment. The arena grows segment by segment;
 existing segments never move (registrations stay valid). A
@@ -824,7 +809,7 @@ segment counts against /dev/shm, as do spill files, which land in
 /dev/shm by default. A segment /dev/shm cannot hold counts as arena
 full (sends spill, see <code class="docutils literal notranslate"><span class="pre">MSTAR_SHM_ARENA_SPILL</span></code>).</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_SHM_ARENA_MAX_SEGMENTS</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_SHM_ARENA_MAX_SEGMENTS</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">32</span></code></p></td>
 <td><p>Growth cap PER ENTITY. Every entity (workers + the api-server data
 worker) creates its own arena, so node-wide /dev/shm demand can
@@ -833,12 +818,12 @@ reach <code class="docutils literal notranslate"><span class="pre">MAX_SEGMENTS<
 fails fast if one entity’s ceiling exceeds /dev/shm. At the cap,
 sends spill (see <code class="docutils literal notranslate"><span class="pre">MSTAR_SHM_ARENA_SPILL</span></code>).</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_SHM_ARENA_FULL_TIMEOUT_S</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_SHM_ARENA_FULL_TIMEOUT_S</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">30</span></code></p></td>
 <td><p>Strict mode only (<code class="docutils literal notranslate"><span class="pre">MSTAR_SHM_ARENA_SPILL=0</span></code>): how long a send
 backpressures on a full arena before failing.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_SHM_ARENA_SPILL</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_SHM_ARENA_SPILL</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">1</span></code></p></td>
 <td><p>Degrade gracefully at the segment cap: stage the tensor through the
 per-uuid file protocol instead — slower, never fails, matching the
@@ -847,19 +832,19 @@ backpressure + timeout — only meaningful where ANOTHER thread
 drains consumer ACKs (the threaded api-server); on a worker the
 ACKs arrive on the very thread that would be waiting.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_SHM_ARENA_SPILL_AFTER_S</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_SHM_ARENA_SPILL_AFTER_S</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">0</span></code></p></td>
 <td><p>Optional grace before spilling, for deployments where another
 thread frees slots concurrently. Default 0: spill immediately
 (a worker cannot receive ACKs while it waits).</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_SHM_ARENA_PIN</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_SHM_ARENA_PIN</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">1</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">cudaHostRegister</span></code> each mapped segment (both sides) so D2H/H2D
 copies through the side streams run at page-locked bandwidth and
 stay asynchronous. <code class="docutils literal notranslate"><span class="pre">0</span></code> disables (pageable copies).</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_SHM_ARENA_PIN_MAX_MB</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_SHM_ARENA_PIN_MAX_MB</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">4096</span></code></p></td>
 <td><p>Budget for TOTAL pinned host memory PER PROCESS, distinct from the
 segment cap (pinned pages come out of the OS’s pageable pool
@@ -868,7 +853,7 @@ system-wide). Node-wide pinned demand is approx
 so one process can pin more than its own arena holds. Segments
 past the budget stay unpinned: copies work, without async overlap.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_SHM_ARENA_GATHER_MAX_BYTES</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_SHM_ARENA_GATHER_MAX_BYTES</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">16384</span></code></p></td>
 <td><p>Largest item (bytes) a consumer gathers with others of the same
 shape, dtype and segment into one pinned buffer and one H2D copy,
@@ -876,14 +861,14 @@ instead of a copy per item (<code class="docutils literal notranslate"><span cla
 is the crossover measured on an H200 host; <code class="docutils literal notranslate"><span class="pre">0</span></code> disables the
 gather. Read in <code class="docutils literal notranslate"><span class="pre">ArenaShmCommunicationManager.__init__</span></code>.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_SHM_ARENA_GATHER_WORDS_MAX_BYTES</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_SHM_ARENA_GATHER_WORDS_MAX_BYTES</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">512</span></code></p></td>
 <td><p>Up to this item size (bytes, 8-byte aligned) the gather indexes
 8-byte words in one pass; larger items are copied one slice each.
 Measured on an H200 host. Read in
 <code class="docutils literal notranslate"><span class="pre">ArenaShmCommunicationManager.__init__</span></code>.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_SHM_ARENA_SLOT_TTL_S</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_SHM_ARENA_SLOT_TTL_S</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">0</span></code></p></td>
 <td><p>TTL backstop for abort-orphaned slots (a request aborted after
 staging but before all consumer ACKs defers reclaim forever).
@@ -893,27 +878,27 @@ timeout) cannot race a real consumer. <code class="docutils literal notranslate"
 pending review discussion); reclaims run under capacity pressure
 and with the periodic stats sweep, logging loudly.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_SHM_ARENA_STATS_INTERVAL_S</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_SHM_ARENA_STATS_INTERVAL_S</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">60</span></code></p></td>
 <td><p>Under <code class="docutils literal notranslate"><span class="pre">--log-stats</span></code>: how often the arena logs its occupancy /
 fragmentation snapshot (segments, free bytes, largest contiguous
 free block, pinned bytes).</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">NCCL_SOCKET_IFNAME</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">NCCL_SOCKET_IFNAME</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">lo</span></code></p></td>
 <td><p>NCCL’s own variable. Every worker runs on the conductor’s host, so
 the conductor sets <code class="docutils literal notranslate"><span class="pre">lo</span></code> for its workers and NCCL’s bootstrap
 sockets listen on loopback only. A value you set, or a set
 <code class="docutils literal notranslate"><span class="pre">NCCL_SOCKET_FAMILY</span></code>, is kept as is.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">NCCL_GRAPH_REGISTER</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">NCCL_GRAPH_REGISTER</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">0</span></code></p></td>
 <td><p>NCCL’s own variable. On, NCCL registers the buffers a CUDA graph
 captures, which succeeds on <code class="docutils literal notranslate"><span class="pre">expandable_segments</span></code> memory, and
 Cosmos3 SP4 with batched captures then gave wrong images (#897).
 Workers on CUDA set <code class="docutils literal notranslate"><span class="pre">0</span></code> unless you set it.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">GLOO_SOCKET_IFNAME</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">GLOO_SOCKET_IFNAME</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">lo</span></code></p></td>
 <td><p>PyTorch’s variable for the Gloo groups next to each TP/SP group.
 Same rule: the conductor sets <code class="docutils literal notranslate"><span class="pre">lo</span></code> for its workers unless you set
@@ -1303,59 +1288,102 @@ are too short to hide the planning in. Read by
 <code class="docutils literal notranslate"><span class="pre">knobs.pre_plan_enabled</span></code>.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_STEP_THREAD_CORE</span></code></p></td>
-<td><p>config’s <code class="docutils literal notranslate"><span class="pre">knobs:</span> <span class="pre">step_thread_core</span></code>, else <code class="docutils literal notranslate"><span class="pre">off</span></code></p></td>
-<td><p>Pin each worker’s main, GPU and plan threads to one core’s two
-hardware threads, and the API server’s message thread and Rust
-frontend bridge to one CPU of another core. A step hands work between
-the three worker threads several times and every step’s tokens pass
-from the message thread to the bridge; a thread woken on an idle core
-waits for that core to leave its idle state. The gain needs deep idle
-states. On a 2x B300 host (Xeon 6767P, <code class="docutils literal notranslate"><span class="pre">intel_idle</span></code>, C6 at 170 µs)
-a handoff to another core took 130-175 µs and 4-5 µs to a running
-one; on an H100 cloud VM without deep C-states it took 22 µs and
-11 µs, and pinning only cost throughput there. Turn it on (<code class="docutils literal notranslate"><span class="pre">auto</span></code>)
-where <code class="docutils literal notranslate"><span class="pre">/sys/devices/system/cpu/cpu*/cpuidle/state*/latency</span></code> shows a
-C6-class state of 100 µs or more and the server is host-bound (small
-models, high concurrency); leave it off on a VM without deep idle
-states. Measured off → <code class="docutils literal notranslate"><span class="pre">auto</span></code> (all three threads on one CPU in
-parentheses). B300 host, server <code class="docutils literal notranslate"><span class="pre">taskset</span></code> to 16 cores and their
-siblings: Qwen3.5-0.8B c=1 408 → 546 tok/s, c=16 5969 → 8049;
-Qwen3-TTS 1.7B c=1 TTFA p50 24.9 → 24.3 ms. H100 VM, 40-CPU
-<code class="docutils literal notranslate"><span class="pre">taskset</span></code> (from the #919 review):
-0.8B c=1 525 → 434 (486) tok/s, c=64 14455 → 14040 (12800); Qwen3-TTS
-c=1 TTFA mean 21.0 → 21.0 (25.6) ms. <code class="docutils literal notranslate"><span class="pre">auto</span></code>
-places by the GPU’s rank among the host’s GPUs on its NUMA node (sysfs
-<code class="docutils literal notranslate"><span class="pre">/sys/bus/pci/devices</span></code>: the PCI functions of the GPU’s vendor and
-class in address order, <code class="docutils literal notranslate"><span class="pre">numa_node</span></code> and <code class="docutils literal notranslate"><span class="pre">local_cpulist</span></code>), so
-servers on different GPUs take different CPUs without knowing about
-each other: a worker the core at that rank from the bottom of the
-node’s cores in the process mask, the API server the core at its
-first worker’s GPU’s rank from the top; further workers of one
-deployment on one GPU step by the node’s GPU count. A GPU whose node
-has no CPU in the mask picks, by its rank among the host’s GPUs in
-the same case, from the cores the node-local GPUs leave. The cores a GPU picks
-from must hold two per GPU that picks from them (its workers count up
-from the bottom, its API server down from the top); with fewer, or a
-mask too small to leave a CPU unpinned, nothing is pinned and a
-warning says why. Servers on one GPU (two MIG instances share its
-address) would take the same CPUs, so the first <code class="docutils literal notranslate"><span class="pre">auto</span></code> server holds
-<code class="docutils literal notranslate"><span class="pre">/tmp/mstar-gpu-&lt;PCI</span> <span class="pre">address&gt;.lock</span></code> for its life and a second one
-pins nothing, with a warning; the lock goes with the process however
-it exits. The lock only reaches servers that share <code class="docutils literal notranslate"><span class="pre">/tmp</span></code>, so
-servers in separate containers on one GPU still take the same CPUs.
-A split config’s second worker can also take a core that a server on
-a GPU without allowed CPUs takes under the same mask. A
-number names the first worker’s core (its hardware threads in the
+<td><p>config’s <code class="docutils literal notranslate"><span class="pre">knobs:</span> <span class="pre">step_thread_core</span></code>, else <code class="docutils literal notranslate"><span class="pre">auto</span></code></p></td>
+<td><p>Pin each worker’s main, GPU and plan threads, and the API server’s
+message thread and Rust frontend bridge on a CPU of their own. A step
+hands work between the three worker threads several times and every
+step’s tokens pass from the message thread to the bridge; on a host
+whose idle cores drop into deep C-states, each handoff to a sleeping
+core waits for it to wake. <code class="docutils literal notranslate"><span class="pre">off</span></code> pins nothing.
+<code class="docutils literal notranslate"><span class="pre">always</span></code> gives each worker <code class="docutils literal notranslate"><span class="pre">cpus.STEP_CORES</span></code> (3) cores, one
+hardware thread of each, and the API server one core; no two pinned
+threads share a core and the siblings of the CPUs taken stay unpinned.
+<code class="docutils literal notranslate"><span class="pre">siblings</span></code> puts each worker’s three threads on all hardware threads
+of one core instead (two cores of one L2 cluster,
+<code class="docutils literal notranslate"><span class="pre">topology/cluster_cpus_list</span></code>, where a core has one CPU in the mask);
+<code class="docutils literal notranslate"><span class="pre">cpus._siblings</span></code> has its numbers. On a deep-idle Xeon 6767P it beat
+no pin and three separate cores; on two H200 hosts with SMT it lost to
+no pin.
+<code class="docutils literal notranslate"><span class="pre">auto</span></code> pins nothing and logs one line saying why for this host, since
+no host it can tell apart has a measurement in which a layout beats no
+pin: <code class="docutils literal notranslate"><span class="pre">idle_hold</span></code> is set (with the cores held awake pinning measured
+no faster), the CPU vendor isn’t Intel (<code class="docutils literal notranslate"><span class="pre">cpus.AUTO_VENDORS</span></code>, by
+<code class="docutils literal notranslate"><span class="pre">/proc/cpuinfo</span></code>’s <code class="docutils literal notranslate"><span class="pre">vendor_id</span></code>), no enabled idle state of 100 µs or
+more shows on a CPU of the process mask
+(<code class="docutils literal notranslate"><span class="pre">/sys/devices/system/cpu/cpu*/cpuidle/state*/latency</span></code>,
+<code class="docutils literal notranslate"><span class="pre">cpus.deepest_idle</span></code>, <code class="docutils literal notranslate"><span class="pre">cpus.DEEP_IDLE_US</span></code>), or, on a deep-idle Intel
+host, three separate cores measured no faster than no pin.
+A number names the first worker’s core (its hardware threads in the
 mask); the next workers take the next cores up and the API server the
 last core of the mask. A number outside the mask, or too near its top
-for every worker, stops the server at startup. Threads and pools a
-pinned thread starts keep the process mask (<code class="docutils literal notranslate"><span class="pre">mstar.utils.threads</span></code>),
-and the API server’s intra-op and encode pools and FFmpeg’s per-decode
-threads (<code class="docutils literal notranslate"><span class="pre">media_limits.video_decode_threads</span></code>) are sized from the
-CPUs the pins leave (<code class="docutils literal notranslate"><span class="pre">CpuPlan</span></code> in <code class="docutils literal notranslate"><span class="pre">mstar.utils.cpus</span></code>). Each worker
-and the API server log their CPUs and why. Read by
-<code class="docutils literal notranslate"><span class="pre">knobs.step_thread_core</span></code>; no effect where <code class="docutils literal notranslate"><span class="pre">os.sched_setaffinity</span></code>
-is missing (macOS, Windows).</p></td>
+for every worker, stops the server at startup.
+<code class="docutils literal notranslate"><span class="pre">always</span></code> and <code class="docutils literal notranslate"><span class="pre">siblings</span></code> place by the GPU’s rank among the host’s
+GPUs on its NUMA node (sysfs <code class="docutils literal notranslate"><span class="pre">/sys/bus/pci/devices</span></code>: the PCI
+functions of the GPU’s vendor and class in address order,
+<code class="docutils literal notranslate"><span class="pre">numa_node</span></code> and <code class="docutils literal notranslate"><span class="pre">local_cpulist</span></code>), so servers on different GPUs take
+different CPUs without knowing about each other: the API server the
+core at its first worker’s GPU’s rank from the top of the node’s cores
+in the process mask, a worker its cores at that rank from the bottom of
+the rest; further workers of one deployment on one GPU step by the
+node’s GPU count. A GPU whose node has no CPU in the mask picks, by its
+rank among the host’s GPUs in the same case, from the cores the
+node-local GPUs leave. Under <code class="docutils literal notranslate"><span class="pre">always</span></code> the cores a GPU picks from must
+hold four per GPU that picks from them (two under <code class="docutils literal notranslate"><span class="pre">siblings</span></code>). A mask
+too small for that across the host may do for the GPUs this container
+has a device node for, since only those can share it, and those rank
+instead (NVIDIA only; a 2-GPU slice of an 8-GPU host fits an 8-core mask
+this way). Short of that, the GPUs this process was given
+(<code class="docutils literal notranslate"><span class="pre">CUDA_VISIBLE_DEVICES</span></code>, which <code class="docutils literal notranslate"><span class="pre">--gpus</span></code> sets) rank, and the mask is
+cut into as many core sets as it holds for them: a one-GPU server under
+an 8-core job mask on a node of four GPUs gets three cores and an API
+core, and the mask holds two such sets. The log line names the rule
+that sized the plan. Short of that too, or with a mask too small to
+leave a CPU unpinned, nothing is pinned and a warning says why.
+Servers on one GPU (two MIG instances share its address) would take
+the same CPUs, so the first <code class="docutils literal notranslate"><span class="pre">always</span></code> or <code class="docutils literal notranslate"><span class="pre">siblings</span></code> server holds
+<code class="docutils literal notranslate"><span class="pre">/tmp/mstar-gpu-&lt;PCI</span> <span class="pre">address&gt;.lock</span></code> for its life and a second one
+pins nothing, with a warning. Every server that pins, a CPU number
+included, also holds <code class="docutils literal notranslate"><span class="pre">/tmp/mstar-core-&lt;CPU&gt;.lock</span></code> for each physical
+core it pins (named by the core’s first CPU, with its pid inside): one
+that finds a core held logs the holder’s pid and takes the mask’s next
+core set, or pins nothing with a warning when none is free. The locks
+go with the process however it exits, and a file naming a pid that has
+exited is taken over with an info line. They only reach servers that
+share <code class="docutils literal notranslate"><span class="pre">/tmp</span></code>, so servers in separate containers on one GPU or under
+one mask still take the same CPUs.
+A split config’s second worker can also take a core that a server on
+a GPU without allowed CPUs takes under the same mask.
+Threads and pools a pinned thread starts keep the process mask
+(<code class="docutils literal notranslate"><span class="pre">mstar.utils.threads</span></code>), and the API server’s intra-op and encode
+pools and FFmpeg’s per-decode threads
+(<code class="docutils literal notranslate"><span class="pre">media_limits.video_decode_threads</span></code>) are sized from the CPUs the pins
+leave (<code class="docutils literal notranslate"><span class="pre">CpuPlan</span></code> in <code class="docutils literal notranslate"><span class="pre">mstar.utils.cpus</span></code>). Each worker and the API
+server log their CPUs and why. See <a class="reference internal" href="serving.html#host-idle"><span class="std std-ref">Host idle states</span></a> for measurements.
+Read by <code class="docutils literal notranslate"><span class="pre">knobs.step_thread_core</span></code>; no effect where
+<code class="docutils literal notranslate"><span class="pre">os.sched_setaffinity</span></code> is missing (macOS, Windows).</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_STEP_CORE_SET</span></code></p></td>
+<td><p>set by the API server</p></td>
+<td><p>Which of the mask’s core sets the API server locked under
+<code class="docutils literal notranslate"><span class="pre">step_thread_core</span></code> (<code class="docutils literal notranslate"><span class="pre">cpus.claim_cores</span></code>), for the conductor and
+workers it starts: they build the same plan, but only the API server
+knows which set was free. Not meant to be set by hand. Read by
+<code class="docutils literal notranslate"><span class="pre">cpus.devices_plan</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_IDLE_HOLD</span></code></p></td>
+<td><p>config’s <code class="docutils literal notranslate"><span class="pre">knobs:</span> <span class="pre">idle_hold</span></code>, else <code class="docutils literal notranslate"><span class="pre">off</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">qos</span></code> has the API server open <code class="docutils literal notranslate"><span class="pre">/dev/cpu_dma_latency</span></code>, write a
+10 µs latency and keep the fd open for its life, which keeps every CPU
+of the host out of idle states slower than that (C1 and C1E stay
+allowed). The log says what happened, and a device that is absent or
+not writable only costs the hold: startup carries on. Containers
+usually hide the device. The request is host-wide and holds cores awake
+whether or not the server is busy, so it spends power on idle hosts; it
+is off by default. <code class="docutils literal notranslate"><span class="pre">auto</span></code> placement stands down while it is set:
+with every server core held awake by a <code class="docutils literal notranslate"><span class="pre">SCHED_IDLE</span></code> spinner (the
+stand-in where the device is hidden), one core’s hardware threads lost
+to no pin and three separate cores were level with it. Read by
+<code class="docutils literal notranslate"><span class="pre">knobs.idle_hold</span></code>, applied by <code class="docutils literal notranslate"><span class="pre">cpus.hold_idle</span></code>.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_DECODE_BUCKETS</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">1,2,4,8,16,32,48,64,96,128</span></code></p></td>
@@ -1391,17 +1419,7 @@ is not a number, is <code class="docutils literal notranslate"><span class="pre"
 worker starts and <code class="docutils literal notranslate"><span class="pre">5</span></code> is used; a negative value is raised to <code class="docutils literal notranslate"><span class="pre">0</span></code>
 with a warning.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_QWEN35_PREFILL_TOKEN_BUCKETS</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">32,64,128,256,512,1024,2048,2176,4096,4352,8192,8704</span></code></p></td>
-<td><p>Total tokens of a packed Qwen3.5 text-prefill step that get a captured
-graph (one per bucket and batch size). A prompt past the top bucket
-prefills eagerly, which is launch-bound: an eager 8k prefill on 0.8B
-spends 78 ms of wall time on 36 ms of kernels. 2176, 4352 and 8704 add
-1/16 of slack above the powers of two from 2048 up, for a mixed step’s
-decode rows and for batches a few tokens over. Narrow it to save graph
-memory and capture time, or extend it.</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_KV_CHAIN_LAZY_STEPS</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_KV_CHAIN_LAZY_STEPS</span></code></p></td>
 <td><p>config’s <code class="docutils literal notranslate"><span class="pre">knobs:</span> <span class="pre">kv_chain_lazy_steps</span></code>, else <code class="docutils literal notranslate"><span class="pre">1</span></code></p></td>
 <td><p>How many decode steps of sampled ids the KV manager holds back before
 it extends the requests’ prefix chains (the per-page keys the prefix
@@ -1413,6 +1431,17 @@ already allows; a request that finishes in between may leave its last
 page unindexed. The default <code class="docutils literal notranslate"><span class="pre">1</span></code> extends on every step: <code class="docutils literal notranslate"><span class="pre">16</span></code>
 measured as noise at c64/c128 on 0.8B (the extension is a small part
 of the stop check’s tail).</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_WORKSPACE_BUFFER_MB</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">512</span></code></p></td>
+<td><p>The size each FlashInfer attention workspace starts at, per (plan label, slot), read
+by <code class="docutils literal notranslate"><span class="pre">workspace_bytes</span></code> (<code class="docutils literal notranslate"><span class="pre">mstar/engine/resources/attn/workspace.py</span></code>). A floor: a plan
+at startup that asks for more grows that workspace to what it asked for. Raise it for
+an eager step that wants more than startup’s plans left it, which raises with the bytes
+it asked for, since a captured graph holds the workspace’s address by then. A ragged
+resource that declares <code class="docutils literal notranslate"><span class="pre">workspace_mb</span></code> starts there instead, and this doesn’t reach
+it: LTX-2.5’s twelve workspaces hold 1.5 GiB at its 128, and would hold 6 GiB at
+<code class="docutils literal notranslate"><span class="pre">512</span></code> and 24 GiB at <code class="docutils literal notranslate"><span class="pre">2048</span></code> if this applied.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_KV_PINNED_INDPTRS</span></code></p></td>
 <td><p>config’s <code class="docutils literal notranslate"><span class="pre">knobs:</span> <span class="pre">kv_pinned_indptrs</span></code>, else <code class="docutils literal notranslate"><span class="pre">0</span></code></p></td>
@@ -1436,7 +1465,21 @@ allocating. <code class="docutils literal notranslate"><span class="pre">50000</
 shorter decode step), at the cost of holding at most that many young
 objects between collections. Read by <code class="docutils literal notranslate"><span class="pre">knobs.gc_gen0_threshold</span></code>.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_KV_PLAN_CACHE</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_RESIDENT_PLANNING</span></code></p></td>
+<td><p>config’s <code class="docutils literal notranslate"><span class="pre">knobs:</span> <span class="pre">resident_planning</span></code>, else <code class="docutils literal notranslate"><span class="pre">auto</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">auto</span></code> runs a node’s captured decode steps off per-request tables on
+the device where the submodule names resident walks
+(<code class="docutils literal notranslate"><span class="pre">NodeSubmodule.resident_walks</span></code>) and every resource of the node can
+(<code class="docutils literal notranslate"><span class="pre">Resource.resident_refusal</span></code>); the worker log says why a node that
+names walks stays on the host. <code class="docutils literal notranslate"><span class="pre">off</span></code> plans every step on the host. The
+tables are sized at startup, not by a setting: twice the walk’s largest
+capture batch in rows, plus one, since a request that finds no row takes
+the least recently run one’s. A row has a cell per page of the KV pool’s
+<code class="docutils literal notranslate"><span class="pre">max_seq_len</span></code> (the model’s context, or <code class="docutils literal notranslate"><span class="pre">resources:</span> <span class="pre">&lt;kv&gt;:</span> <span class="pre">max_seq_len</span></code>;
+not the config’s top-level key), at most the pool’s pages, plus a few, 8
+bytes each. Read by <code class="docutils literal notranslate"><span class="pre">knobs.resident_planning</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_KV_PLAN_CACHE</span></code></p></td>
 <td><p>config’s <code class="docutils literal notranslate"><span class="pre">knobs:</span> <span class="pre">kv_plan_cache</span></code>, else <code class="docutils literal notranslate"><span class="pre">0</span></code></p></td>
 <td><p>The KV manager plans a captured decode step off the previous step’s
 plan when the batch is the same rows in the same order and nothing
@@ -1449,7 +1492,7 @@ views); the reworked path keeps the views lazy and is off by default
 until measured. <code class="docutils literal notranslate"><span class="pre">0</span></code> plans every step from the streams. <code class="docutils literal notranslate"><span class="pre">2</span></code> runs
 both and logs a difference, for checking a run.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_DEVICE_LOOPBACK</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_DEVICE_LOOPBACK</span></code></p></td>
 <td><p>config’s <code class="docutils literal notranslate"><span class="pre">knobs:</span> <span class="pre">device_loopback</span></code>, else <code class="docutils literal notranslate"><span class="pre">1</span></code></p></td>
 <td><p>Whether a decode node may keep its loop-back token on the device:
 the sampler writes each request’s last token to a slot-addressed
@@ -1463,7 +1506,7 @@ buffers; the sampler keeps the masters for those nodes alone, so a
 node that takes its tokens on the host does not pay the eager-step
 master write. <code class="docutils literal notranslate"><span class="pre">0</span></code> keeps every node on the per-request tensor path.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_INGRAPH_DECODE_ROPE</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_INGRAPH_DECODE_ROPE</span></code></p></td>
 <td><p>config’s <code class="docutils literal notranslate"><span class="pre">knobs:</span> <span class="pre">ingraph_decode_rope</span></code>, else <code class="docutils literal notranslate"><span class="pre">0</span></code></p></td>
 <td><p>A captured Qwen3.5 text prefill or mixed step builds its rotary tables
 inside the graph from the position resource’s planned positions instead
@@ -1471,7 +1514,7 @@ of building them before the replay (<code class="docutils literal notranslate"><
 captured decode step always does. Experiment knob, measured and gated
 on its own.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_SAMPLER_INGRAPH_SCATTER</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_SAMPLER_INGRAPH_SCATTER</span></code></p></td>
 <td><p>config’s <code class="docutils literal notranslate"><span class="pre">knobs:</span> <span class="pre">sampler_ingraph_scatter</span></code>, else <code class="docutils literal notranslate"><span class="pre">1</span></code></p></td>
 <td><p>The captured sampler gathers its RNG offsets from the slot masters
 and scatters the advanced offsets and the sampled tokens back inside
@@ -1488,31 +1531,31 @@ one. Only for a node that reads its tokens back on the device
 rank: above one, where admission doesn’t decide, the masters grow and
 the scatter runs after the replay, as with <code class="docutils literal notranslate"><span class="pre">0</span></code>.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_SAMPLER_SLOTS</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_SAMPLER_SLOTS</span></code></p></td>
 <td><p>config’s <code class="docutils literal notranslate"><span class="pre">knobs:</span> <span class="pre">sampler_slots</span></code>, else <code class="docutils literal notranslate"><span class="pre">4096</span></code></p></td>
 <td><p>Request rows of the sampler masters a captured graph indexes when
 <code class="docutils literal notranslate"><span class="pre">MSTAR_SAMPLER_INGRAPH_SCATTER</span></code> is on (at least the node’s largest
 capture batch): the most requests admitted at once on such a node; the
 rest wait to be admitted. Read by <code class="docutils literal notranslate"><span class="pre">knobs.sampler_slots</span></code>.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_RUST_SEND_TIMING</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_RUST_SEND_TIMING</span></code></p></td>
 <td><p>unset</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">1</span></code> makes the Rust runtime print, every 500 calls, how long the
 worker’s per-step send spends in its own work against the whole call
 (which includes taking the GIL back when the send had to release it).
 A diagnostic for the host-overhead work; off by default.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_SPEC_PEEK_FOR_FAIRNESS</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_SPEC_PEEK_FOR_FAIRNESS</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">1</span></code></p></td>
 <td><p>Yield the speculation chain only when another (node, walk) is
 actually ready right now; <code class="docutils literal notranslate"><span class="pre">0</span></code> uses the consecutive-step cap alone.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_PHASE_TIMING</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_PHASE_TIMING</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">0</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">N</span> <span class="pre">&gt;</span> <span class="pre">0</span></code>: every N iterations log per-phase p50/p95/mean of the
 worker main loop (speculate, await_gpu, submit_spec, …).</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_KV_DEBUG_ASSERTS</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_KV_DEBUG_ASSERTS</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">0</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">1</span></code>: after every <code class="docutils literal notranslate"><span class="pre">admit</span></code>, <code class="docutils literal notranslate"><span class="pre">commit</span></code>, <code class="docutils literal notranslate"><span class="pre">reset_request</span></code>, <code class="docutils literal notranslate"><span class="pre">remove_request</span></code>
 and change to an admitted request’s pages, check the KV page bookkeeping against
@@ -1545,15 +1588,24 @@ footprint at removal. Tests and debugging only.</p></td>
 <td><p>Dynamo’s recompile limit, clamped to [8, 256]. Raise it if the logs
 show <code class="docutils literal notranslate"><span class="pre">hit</span> <span class="pre">config.recompile_limit</span></code>.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_COMPILE_LEVEL</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_KERNEL_TABLES</span></code></p></td>
+<td><p>unset</p></td>
+<td><p>Directories of tuned kernel-config tables (<code class="docutils literal notranslate"><span class="pre">os.pathsep</span></code>-separated),
+searched before the package’s <code class="docutils literal notranslate"><span class="pre">mstar/kernels/tables</span></code> (read by
+<code class="xref py py-func docutils literal notranslate"><span class="pre">mstar.kernels.table.table_dirs()</span></code>). <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">benchmark.kernels.sweep</span>
+<span class="pre">...</span> <span class="pre">--out</span> <span class="pre">DIR</span></code> writes one, so a sweep can be served and measured before it
+is committed. Set it the same way on every node, so every rank of a lockstep
+instance picks the same configs.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_COMPILE_LEVEL</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">1</span></code></p></td>
 <td><p>How much a captured forward’s compile tunes; <code class="docutils literal notranslate"><span class="pre">mstar</span> <span class="pre">serve</span> <span class="pre">-O</span></code> sets it
-(read by <a class="reference internal" href="_autosummary/mstar.engine.accelerator_graph_runner.html#mstar.engine.accelerator_graph_runner.compile_level" title="mstar.engine.accelerator_graph_runner.compile_level"><code class="xref py py-func docutils literal notranslate"><span class="pre">mstar.engine.accelerator_graph_runner.compile_level()</span></code></a>).
+(read by <code class="xref py py-func docutils literal notranslate"><span class="pre">mstar.engine.accelerator_graph_runner.compile_level()</span></code>).
 <code class="docutils literal notranslate"><span class="pre">0</span></code>: torch.compile’s default mode. <code class="docutils literal notranslate"><span class="pre">1</span></code>: coordinate descent tuning.
 <code class="docutils literal notranslate"><span class="pre">2</span></code>: <code class="docutils literal notranslate"><span class="pre">max-autotune-no-cudagraphs</span></code>. A capture config that names its
 own <code class="docutils literal notranslate"><span class="pre">compile_mode</span></code> keeps it.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_COMPILE_DETERMINISTIC</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_COMPILE_DETERMINISTIC</span></code></p></td>
 <td><p>config’s <code class="docutils literal notranslate"><span class="pre">knobs:</span> <span class="pre">compile_deterministic</span></code>, else <code class="docutils literal notranslate"><span class="pre">0</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">1</span></code>: Qwen3.5’s decode capture compiles in Inductor’s deterministic
 mode, as its prefill, mixed and vision captures always do, so greedy
@@ -1561,7 +1613,7 @@ output reproduces across server processes and the cold start shrinks,
 at the cost of one-row decode speed. Only Qwen3.5’s text walks read it
 (<code class="docutils literal notranslate"><span class="pre">knobs.compile_deterministic</span></code>).</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">TRITON_PTXAS_BLACKWELL_PATH</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">TRITON_PTXAS_BLACKWELL_PATH</span></code></p></td>
 <td><p>torch’s ptxas, when needed</p></td>
 <td><p>Triton’s own variable: the ptxas it runs for sm_100 and up. ptxas
 before 13.1.115, including the 13.1.80 that Triton 3.7.1 bundles,
@@ -1577,7 +1629,7 @@ is kept, and the cache tag then names the ptxas you chose, so a cache
 another ptxas wrote is not reused. A <code class="docutils literal notranslate"><span class="pre">TORCH_COMPILE_CACHE_KEY_TAG</span></code>
 you set gets <code class="docutils literal notranslate"><span class="pre">-ptxas-blackwell-&lt;version&gt;</span></code> appended.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">TORCHINDUCTOR_CACHE_DIR</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">TORCHINDUCTOR_CACHE_DIR</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">$XDG_CACHE_HOME/mstar/torchinductor</span></code> (<code class="docutils literal notranslate"><span class="pre">~/.cache/mstar/torchinductor</span></code> when unset)</p></td>
 <td><p>torch’s own variable; M* sets this default when importing
 <a class="reference internal" href="_autosummary/mstar.engine.html#module-mstar.engine" title="mstar.engine"><code class="xref py py-mod docutils literal notranslate"><span class="pre">mstar.engine</span></code></a> (<code class="docutils literal notranslate"><span class="pre">_default_compile_caches</span></code>), so compiled graphs and
@@ -1588,7 +1640,7 @@ start (Triton’s kernels follow it unless <code class="docutils literal notrans
 FlashInfer’s JIT cache stays warm). See
 <a class="reference internal" href="serving.html#restarts-and-the-compile-cache"><span class="std std-ref">Restarts and the compile cache</span></a>.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">TRITON_CACHE_DIR</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">TRITON_CACHE_DIR</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">$TORCHINDUCTOR_CACHE_DIR/triton</span></code></p></td>
 <td><p>Triton’s own variable, defaulted by the same function once
 <code class="docutils literal notranslate"><span class="pre">TORCHINDUCTOR_CACHE_DIR</span></code> is resolved (exported or M*’s default; left unset
