@@ -451,7 +451,8 @@ overrides** in :doc:`serving`.
 
    The keys cover the label's first ``keyed_spans`` spans. An ids span is keyed by its
    token ids, a digest span by its file. Each span is its own step unless it sets
-   ``opens_step=False``, which puts it in one row with the span before it: a match cuts the
+   ``opens_step=False``, which puts it in one row with the span before it, of the same walk
+   (``LabelLayout.row()`` fails a layout where it isn't): a match cuts the
    row, and the row keeps placing its own positions, so its walk declares the advance of the
    whole row whatever the cut left (Qwen3-Omni's prefill of text around an attachment).
 
@@ -1653,7 +1654,10 @@ and lengths; positions read the pool their ``PositionConfig.kv_cache`` names. Ca
 turns it on only if every resource of the node can (``Resource.resident_refusal``) and
 the deployment left ``knobs: resident_planning`` at ``auto``; the worker log says why
 otherwise. Steps of other walks, and eager steps, keep the host plan and leave the row
-stale, so the first resident step after them writes it.
+stale, so the first resident step after them writes it. The sampler takes part on its
+own: its per-request scalars (temperature, top-k, top-p, seed, penalties) become cells
+of the row, so a resident step stages none of them, while the RNG offset, the last token
+and the repetition-penalty mask stay by the sampler's own row of each request.
 
 A ``SubmoduleStep`` contains a list of ``Segment`` objects and one ``ResourceStep`` per
 resource key:
