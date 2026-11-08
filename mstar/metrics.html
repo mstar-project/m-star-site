@@ -227,6 +227,7 @@
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.api_server.request_types.html">mstar.api_server.request_types</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.api_server.rust_frontend.html">mstar.api_server.rust_frontend</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.api_server.streaming_response.html">mstar.api_server.streaming_response</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.api_server.ws_frames.html">mstar.api_server.ws_frames</a></li>
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="_autosummary/mstar.communication.html">mstar.communication</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -967,7 +968,7 @@ worker and transport values its message carries are stale.</p>
 <h2>Engine workers<a class="headerlink" href="#engine-workers" title="Link to this heading">#</a></h2>
 <p>From the workers’ numbers, forwarded in the conductor’s status message, so up to two
 seconds old. A node with replicas on several workers shows their sum. The ranks of a
-tensor or sequence parallel instance count once: the instance’s first rank reports.</p>
+TP, SP or CFG instance count once: the instance’s first rank reports.</p>
 <dl class="simple">
 <dt><code class="docutils literal notranslate"><span class="pre">mstar_kv_pages_used{model_name,</span> <span class="pre">component,</span> <span class="pre">resource}</span></code></dt><dd><p>Gauge. Pages of a paged KV cache not on its free list: held by requests, or kept by
 the prefix cache. A node can have several caches (e.g. a decoder’s self and cross

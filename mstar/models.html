@@ -227,6 +227,7 @@
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.api_server.request_types.html">mstar.api_server.request_types</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.api_server.rust_frontend.html">mstar.api_server.rust_frontend</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.api_server.streaming_response.html">mstar.api_server.streaming_response</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.api_server.ws_frames.html">mstar.api_server.ws_frames</a></li>
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="_autosummary/mstar.communication.html">mstar.communication</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -1312,15 +1313,24 @@ not the 256-slot default. The state defaults to the checkpoint’s
 <code class="docutils literal notranslate"><span class="pre">gdn_state.state_dtype:</span> <span class="pre">bfloat16</span></code> halves state traffic at some precision and
 needs FlashInfer’s fused bf16 decode kernel (K = V = 128).</p>
 <p>Text prefill and mixed steps replay captured graphs by total tokens, on the
-ladder <code class="docutils literal notranslate"><span class="pre">32</span> <span class="pre">...</span> <span class="pre">8704</span></code> (powers of two, plus 2176, 4352 and 8704 for a mixed
-step’s decode rows and batches a few tokens over; a mixed step keeps only the
-powers of two past 2176); a step pads to its bucket and a longer one runs
-eagerly. <code class="docutils literal notranslate"><span class="pre">model_kwargs:</span> <span class="pre">prefill_token_buckets:</span> <span class="pre">[...]</span></code> sets a
-deployment’s own ladder (distinct positive token counts, checked when the
-worker loads): <code class="docutils literal notranslate"><span class="pre">configs/qwen3_5_9b*.yaml</span></code> take the powers of two to 2048
-and 2176 for a mixed step, since the LLM’s 2048-token step budget
+ladder <code class="docutils literal notranslate"><span class="pre">32</span> <span class="pre">...</span> <span class="pre">8192</span></code> (powers of two, plus 2176 as slack for a step a few
+tokens over the 2048-token step budget); a step pads to its bucket and a longer
+one runs eagerly. A text-prefill step, one with no decode rows beside it, also
+has 1152, 1280, 1536 and 1792, so a prompt a little past 1024 tokens doesn’t
+pad to 2048; a mixed step captures only the ladder’s powers of two and 2176, on
+a deployment’s own ladder too, so a ladder needs at least one of those.
+<code class="docutils literal notranslate"><span class="pre">model_kwargs:</span> <span class="pre">prefill_token_buckets:</span> <span class="pre">[...]</span></code> sets a deployment’s own ladder
+(distinct positive token counts, checked when the worker loads):
+<code class="docutils literal notranslate"><span class="pre">configs/qwen3_5_9b*.yaml</span></code> take the powers of two to 2048,
+1152-1792, and 2176 as slack, since the LLM’s 2048-token step budget
 (<code class="docutils literal notranslate"><span class="pre">MAX_BATCH_TOKENS</span></code>) caps prefill and mixed steps and no bucket past 2176 is
-reached. Each bucket adds captures and startup time.</p>
+reached. Each bucket adds captures and startup time. 4096 and 8192 stay in the
+default ladder for a deployment that raises <code class="docutils literal notranslate"><span class="pre">max_batch_tokens</span></code> or turns
+chunking off, which fills them exactly. The ladder leaves out slack rungs above
+them (4352, 8704): such a deployment adds them to its own ladder, and without
+them a step just past a power of two pads to the next one and a step past 8192
+runs eagerly. Added rungs serve text-prefill steps only; a mixed step’s slack
+stays 2176.</p>
 <p>A captured decode step builds its rotary tables inside the graph from the
 planned positions, rather than staging tables built eagerly before the replay
 (that build sat on the per-step critical path: +13% output tok/s at c=32 on
@@ -1492,7 +1502,8 @@ video frame group), FlashInfer by default, so no <code class="docutils literal n
 needed. A deployment can pick the kernel under <code class="docutils literal notranslate"><span class="pre">resources:</span></code> in its YAML,
 e.g. <code class="docutils literal notranslate"><span class="pre">vision_attn:</span> <span class="pre">{flashinfer_backend:</span> <span class="pre">cutlass}</span></code>. Each encoder’s block stack
 is captured as a CUDA graph per token-count bucket; a request past the
-largest bucket (32768 patches, about 5 minutes of audio) runs it eagerly.</p></li>
+largest bucket (8192 patches, about a 1920x1080 image; 4096 audio tokens)
+runs it eagerly.</p></li>
 <li><p>A request with no audio output decodes on its own walk, <code class="docutils literal notranslate"><span class="pre">thinker_text_decode</span></code>:
 its token stays on the device between steps and reaches the client inline, as
 Qwen3.5’s does, and nothing goes to the Talker. A request with audio output
@@ -2259,14 +2270,16 @@ image (one latent) keeps the compiled stock <code class="docutils literal notran
 is faster for a single frame. False decodes everything with the compiled stock
 <code class="docutils literal notranslate"><span class="pre">vae.decode</span></code> on the shared instance.</p>
 <p>Two or more requests at the same denoise step run one cross-request forward
-(<code class="docutils literal notranslate"><span class="pre">max_gen_batch_size</span></code>, default 8) for video, image and sound; the action step
-runs eager. With <code class="docutils literal notranslate"><span class="pre">compile_denoise_batched</span></code> (default on) its layer stack is
+(<code class="docutils literal notranslate"><span class="pre">max_gen_batch_size</span></code>, default 8) for video, image, sound and action. With
+<code class="docutils literal notranslate"><span class="pre">compile_denoise_batched</span></code> (default on) the layer stack these steps share is
 compiled with the same mode, once, while the server starts, with the packed
 length dynamic: no batch size or mix of resolutions compiles mid-traffic. The
-per-request patchify, rotary tables and unpatchify around it run eager. At
-832x480x121 one request’s guidance pair is 24k tokens, which already fills the
-GPU’s GEMM and attention throughput, so a batch of N costs about N single
-steps: batching keeps requests in step rather than adding throughput.</p>
+per-request patchify, rotary tables and unpatchify around it run eager.
+Compiled, a batched action step’s outputs differ from the eager stack’s at the
+kernel-drift level. At 832x480x121 one request’s guidance pair is 24k tokens,
+which already fills the GPU’s GEMM and attention throughput, so a batch of N
+costs about N single steps: batching keeps requests in step rather than adding
+throughput.</p>
 <p>The action policy (<code class="docutils literal notranslate"><span class="pre">cosmos3_edge_droid</span></code>, or <code class="docutils literal notranslate"><span class="pre">cosmos3_edge</span></code> with an action
 <code class="docutils literal notranslate"><span class="pre">domain_name</span></code>) predicts a chunk of robot actions from the current observation:
 <code class="docutils literal notranslate"><span class="pre">output_modalities=action</span></code> with <code class="docutils literal notranslate"><span class="pre">model_kwargs</span></code>
@@ -2551,9 +2564,28 @@ tiles only when free VRAM at decode time is short of the untiled estimate
 (the <code class="docutils literal notranslate"><span class="pre">auto</span></code> policy; <code class="docutils literal notranslate"><span class="pre">WAN22_VAE_DECODE_TILING</span></code> forces a path), which keeps the untiled conv3d from OOMing a
 32 GiB card. No CUDA-graph capture, no continuous batching (one request per
 step) and no component offload.</p>
-<p><strong>Two GPUs.</strong> <code class="docutils literal notranslate"><span class="pre">configs/wan22_dp2.yaml</span></code> serves a whole replica per GPU: 5.2
-videos/min at 4 concurrent on H200s (measured on an earlier version), while one
-request takes the 1-GPU time.</p>
+<p><strong>Two GPUs.</strong> <code class="docutils literal notranslate"><span class="pre">configs/wan22_cfg_parallel_2gpu.yaml</span></code> is CFG-parallel: it runs
+the dit over two ranks (<code class="docutils literal notranslate"><span class="pre">cfg_size:</span> <span class="pre">2</span></code>) that split the classifier-free guidance
+batch: each rank runs one branch over the batch’s rows and the two noise
+predictions are all-gathered
+every step, so a guided step costs one branch’s forward (502 vs 1000 ms at
+1280x704x81 on H200s; one request 13.4 s vs 23.3 s end to end at 20 steps;
+measured on that earlier version). The
+text encoder and VAE run on rank 0. Without guidance both ranks compute the same
+step, correct but no faster. For throughput under concurrency,
+<code class="docutils literal notranslate"><span class="pre">configs/wan22_dp2.yaml</span></code> serves a whole replica per GPU instead: 5.2 videos/min
+at 4 concurrent vs 4.7 CFG-parallel (whose rank 1 idles through rank 0’s VAE
+decode; measured on that earlier version), while one request takes the 1-GPU time.</p>
+<p><strong>Four GPUs.</strong> <code class="docutils literal notranslate"><span class="pre">configs/wan22_cfg2_sp2_4gpu.yaml</span></code> also splits each branch’s
+tokens over a pair of ranks (<code class="docutils literal notranslate"><span class="pre">cfg_size:</span> <span class="pre">2,</span> <span class="pre">sp_size:</span> <span class="pre">2</span></code>, Ulysses on the dit’s
+self-attention) to cut one request’s latency. Split the guidance branches
+first (<code class="docutils literal notranslate"><span class="pre">cfg_size:</span> <span class="pre">2</span></code>), then add <code class="docutils literal notranslate"><span class="pre">sp_size</span></code> on top: on two GPUs,
+<code class="docutils literal notranslate"><span class="pre">sp_size:</span> <span class="pre">2</span></code> alone is slower than <code class="docutils literal notranslate"><span class="pre">cfg_size:</span> <span class="pre">2</span></code>.
+<code class="docutils literal notranslate"><span class="pre">sp_size</span></code> must divide the dit’s 24 attention heads. Under concurrency, data
+parallelism stays the throughput layout: at 1280x704x81 and 4 concurrent, four
+replicas (<code class="docutils literal notranslate"><span class="pre">wan22_dp2.yaml</span></code>’s layout over four ranks) serve 8.6 videos/min
+against 7.2 for this layout on H200s, and 11.0 against 7.4 in a separate run on
+H100s.</p>
 </section>
 <section id="ltx-2-5-ltx2-5">
 <h2>LTX-2.5 (<code class="docutils literal notranslate"><span class="pre">ltx2_5</span></code>)<a class="headerlink" href="#ltx-2-5-ltx2-5" title="Link to this heading">#</a></h2>
