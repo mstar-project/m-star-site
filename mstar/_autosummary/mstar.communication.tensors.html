@@ -55,7 +55,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="0.2.1" />
-    <meta name="docbuild:last-update" content="Nov 07, 2026"/>
+    <meta name="docbuild:last-update" content="Nov 08, 2026"/>
   
     
     <script src="../_static/searchtools.js"></script>
@@ -477,9 +477,10 @@
 <li class="toctree-l3"><a class="reference internal" href="mstar.worker.chunk_loops.html">mstar.worker.chunk_loops</a></li>
 <li class="toctree-l3"><a class="reference internal" href="mstar.worker.host_pool.html">mstar.worker.host_pool</a></li>
 <li class="toctree-l3"><a class="reference internal" href="mstar.worker.node_manager_utils.html">mstar.worker.node_manager_utils</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mstar.worker.phase_timer.html">mstar.worker.phase_timer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="mstar.worker.rebuild.html">mstar.worker.rebuild</a></li>
 <li class="toctree-l3"><a class="reference internal" href="mstar.worker.rid_table.html">mstar.worker.rid_table</a></li>
-<li class="toctree-l3"><a class="reference internal" href="mstar.worker.side_steps.html">mstar.worker.side_steps</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mstar.worker.scheduled_batch.html">mstar.worker.scheduled_batch</a></li>
 <li class="toctree-l3"><a class="reference internal" href="mstar.worker.spec_rows.html">mstar.worker.spec_rows</a></li>
 <li class="toctree-l3"><a class="reference internal" href="mstar.worker.stream_buffers.html">mstar.worker.stream_buffers</a></li>
 <li class="toctree-l3"><a class="reference internal" href="mstar.worker.worker_metrics.html">mstar.worker.worker_metrics</a></li>
@@ -1562,7 +1563,8 @@ identity on strings.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="mstar.communication.tensors.TensorCommunicationManager.ack_unread_tensors">
 <span class="sig-name descname"><span class="pre">ack_unread_tensors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">graph_edges</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mstar/communication/tensors.html#TensorCommunicationManager.ack_unread_tensors"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mstar.communication.tensors.TensorCommunicationManager.ack_unread_tensors" title="Link to this definition">#</a></dt>
-<dd><p>Ack tensors for an already-removed request without reading them.</p>
+<dd><p>Ack tensors without reading them, for edges nothing here will consume: a
+removed request, one with a remove pending, or a stream with no buffer here.</p>
 <p>The producer holds these buffers until it gets the TENSOR_RECEIVED ack;
 emit it here so it can reclaim them.</p>
 <dl class="field-list simple">
@@ -2619,7 +2621,7 @@ By M* Team
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Nov 07, 2026.
+  Last updated on Nov 08, 2026.
   <br/>
 </p>
   </div>
