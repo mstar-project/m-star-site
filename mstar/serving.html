@@ -404,6 +404,10 @@
 </ul>
 </details></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.model.rebuild.html">mstar.model.rebuild</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="_autosummary/mstar.model.ripple.html">mstar.model.ripple</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.model.ripple.config.html">mstar.model.ripple.config</a></li>
+</ul>
+</details></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.model.submodule_base.html">mstar.model.submodule_base</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.model.utils.html">mstar.model.utils</a></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="_autosummary/mstar.model.vjepa2.html">mstar.model.vjepa2</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -1005,10 +1009,10 @@ environment, and so does a variable that expands to nothing (<code class="docuti
 <p>Under NVIDIA Dynamo, Dynamo’s own frontend serves HTTP and does not forward
 <code class="docutils literal notranslate"><span class="pre">Authorization</span></code> to backends, so the M* worker cannot check a key there: authenticate at
 Dynamo’s frontend or a gateway in front of it.</p>
-<p>The Dynamo worker (<code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">mstar.integrations.dynamo</span></code>) does not serve a model that
-takes live client input (<code class="docutils literal notranslate"><span class="pre">nemotron_duplex</span></code>): no Dynamo surface carries a live call’s
-appends, so it exits at startup saying so, before any GPU process starts. Serve such a
-model with <code class="docutils literal notranslate"><span class="pre">mstar</span> <span class="pre">serve</span></code> and call it over <code class="docutils literal notranslate"><span class="pre">/v1/realtime</span></code> or <code class="docutils literal notranslate"><span class="pre">/generate/ws</span></code>.</p>
+<p>No Dynamo surface carries a live call’s appends: the Dynamo worker
+(<code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">mstar.integrations.dynamo</span></code>) serves one-shot calls, whose input ends with the
+request. For live input, serve the model with <code class="docutils literal notranslate"><span class="pre">mstar</span> <span class="pre">serve</span></code> and call it over
+<code class="docutils literal notranslate"><span class="pre">/v1/realtime</span></code> or <code class="docutils literal notranslate"><span class="pre">/generate/ws</span></code>.</p>
 </section>
 <section id="config-files">
 <h2>Config files<a class="headerlink" href="#config-files" title="Link to this heading">#</a></h2>
@@ -1233,8 +1237,9 @@ binds, so no client pays a shape’s first-request cost (torch.compile of a step
 a cold cache). Each entry is a <code class="docutils literal notranslate"><span class="pre">/generate</span></code> request in yaml form: <code class="docutils literal notranslate"><span class="pre">text</span></code>,
 <code class="docutils literal notranslate"><span class="pre">output_modalities</span></code>, <code class="docutils literal notranslate"><span class="pre">model_kwargs</span></code>, and <code class="docutils literal notranslate"><span class="pre">files</span></code>, a list of media
 inputs in prompt order (text follows them). A file is a path or
-<code class="docutils literal notranslate"><span class="pre">hf://&lt;owner&gt;/&lt;repo&gt;/&lt;path&gt;</span></code> (a file in a model’s HF repo); its modality
-comes from the extension, or give <code class="docutils literal notranslate"><span class="pre">{path:</span> <span class="pre">...,</span> <span class="pre">modality:</span> <span class="pre">...}</span></code>.
+<code class="docutils literal notranslate"><span class="pre">hf://&lt;owner&gt;/&lt;repo&gt;/&lt;path&gt;</span></code> (a file in a model’s HF repo, fetched into
+<code class="docutils literal notranslate"><span class="pre">--cache-dir</span></code>); its modality comes from the extension, or give
+<code class="docutils literal notranslate"><span class="pre">{path:</span> <span class="pre">...,</span> <span class="pre">modality:</span> <span class="pre">...}</span></code>.
 <code class="docutils literal notranslate"><span class="pre">repeat:</span> <span class="pre">N</span></code> sends <code class="docutils literal notranslate"><span class="pre">text</span></code> N times over, a long prompt for a path only
 long prompts take (a long-context prefill). Each entry is sent as many
 times at once as the most data-parallel replicas any of the model’s worker
@@ -1319,6 +1324,8 @@ them by that name:</p>
 <span class="w">  </span><span class="nt">vit_attn</span><span class="p">:</span><span class="w">                  </span><span class="c1"># a cacheless (ragged) attention resource</span>
 <span class="w">    </span><span class="nt">max_segments_per_request</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span><span class="w">  </span><span class="c1"># also: max_segments_per_step, max_tokens_per_request,</span>
 <span class="w">                                 </span><span class="c1"># flashinfer_backend</span>
+<span class="w">  </span><span class="nt">sampler</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">greedy_capture</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span><span class="w">    </span><span class="c1"># also: enable_logprobs, enable_processed_logprobs</span>
 </pre></div>
 </div>
 <p>Use one block per resource. A model with two caches, such as Whisper’s decoder cache and
@@ -1326,6 +1333,11 @@ its encoder context, can therefore size each one separately. If a block names a 
 that the model does not declare, or sets a key that the resource does not accept, loading
 fails. A misspelled setting is never silently ignored. A top-level <code class="docutils literal notranslate"><span class="pre">kv_cache:</span></code> block is
 no longer read. It raises an error with a message describing the migration.</p>
+<p><code class="docutils literal notranslate"><span class="pre">greedy_capture:</span> <span class="pre">false</span></code> on a sampler stops all-greedy steps from taking each row’s
+argmax, and the engine from capturing a twin of each batched bucket for them. A sampler
+whose vocabulary is past 4096 has them by default (see <code class="docutils literal notranslate"><span class="pre">SamplerSpec</span></code> in
+<a class="reference internal" href="adding_models.html"><span class="doc">Adding a New Model</span></a>), so a deployment that never samples greedily can save their capture
+memory and time this way.</p>
 <p><code class="docutils literal notranslate"><span class="pre">prefix_cache:</span> <span class="pre">false</span></code> turns cross-request prefix reuse off for that cache, and
 <code class="docutils literal notranslate"><span class="pre">prefix_cache_salt</span></code> keeps two otherwise identical deployments off each other’s
 cached pages. A single request opts out by sending <code class="docutils literal notranslate"><span class="pre">prefix_cache=False</span></code>, which

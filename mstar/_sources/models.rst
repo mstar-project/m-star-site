@@ -75,6 +75,10 @@ Registry keys live in ``mstar/model/registry.py`` (``MODEL_REGISTRY`` / ``HF_MOD
      - ``meta-models/Muse-Glimmer-30B``
      - Meta's 30B dense agentic VLM (text + image in, text out): sliding-window and
        NoPE global attention layers 3:1, plus a windowed ViT perception encoder.
+   * - ``ripple_65b`` *(Experimental)*
+     - ``ricursiveAI/Ripple-65B-Preview``
+     - Ricursive's 65B dense text LLM: sliding-window and NoPE global attention layers
+       4:1, with a value residual from the token embeddings. BF16, TP2 or TP4.
    * - ``nemotron_duplex`` *(Beta)*
      - ``nvidia/NVIDIA-NemotronLabs-VoiceChat-11B``
      - Full-duplex speech-to-speech (NemotronLabs VoiceChat-11B): Fast-Conformer
@@ -192,6 +196,11 @@ Registry keys live in ``mstar/model/registry.py`` (``MODEL_REGISTRY`` / ``HF_MOD
      - ``Overworld/Waypoint-1.5-1B``
      - Waypoint-1.5 interactive video world model: 1.28B DiT generating one latent
        frame per step, TAEHV encode/decode. Live RGB frame output; no OpenAI surface.
+       A request carries a seed image and ``model_kwargs.actions`` (1 to ``max_frames``,
+       512 latent frames, controller dicts); it generates one frame per action. A live
+       ``/generate/ws`` call (opened with ``end_input: false``) appends more as
+       ``{"append": {"model_kwargs": {"actions": [...]}}}`` and plays until it ends its
+       input, or for at most ``max_frames`` actions in all.
    * - ``lingbot_world_1_3b``
      - ``robbyant/lingbot-world-v2-1.3b-causal-fast``
      - LingBot-World-V2 1.3B causal-fast: camera-controlled image-to-world video, streamed
@@ -363,6 +372,8 @@ Higgs Audio notes
   to the full width and masked (``HiggsAudioTower``'s ``valid_frames``) so it
   replays a graph too. ``model_kwargs: {encoder_graphs: false}`` runs the
   tower eagerly.
+- The model drops or repeats text on long audio, so ``/v1/audio/transcriptions``
+  cuts an upload longer than 30 s into windows of at most 30 s run in parallel.
 - One prefill step per request: the ChatML text around the audio and the audio
   embeddings go into the KV cache as one span.
 - Decode keeps each request's last token in the sampler's slot master and
@@ -379,6 +390,10 @@ Orpheus notes
   renormalizes over the custom tokens: the reference samples the full
   vocabulary, where a text token's probability during speech is negligible but
   not zero, so sampled output is not identical to the reference's.
+- ``/v1/audio/speech`` input of 250+ characters is synthesized as sentence chunks of
+  about 200: the default 2,048 output tokens are about 25 s of speech, and a longer
+  input would be cut off there (``sentence_chunking: false`` opts out). An input of
+  more than 32 chunks (some 6,400 characters) is a 400.
 
 Omnilingual ASR notes
 ~~~~~~~~~~~~~~~~~~~~~
@@ -423,6 +438,32 @@ Omnilingual ASR notes
 - Parity scripts against Meta's pipeline live in ``test/omnilingual_asr/``
   (``record_oracle.py`` runs the reference in its own venv, as it pins torch 2.8 and
   fairseq2).
+
+Ripple-65B (``ripple_65b``)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: bash
+
+    mstar serve ripple_65b --gpus 0,1,2,3
+    mstar serve ripple_65b --config configs/ripple_65b_tp2.yaml --gpus 0,1
+
+- ``configs/ripple_65b_tp4.yaml``, the default, needs four 80 GB GPUs and
+  ``configs/ripple_65b_tp2.yaml`` two 141 GB ones. TP can't pass the model's 8 KV heads. Both
+  serve 131072 tokens a request.
+  For more, raise ``resources.kv_cache.max_seq_len`` and ``max_num_pages`` together: a prompt
+  holds all 80 layers' K/V until its prefill commits, so the shipped pool runs out near 260K
+  tokens and two 128K prompts can't prefill at once.
+- A chat with no ``temperature`` samples at 1.0, as Ricursive's server does, and one with no
+  ``max_tokens`` stops at 2048 tokens, which a long reasoning reply can reach inside
+  ``<think>``. Set ``max_tokens`` for hard problems.
+- Text in, text out, on ``/generate`` and ``/v1/chat/completions``. A reply's reasoning stays
+  inline as ``<think>...</think>``, and a chat that asks for tool calls is refused.
+- Not supported yet: the NVFP4 checkpoint, prefix caching (a pool that keeps a sliding window
+  doesn't prefix cache) and DP replicas (a window pool can't span instances).
+- The GPU parity scripts live in ``test/ripple/``: ``run_parity.py`` drives a server and gates
+  the result, and ``record_oracle.py`` teacher-forces its replies through the checkpoint's own
+  ``modeling_ricursive.py``, in its own venv, with the attention gate and the value residual
+  each turned off as controls.
 
 FastConformer ASR (``canary``, ``canary_qwen``, ``parakeet``, ``nemotron_asr``) notes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -511,7 +552,9 @@ unless the checkpoint's generation_config sets a ``min_p``, which turns the
 sampler's min-p filter on. ``reasoning_effort`` (``low``, ``medium``, ``high``,
 ``xhigh``; default ``high``) sets the template's reasoning strength, and
 ``enable_thinking: false`` means ``low``, as the template has no off: the model
-still reasons, at the template's lowest strength. The reply
+still reasons, at the template's lowest strength. Either, or the template's own
+``reasoning_strength`` and ``current_date``, may also come in
+``chat_template_kwargs``; a flat key wins. The reply
 is the model's channel stream as generated: reasoning addressed ``to=self``,
 then the answer ``to=user``. Tool calls are refused for now. Images resize with the
 reference's antialiased Lanczos, which torchvision has from 0.27 (torch 2.12); an older
@@ -620,8 +663,9 @@ c=4 up it makes no difference.
 
 ``temperature``, ``top_p``, ``max_tokens`` and ``seed`` are the standard fields.
 ``top_k``, ``min_p``, ``repetition_penalty``, ``penalize_prompt`` and
-``enable_thinking`` (default true; the template opens a ``<think>`` block) are
-read by the model but are not OpenAI fields — pass them via ``extra_body``.
+``enable_thinking`` (default true; the template opens a ``<think>`` block;
+``chat_template_kwargs.enable_thinking`` also works) are read by the model but
+are not OpenAI fields — pass them via ``extra_body``.
 Sampling defaults to the checkpoint's generation_config, under whatever the
 request sets. Qwen3.5-27B's sets temperature 0.6, top_k 20 and top_p 0.95,
 and Qwen3.8-27B's temperature 1, top_k 20 and top_p 0.95; the 0.8B, 2B, 4B
@@ -677,9 +721,10 @@ Adapters may touch every module PEFT adapters for Qwen3.5 on the Hub touch:
   2B, 4B) each delta stays on its own side, as PEFT applies them;
 * the vision tower, as unsloth's vision fine-tunes adapt it: each block's
   ``attn.qkv``, ``attn.proj``, ``mlp.linear_fc1`` and ``mlp.linear_fc2``, the merger's
-  ``linear_fc1`` / ``linear_fc2``, and the conv ``patch_embed.proj``. The vision
-  encoder node has its own pool (``vision_lora``), sized by the same ``lora:`` block,
-  and runs the request's adapter too.
+  ``linear_fc1`` / ``linear_fc2``, and the conv ``patch_embed.proj``. One spec covers
+  both nodes, sized by the one ``lora:`` block; the vision encoder node has a pool of
+  its own (``lora@vision_encoder``, beside the LLM's ``lora@LLM``) and runs the
+  request's adapter too.
 
 Module names may be in any layout PEFT writes for the model: the released checkpoint's
 (``model.language_model.layers.*``, ``model.visual.*``), the text-only causal LM's
@@ -753,8 +798,7 @@ unless the ``lora`` block opts in, and answer 404 otherwise (as vLLM's do withou
         -d '{"lora_name": "sql"}'
 
 ``lora_path`` is a PEFT directory (its ``adapter_model.safetensors`` is read) or a
-safetensors file, readable at the same path by the API server, the conductor (which
-reads the adapter's header to check requests on it) and every worker. A load is checked
+safetensors file, readable at the same path by the API server and every worker. A load is checked
 first (LoRA layers present, rank within ``max_rank``, only the targets above, shapes
 that fit them), then read by every worker that hosts a node with a LoRA pool (the LLM's
 or the vision encoder's); the name is selectable, and listed by ``/v1/models``, once all
@@ -786,7 +830,7 @@ the key and hard-codes SiLU. Video is still
 refused and the MTP head is skipped. The chat template's new
 ``reasoning_effort`` and ``preserve_thinking`` are not forwarded: every
 request gets the template's defaults (``xhigh`` and preserved), whatever the
-client sends.
+client sends, and a request that sends one is logged as ignoring it.
 
 Command A+ (``command_a_plus``)
 -------------------------------
@@ -1057,6 +1101,15 @@ Qwen3-TTS notes
 - Text layout follows the reference defaults: CustomVoice and VoiceDesign put
   the whole text in the prefill; Base feeds it one token per frame. Override
   per request with ``non_streaming_mode``.
+- Live text: with ``non_streaming_mode: false`` (Base, or x-vector-only
+  cloning), a ``/generate/ws`` call opened with ``end_input: false`` takes the
+  rest of its text as ``append`` messages, one token per frame as it arrives,
+  through the ``text_in`` client stream (see :doc:`clients`). Each append is
+  tokenized alone, which matches tokenizing the whole text when the cut falls
+  before a space or at punctuation. In ``non_streaming_mode`` and for an
+  in-context clone, the prefill's pairing fixes the text's length and where TTS
+  EOS sits, so a live opening (``end_input: false``) gets a 400; send those
+  one-shot.
 - ``/v1/audio/speech`` inputs of 600 or more characters are synthesized as
   ordered sentence chunks of about 400 characters (one Talker request each,
   two kept in flight while the current one streams); set
@@ -1385,10 +1438,9 @@ Nemotron VoiceChat (``nemotron_duplex``) notes
   without egress.
 - Inputs are user-only 16 kHz mono audio plus an optional system prompt (the
   request's text, primed before the first frame exactly as the reference
-  does): one clip uploaded with the request; a live call over
-  ``/generate/ws``, ``append`` messages until ``end_input`` (see
-  :doc:`clients`; a one-shot request over the socket carries ``end_input:
-  true`` on its opening message, or it waits for appends); or an OpenAI
+  does): one clip uploaded with the request, a live call over
+  ``/generate/ws`` (an opening with ``end_input: false``, then ``append``
+  messages until ``end_input``; see :doc:`clients`), or an OpenAI
   Realtime conversation over ``/v1/realtime``, which takes PCM16 at one of
   the eight rates :doc:`clients` lists (8 to 48 kHz) or G.711, resamples it
   to 16 kHz, appends it as it comes, and sends each agent reply as one
@@ -1986,7 +2038,9 @@ each row count compiling its own graph.
 
 **What is accelerated by default.** The DiT runs under ``torch.compile``
 (``compile_dit``); its self-attention runs on the engine's ragged attention
-resource (FlashInfer, FA3 on Hopper) as an opaque op inside the compiled graph,
+resource (FlashInfer, FA3 on Hopper; on a B300 the ``ragged_attention`` kernel table
+picks torch's cuDNN SDPA, the kernel ``attention_backend: sdpa`` runs, and the two
+configs give the same videos at the same step time) as an opaque op inside the compiled graph,
 6% off a 1280x704x81 denoise step on an H200 against cuDNN SDPA, measured on
 an earlier version of the DiT block, before the adaLN was computed in one pass
 and the q/k norm and RoPE were fused
@@ -2216,9 +2270,13 @@ conditioning tokens, in order).
 Deployment knobs live under ``model_kwargs`` in ``configs/flux2_klein.yaml``:
 
 ``attention_backend``
-   ``sdpa`` (default) is the reference kernel, cuDNN on an H100. ``flashinfer`` runs the
-   DiT's joint attention on the engine's ragged FlashInfer resource; both are CUDA-graph
-   replayable.
+   ``sdpa`` (the shipped configs) is the reference kernel: torch's SDPA called by the model,
+   cuDNN on an H100 and a B300. ``flashinfer`` (the model's default when a config names none)
+   runs the DiT's joint attention on the engine's ragged attention resource, whose kernel the
+   GPU's ``ragged_attention`` table picks: torch's cuDNN SDPA on ``sm_103`` (B300), FlashInfer's
+   ragged prefill (FA3 on Hopper) where no table covers the GPU. ``resources: dit_attn:
+   backend: flashinfer`` keeps FlashInfer. Both are CUDA-graph replayable. Z-Image takes the
+   same knob.
 
 ``compile``
    ``torch.compile`` of the transformer, one trace per shape.
