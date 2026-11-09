@@ -55,7 +55,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="0.2.1" />
-    <meta name="docbuild:last-update" content="Nov 08, 2026"/>
+    <meta name="docbuild:last-update" content="Nov 09, 2026"/>
   
     
     <script src="_static/searchtools.js"></script>
@@ -476,6 +476,7 @@
 <li class="toctree-l2 has-children"><a class="reference internal" href="_autosummary/mstar.worker.html">mstar.worker</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.batch_builder.html">mstar.worker.batch_builder</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.chunk_loops.html">mstar.worker.chunk_loops</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.host_copies.html">mstar.worker.host_copies</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.host_pool.html">mstar.worker.host_pool</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.node_manager_utils.html">mstar.worker.node_manager_utils</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.phase_timer.html">mstar.worker.phase_timer</a></li>
@@ -1111,7 +1112,8 @@ that key, which the client sends as <code class="docutils literal notranslate"><
 <tbody>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/v1/models</span></code></p></td>
 <td><p>all</p></td>
-<td><p>Lists the served model.</p></td>
+<td><p>Lists the served model, and any LoRA adapters it serves (each with <code class="docutils literal notranslate"><span class="pre">parent</span></code>
+naming the base model; see the Qwen3.5 notes in <a class="reference internal" href="models.html"><span class="doc">Supported Models</span></a>).</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/v1/chat/completions</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">bagel</span></code>, <code class="docutils literal notranslate"><span class="pre">qwen3_omni</span></code></p></td>
@@ -1199,17 +1201,17 @@ text stream and are lifted into <code class="docutils literal notranslate"><span
 Higgs-Audio emits no timestamps, so its <code class="docutils literal notranslate"><span class="pre">verbose_json</span></code> / <code class="docutils literal notranslate"><span class="pre">srt</span></code> / <code class="docutils literal notranslate"><span class="pre">vtt</span></code> get
 one segment per window, timed to the windows. A
 streaming client receives only the spoken words. Uploads longer than the
-model’s clip (30 s for Whisper) are served as consecutive windows. By default
-they run in order, openai-whisper style: each window gets the transcript so
-far as <code class="docutils literal notranslate"><span class="pre">initial_prompt</span></code> and the first window’s detected language, is decoded
-with timestamps so the next window can start where its last closed segment
-ended (no word is split by a boundary), and is decoded again when its text is
-a repetition loop (gzip compression ratio above 2.4): first without the
-conditioning text, then at rising temperatures — after which the transcript
-so far stops conditioning later windows.
-Leave <code class="docutils literal notranslate"><span class="pre">temperature</span></code> at 0 to get that fallback; a pinned temperature is used
-as is. <code class="docutils literal notranslate"><span class="pre">long_form=&quot;parallel&quot;</span></code> in <code class="docutils literal notranslate"><span class="pre">extra_body</span></code> submits fixed windows all at
-once, each cut at the quietest moment before its boundary. Segment timestamps
+model’s clip (30 s for Whisper) are cut into fixed windows, each at the quietest
+moment before its boundary, and submitted at once. <code class="docutils literal notranslate"><span class="pre">long_form=&quot;sequential&quot;</span></code> in
+<code class="docutils literal notranslate"><span class="pre">extra_body</span></code> runs them in order instead, openai-whisper style: each window gets
+the transcript so far as <code class="docutils literal notranslate"><span class="pre">initial_prompt</span></code> and the first window’s detected
+language, is decoded with timestamps so the next window can start where its last
+closed segment ended (no word is split by a boundary), and is decoded again when
+its text is a repetition loop (gzip compression ratio above 2.4): first without
+the conditioning text, then at rising temperatures, after which the transcript so
+far stops conditioning later windows. Leave <code class="docutils literal notranslate"><span class="pre">temperature</span></code> at 0 to get that
+fallback; a pinned temperature is used as is. It is several times slower, and only
+it has that repetition guard. Segment timestamps
 are offset to the whole file. For Whisper, <code class="docutils literal notranslate"><span class="pre">window_seconds</span></code> in <code class="docutils literal notranslate"><span class="pre">extra_body</span></code>
 (5 to 30) sets the window length for one request, and an upload longer than it
 is windowed. An upload, like any audio a request attaches, is refused once it
@@ -1381,7 +1383,7 @@ By M* Team
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Nov 08, 2026.
+  Last updated on Nov 09, 2026.
   <br/>
 </p>
   </div>

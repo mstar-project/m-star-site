@@ -410,7 +410,7 @@ window.runMermaid = runMermaid;</script>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="0.2.1" />
-    <meta name="docbuild:last-update" content="Nov 08, 2026"/>
+    <meta name="docbuild:last-update" content="Nov 09, 2026"/>
   
     
     <script src="../../../../../_static/searchtools.js"></script>
@@ -829,6 +829,7 @@ window.runMermaid = runMermaid;</script>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../../../_autosummary/mstar.worker.html">mstar.worker</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../../../_autosummary/mstar.worker.batch_builder.html">mstar.worker.batch_builder</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../../_autosummary/mstar.worker.chunk_loops.html">mstar.worker.chunk_loops</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../../_autosummary/mstar.worker.host_copies.html">mstar.worker.host_copies</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../../_autosummary/mstar.worker.host_pool.html">mstar.worker.host_pool</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../../_autosummary/mstar.worker.node_manager_utils.html">mstar.worker.node_manager_utils</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../../_autosummary/mstar.worker.phase_timer.html">mstar.worker.phase_timer</a></li>
@@ -1074,6 +1075,7 @@ window.runMermaid = runMermaid;</script>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
 
+<span class="kn">from</span><span class="w"> </span><span class="nn">mstar.distributed.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">PARALLEL_AXES</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">mstar.engine.resources.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">CGSlotKey</span><span class="p">,</span> <span class="n">EngineResourceInfo</span><span class="p">,</span> <span class="n">Resource</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">mstar.engine.resources.lora.backend</span><span class="w"> </span><span class="kn">import</span> <span class="n">LoraBackend</span><span class="p">,</span> <span class="n">make_backend</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">mstar.engine.resources.lora.config</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
@@ -1302,14 +1304,16 @@ window.runMermaid = runMermaid;</script>
         <span class="n">rank</span><span class="p">,</span> <span class="n">world_size</span><span class="p">,</span> <span class="n">agree</span><span class="p">,</span> <span class="n">decides</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">True</span>
         <span class="n">joint</span> <span class="o">=</span> <span class="n">info</span><span class="o">.</span><span class="n">joint_comm_group</span>
         <span class="k">if</span> <span class="n">joint</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">joint</span><span class="o">.</span><span class="n">sp_group</span><span class="o">.</span><span class="n">world_size</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">"LoRA resource </span><span class="si">{</span><span class="n">spec</span><span class="o">.</span><span class="n">resource_key</span><span class="si">!r}</span><span class="s2"> serves a node that runs sequence "</span>
-                    <span class="sa">f</span><span class="s2">"parallelism (SP=</span><span class="si">{</span><span class="n">joint</span><span class="o">.</span><span class="n">sp_group</span><span class="o">.</span><span class="n">world_size</span><span class="si">}</span><span class="s2">), which LoRA does not "</span>
-                    <span class="s2">"support: its rows are laid out per request, while each SP rank holds "</span>
-                    <span class="s2">"a shard of the tokens. Serve this node without SP, or drop the "</span>
-                    <span class="s2">"'lora:' block"</span>
-                <span class="p">)</span>
+            <span class="c1"># its rows are laid out per request over the whole batch; every axis but TP</span>
+            <span class="c1"># (cfg branches, sp token shards) hands each rank only part of it</span>
+            <span class="k">for</span> <span class="n">axis</span> <span class="ow">in</span> <span class="n">PARALLEL_AXES</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">axis</span> <span class="o">!=</span> <span class="s2">"tp"</span> <span class="ow">and</span> <span class="p">(</span><span class="n">size</span> <span class="o">:=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">joint</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">axis</span><span class="si">}</span><span class="s2">_group"</span><span class="p">)</span><span class="o">.</span><span class="n">world_size</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">"LoRA resource </span><span class="si">{</span><span class="n">spec</span><span class="o">.</span><span class="n">resource_key</span><span class="si">!r}</span><span class="s2"> serves a node at </span><span class="si">{</span><span class="n">axis</span><span class="si">}</span><span class="s2">_size </span><span class="si">{</span><span class="n">size</span><span class="si">}</span><span class="s2">, "</span>
+                        <span class="s2">"which LoRA does not support: its rows are laid out per request over the "</span>
+                        <span class="sa">f</span><span class="s2">"whole batch, while each </span><span class="si">{</span><span class="n">axis</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="si">}</span><span class="s2"> rank runs only part of it. Serve "</span>
+                        <span class="sa">f</span><span class="s2">"this node at </span><span class="si">{</span><span class="n">axis</span><span class="si">}</span><span class="s2">_size 1, or drop the 'lora:' block"</span>
+                    <span class="p">)</span>
             <span class="c1"># the base linears split over the TP group</span>
             <span class="n">rank</span><span class="p">,</span> <span class="n">world_size</span> <span class="o">=</span> <span class="n">joint</span><span class="o">.</span><span class="n">tp_group</span><span class="o">.</span><span class="n">rank</span><span class="p">,</span> <span class="n">joint</span><span class="o">.</span><span class="n">tp_group</span><span class="o">.</span><span class="n">world_size</span>
             <span class="k">if</span> <span class="n">joint</span><span class="o">.</span><span class="n">world_size</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
@@ -2257,7 +2261,7 @@ By M* Team
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Nov 08, 2026.
+  Last updated on Nov 09, 2026.
   <br/>
 </p>
   </div>

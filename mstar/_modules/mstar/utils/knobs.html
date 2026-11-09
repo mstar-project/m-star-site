@@ -410,7 +410,7 @@ window.runMermaid = runMermaid;</script>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="0.2.1" />
-    <meta name="docbuild:last-update" content="Nov 08, 2026"/>
+    <meta name="docbuild:last-update" content="Nov 09, 2026"/>
   
     
     <script src="../../../_static/searchtools.js"></script>
@@ -829,6 +829,7 @@ window.runMermaid = runMermaid;</script>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../_autosummary/mstar.worker.html">mstar.worker</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.worker.batch_builder.html">mstar.worker.batch_builder</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.worker.chunk_loops.html">mstar.worker.chunk_loops</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.worker.host_copies.html">mstar.worker.host_copies</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.worker.host_pool.html">mstar.worker.host_pool</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.worker.node_manager_utils.html">mstar.worker.node_manager_utils</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.worker.phase_timer.html">mstar.worker.phase_timer</a></li>
@@ -1021,6 +1022,7 @@ window.runMermaid = runMermaid;</script>
     <span class="s2">"kv_pinned_indptrs"</span><span class="p">:</span> <span class="s2">"MSTAR_KV_PINNED_INDPTRS"</span><span class="p">,</span>
     <span class="s2">"gc_gen0_threshold"</span><span class="p">:</span> <span class="s2">"MSTAR_GC_GEN0_THRESHOLD"</span><span class="p">,</span>
     <span class="s2">"pre_plan"</span><span class="p">:</span> <span class="s2">"MSTAR_PRE_PLAN_SPEC"</span><span class="p">,</span>
+    <span class="s2">"step_threads"</span><span class="p">:</span> <span class="s2">"MSTAR_STEP_THREADS"</span><span class="p">,</span>
     <span class="s2">"step_thread_core"</span><span class="p">:</span> <span class="s2">"MSTAR_STEP_THREAD_CORE"</span><span class="p">,</span>
     <span class="s2">"compile_deterministic"</span><span class="p">:</span> <span class="s2">"MSTAR_COMPILE_DETERMINISTIC"</span><span class="p">,</span>
     <span class="s2">"idle_hold"</span><span class="p">:</span> <span class="s2">"MSTAR_IDLE_HOLD"</span><span class="p">,</span>
@@ -1055,6 +1057,8 @@ window.runMermaid = runMermaid;</script>
             <span class="n">out</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">_idle_hold_value</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">"resident_planning"</span><span class="p">:</span>
             <span class="n">out</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">_resident_planning_value</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">"step_threads"</span><span class="p">:</span>
+            <span class="n">out</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">_step_threads_value</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
             <span class="n">out</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"1"</span> <span class="k">if</span> <span class="n">value</span> <span class="k">else</span> <span class="s2">"0"</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
@@ -1065,6 +1069,13 @@ window.runMermaid = runMermaid;</script>
             <span class="p">)</span>
     <span class="k">return</span> <span class="n">out</span></div>
 
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_step_threads_value</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">text</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"threaded"</span><span class="p">,</span> <span class="s2">"serial"</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">text</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"`knobs: step_threads` must be threaded or serial, got </span><span class="si">{</span><span class="n">value</span><span class="si">!r}</span><span class="s2">"</span><span class="p">)</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_resident_planning_value</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
@@ -1236,6 +1247,18 @@ window.runMermaid = runMermaid;</script>
 
 
 
+<div class="viewcode-block" id="step_threads">
+<a class="viewcode-back" href="../../../_autosummary/mstar.utils.knobs.html#mstar.utils.knobs.step_threads">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">step_threads</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""``step_threads`` / ``MSTAR_STEP_THREADS`` (default ``threaded``): where a</span>
+<span class="sd">    worker runs a step's host work. ``threaded`` uses its GPU and plan threads;</span>
+<span class="sd">    ``serial`` runs that work on the main thread, keeping CPU-GPU overlap and</span>
+<span class="sd">    giving up CPU-CPU overlap, which the GIL mostly denies a Python-heavy step</span>
+<span class="sd">    anyway."""</span>
+    <span class="k">return</span> <span class="n">_step_threads_value</span><span class="p">(</span><span class="n">_setting</span><span class="p">(</span><span class="s2">"step_threads"</span><span class="p">,</span> <span class="s2">"threaded"</span><span class="p">))</span></div>
+
+
+
 <div class="viewcode-block" id="step_thread_core">
 <a class="viewcode-back" href="../../../_autosummary/mstar.utils.knobs.html#mstar.utils.knobs.step_thread_core">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">step_thread_core</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">:</span>
@@ -1328,7 +1351,7 @@ By M* Team
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Nov 08, 2026.
+  Last updated on Nov 09, 2026.
   <br/>
 </p>
   </div>

@@ -55,7 +55,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="0.2.1" />
-    <meta name="docbuild:last-update" content="Nov 08, 2026"/>
+    <meta name="docbuild:last-update" content="Nov 09, 2026"/>
   
     
     <script src="_static/searchtools.js"></script>
@@ -476,6 +476,7 @@
 <li class="toctree-l2 has-children"><a class="reference internal" href="_autosummary/mstar.worker.html">mstar.worker</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.batch_builder.html">mstar.worker.batch_builder</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.chunk_loops.html">mstar.worker.chunk_loops</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.host_copies.html">mstar.worker.host_copies</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.host_pool.html">mstar.worker.host_pool</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.node_manager_utils.html">mstar.worker.node_manager_utils</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.phase_timer.html">mstar.worker.phase_timer</a></li>
@@ -1228,9 +1229,9 @@ model: the server refuses to start on another value. See <a class="reference int
 <td><p><em>(optional)</em> Engine knobs for this deployment, by name: <code class="docutils literal notranslate"><span class="pre">device_loopback</span></code>,
 <code class="docutils literal notranslate"><span class="pre">sampler_ingraph_scatter</span></code>, <code class="docutils literal notranslate"><span class="pre">sampler_slots</span></code>, <code class="docutils literal notranslate"><span class="pre">ingraph_decode_rope</span></code>,
 <code class="docutils literal notranslate"><span class="pre">kv_chain_lazy_steps</span></code>, <code class="docutils literal notranslate"><span class="pre">kv_pinned_indptrs</span></code>,
-<code class="docutils literal notranslate"><span class="pre">gc_gen0_threshold</span></code>, <code class="docutils literal notranslate"><span class="pre">pre_plan</span></code>, <code class="docutils literal notranslate"><span class="pre">step_thread_core</span></code>, <code class="docutils literal notranslate"><span class="pre">idle_hold</span></code>,
+<code class="docutils literal notranslate"><span class="pre">gc_gen0_threshold</span></code>, <code class="docutils literal notranslate"><span class="pre">pre_plan</span></code>, <code class="docutils literal notranslate"><span class="pre">step_threads</span></code>, <code class="docutils literal notranslate"><span class="pre">step_thread_core</span></code>, <code class="docutils literal notranslate"><span class="pre">idle_hold</span></code>,
 <code class="docutils literal notranslate"><span class="pre">compile_deterministic</span></code> and <code class="docutils literal notranslate"><span class="pre">resident_planning</span></code> (<code class="docutils literal notranslate"><span class="pre">true</span></code>/<code class="docutils literal notranslate"><span class="pre">false</span></code> or an integer;
-<code class="docutils literal notranslate"><span class="pre">step_thread_core</span></code> takes <code class="docutils literal notranslate"><span class="pre">auto</span></code>, the default, <code class="docutils literal notranslate"><span class="pre">off</span></code>, <code class="docutils literal notranslate"><span class="pre">always</span></code>, <code class="docutils literal notranslate"><span class="pre">siblings</span></code> or a CPU number,
+<code class="docutils literal notranslate"><span class="pre">step_threads</span></code> takes <code class="docutils literal notranslate"><span class="pre">threaded</span></code>, the default, or <code class="docutils literal notranslate"><span class="pre">serial</span></code>, <code class="docutils literal notranslate"><span class="pre">step_thread_core</span></code> takes <code class="docutils literal notranslate"><span class="pre">auto</span></code>, the default, <code class="docutils literal notranslate"><span class="pre">off</span></code>, <code class="docutils literal notranslate"><span class="pre">always</span></code>, <code class="docutils literal notranslate"><span class="pre">siblings</span></code> or a CPU number,
 <code class="docutils literal notranslate"><span class="pre">idle_hold</span></code> <code class="docutils literal notranslate"><span class="pre">off</span></code>, the default, or <code class="docutils literal notranslate"><span class="pre">qos</span></code>, see <a class="reference internal" href="#host-idle"><span class="std std-ref">Host idle states</span></a>, and <code class="docutils literal notranslate"><span class="pre">resident_planning</span></code>
 <code class="docutils literal notranslate"><span class="pre">auto</span></code>, the default, or <code class="docutils literal notranslate"><span class="pre">off</span></code>). <code class="docutils literal notranslate"><span class="pre">compile_deterministic</span></code> reaches
 Qwen3.5’s text walks and no other model (see <a class="reference internal" href="models.html"><span class="doc">Supported Models</span></a>). Each one’s environment variable
@@ -2077,7 +2078,7 @@ By M* Team
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Nov 08, 2026.
+  Last updated on Nov 09, 2026.
   <br/>
 </p>
   </div>
