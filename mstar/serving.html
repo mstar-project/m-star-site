@@ -244,6 +244,7 @@
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="_autosummary/mstar.conductor.html">mstar.conductor</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.conductor.lora_ops.html">mstar.conductor.lora_ops</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.conductor.mps.html">mstar.conductor.mps</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.conductor.request_info.html">mstar.conductor.request_info</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.conductor.workers.html">mstar.conductor.workers</a></li>
@@ -351,6 +352,11 @@
 </ul>
 </details></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.model.media_limits.html">mstar.model.media_limits</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="_autosummary/mstar.model.minimax_h3.html">mstar.model.minimax_h3</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.model.minimax_h3.components.html">mstar.model.minimax_h3.components</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.model.minimax_h3.tests.html">mstar.model.minimax_h3.tests</a></li>
+</ul>
+</details></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.model.multimodal.html">mstar.model.multimodal</a></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="_autosummary/mstar.model.muse.html">mstar.model.muse</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.model.muse.components.html">mstar.model.muse.components</a></li>
@@ -360,7 +366,6 @@
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="_autosummary/mstar.model.nemotron_duplex.html">mstar.model.nemotron_duplex</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.model.nemotron_duplex.components.html">mstar.model.nemotron_duplex.components</a></li>
-<li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.model.nemotron_duplex.realtime_api.html">mstar.model.nemotron_duplex.realtime_api</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="_autosummary/mstar.model.omnilingual_asr.html">mstar.model.omnilingual_asr</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -390,7 +395,6 @@
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="_autosummary/mstar.model.qwen3_5.html">mstar.model.qwen3_5</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.model.qwen3_5.components.html">mstar.model.qwen3_5.components</a></li>
-<li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.model.qwen3_5.config.html">mstar.model.qwen3_5.config</a></li>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.model.qwen3_5.video.html">mstar.model.qwen3_5.video</a></li>
 </ul>
 </details></li>
@@ -478,6 +482,7 @@
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.chunk_loops.html">mstar.worker.chunk_loops</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.host_copies.html">mstar.worker.host_copies</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.host_pool.html">mstar.worker.host_pool</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.lora_loads.html">mstar.worker.lora_loads</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.node_manager_utils.html">mstar.worker.node_manager_utils</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.phase_timer.html">mstar.worker.phase_timer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.rebuild.html">mstar.worker.rebuild</a></li>
@@ -996,12 +1001,14 @@ list. An empty value turns the check off, so <code class="docutils literal notra
 environment, and so does a variable that expands to nothing (<code class="docutils literal notranslate"><span class="pre">--api-key</span> <span class="pre">&quot;$UNSET_VAR&quot;</span></code>).</p>
 <p>Clients send the key as their API key: <code class="docutils literal notranslate"><span class="pre">MStarClient(base_url,</span> <span class="pre">api_key=...)</span></code> (it reads
 <code class="docutils literal notranslate"><span class="pre">MSTAR_API_KEY</span></code> when not given one) or <code class="docutils literal notranslate"><span class="pre">OpenAI(base_url=...,</span> <span class="pre">api_key=...)</span></code>; see
-<a class="reference internal" href="clients.html"><span class="doc">Using a Server</span></a>. The standalone Nemotron realtime server
-(<code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">mstar.model.nemotron_duplex.realtime_api</span></code>) takes the same flag and
-variable.</p>
+<a class="reference internal" href="clients.html"><span class="doc">Using a Server</span></a>.</p>
 <p>Under NVIDIA Dynamo, Dynamo’s own frontend serves HTTP and does not forward
 <code class="docutils literal notranslate"><span class="pre">Authorization</span></code> to backends, so the M* worker cannot check a key there: authenticate at
 Dynamo’s frontend or a gateway in front of it.</p>
+<p>The Dynamo worker (<code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">mstar.integrations.dynamo</span></code>) does not serve a model that
+takes live client input (<code class="docutils literal notranslate"><span class="pre">nemotron_duplex</span></code>): no Dynamo surface carries a live call’s
+appends, so it exits at startup saying so, before any GPU process starts. Serve such a
+model with <code class="docutils literal notranslate"><span class="pre">mstar</span> <span class="pre">serve</span></code> and call it over <code class="docutils literal notranslate"><span class="pre">/v1/realtime</span></code> or <code class="docutils literal notranslate"><span class="pre">/generate/ws</span></code>.</p>
 </section>
 <section id="config-files">
 <h2>Config files<a class="headerlink" href="#config-files" title="Link to this heading">#</a></h2>
@@ -1062,7 +1069,7 @@ share while its captures are sized, so its eager step must fit in it.</p></td>
 <td><p><em>(optional)</em> <code class="docutils literal notranslate"><span class="pre">true</span></code> runs the workers as clients of a CUDA MPS control daemon the
 conductor starts in a private directory, so workers that share a GPU overlap their
 kernels instead of time-slicing (the ASR <code class="docutils literal notranslate"><span class="pre">*_split</span></code> configs, and the speech ones:
-<code class="docutils literal notranslate"><span class="pre">chatterbox*_split</span></code>, <code class="docutils literal notranslate"><span class="pre">omnivoice_split</span></code>, <code class="docutils literal notranslate"><span class="pre">qwen3tts_split</span></code>). NVIDIA only, and it
+<code class="docutils literal notranslate"><span class="pre">chatterbox*_split</span></code>, <code class="docutils literal notranslate"><span class="pre">omnivoice_split</span></code>, <code class="docutils literal notranslate"><span class="pre">cosyvoice3_split</span></code>, <code class="docutils literal notranslate"><span class="pre">qwen3tts_split</span></code>). NVIDIA only, and it
 needs <code class="docutils literal notranslate"><span class="pre">nvidia-cuda-mps-control</span></code> on <code class="docutils literal notranslate"><span class="pre">PATH</span></code>. The conductor stops the daemon on
 shutdown; on Linux the daemon also gets SIGTERM if the conductor is killed. Default
 <code class="docutils literal notranslate"><span class="pre">false</span></code>.</p></td>
@@ -1070,7 +1077,9 @@ shutdown; on Linux the daemon also gets SIGTERM if the conductor is killed. Defa
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">max_call_input_mb</span></code></p></td>
 <td><p><em>(optional, default 512)</em> For a model that takes live client input: how many MiB
 of files (and append text) one call may send over its whole life, its opening
-message’s included.
+message’s included, and of decoded audio samples a route appends
+(<code class="docutils literal notranslate"><span class="pre">/v1/realtime</span></code>: 4 bytes a sample at the stream’s rate, server-padded silence
+included).
 A live call’s opening message past it is refused, and an append that would pass
 it ends the call with a 400; a one-shot request is not counted. It caps a call’s input, not memory:
 decoded input is larger than its files, and how much of it waits in buffers
@@ -1134,11 +1143,61 @@ walk outside its combined walks, fails loading.</p></td>
 mapping of walk -&gt; budget; null turns a walk’s chunking off. Overrides the
 model’s defaults. See <em>Chunked prefill budgets</em> below.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">can_override_mixed_max_tokens</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">prefill_token_buckets</span></code></p></td>
+<td><p><em>(optional)</em> Per node, a mapping of name -&gt; ladder: the token counts a packed
+graph capture is taken at, in place of the model’s. A name is a walk the
+node runs, for its packed captures on that walk (the model’s
+<code class="docutils literal notranslate"><span class="pre">capture_token_lengths</span></code>; Orpheus’s <code class="docutils literal notranslate"><span class="pre">mixed</span></code> steps replay its <code class="docutils literal notranslate"><span class="pre">prefill</span></code>
+capture, so name <code class="docutils literal notranslate"><span class="pre">prefill</span></code>), or the label of one of its piecewise packed
+regions, for that region’s <code class="docutils literal notranslate"><span class="pre">total_tokens</span></code> (BAGEL’s <code class="docutils literal notranslate"><span class="pre">vit_block_loop</span></code>,
+OmniVoice’s <code class="docutils literal notranslate"><span class="pre">backbone_layers</span></code>). A step pads to the smallest rung that
+holds it, and a longer one runs eagerly. A walk’s ladder is a list, or a
+mapping of min batch size -&gt; list for a ladder per range of batch sizes:
+<code class="docutils literal notranslate"><span class="pre">{1:</span> <span class="pre">[...],</span> <span class="pre">2:</span> <span class="pre">[...]}</span></code> captures one request on the first and every larger
+batch on the second (a larger batch size’s ladder must reach at least as
+far). A walk’s ladder runs to the first rung that holds the most tokens a
+step its capture replays runs: its token budget (<code class="docutils literal notranslate"><span class="pre">max_batch_tokens</span></code>; a walk
+inside a combined walk runs under the combined walk’s), or, for a combined
+walk’s steps, past it where the capture’s widest batch of one-token decode
+rows leaves a prompt less than <code class="docutils literal notranslate"><span class="pre">min_chunk_tokens</span></code>, which then still runs
+that many. The rungs past it, which no step would reach, are dropped and
+logged. A ladder is kept whole
+where its steps run under no budget or may hold a prompt of a walk whose
+chunking <code class="docutils literal notranslate"><span class="pre">max_batch_tokens</span></code> turned off, which runs whole, as is a
+region’s. A vision tower’s <code class="docutils literal notranslate"><span class="pre">vision_block_loop</span></code> and an AuT encoder’s
+<code class="docutils literal notranslate"><span class="pre">aut_encode</span></code> (Qwen3-Omni, Qwen3-ASR) pack a step up to their ladder’s top;
+every other region keeps its own batch cap. A tower’s attention resource is
+sized from the model’s own top rung, and a batch with more attention segments
+than it holds is split into its requests, a request still over it running
+eagerly, so a ladder past that rung replays its longer steps only with the
+resource raised under <code class="docutils literal notranslate"><span class="pre">resources</span></code>: <code class="docutils literal notranslate"><span class="pre">vision_attn:</span> <span class="pre">{max_segments_per_step:</span> <span class="pre">N}</span></code>
+for a vision tower’s <code class="docutils literal notranslate"><span class="pre">vision_block_loop</span></code> (Qwen3.5, Qwen3-Omni, Muse Glimmer; N
+frames or windows a step), and <code class="docutils literal notranslate"><span class="pre">audio_attn:</span> <span class="pre">{max_segments_per_request:</span> <span class="pre">N}</span></code> for
+Qwen3-Omni’s <code class="docutils literal notranslate"><span class="pre">aut_encode</span></code> (N 8 s windows a clip). Each rung adds captures,
+graph memory and startup time. Loading fails, before any weights load, if the
+setting is not a mapping of node -&gt; name -&gt; ladder, names a node in no node
+group or a walk of the model that does not run the node (a node runs the walks
+it is in and its combined walks), a ladder is not a non-empty list of distinct
+positive ints, or a name that is no walk has a mapping. Warmup fails on a walk
+whose steps replay another walk’s capture, naming that walk, on a walk the node
+captures by batch size alone (a <code class="docutils literal notranslate"><span class="pre">decode</span></code> capture), on a walk of a node whose
+model captures no walk at all (a vision tower, an AuT encoder), naming its
+regions, on a name that is neither a walk nor a region of the node or is both
+(on a node whose model declares no region, every name that is no walk), and on a
+region captured by batch size alone; a walk or region the node captures nothing
+for at this deployment (a model that turns its captures off, such as GLM-5.2 with
+<code class="docutils literal notranslate"><span class="pre">dsa_long_context</span></code>) is logged and skipped. Loading also fails where a model
+refuses a region whose buckets it uses elsewhere: CosyVoice3’s
+<code class="docutils literal notranslate"><span class="pre">flow/solve_new_frames</span></code> takes <code class="docutils literal notranslate"><span class="pre">model_kwargs.flow_new_frame_buckets</span></code>. The
+key replaces <code class="docutils literal notranslate"><span class="pre">model_kwargs.prefill_token_buckets</span></code>,
+<code class="docutils literal notranslate"><span class="pre">prefill_batched_token_buckets</span></code> (GLM-5.2), <code class="docutils literal notranslate"><span class="pre">backbone_token_buckets</span></code>
+(OmniVoice) and <code class="docutils literal notranslate"><span class="pre">lm_prefill_token_buckets</span></code> (CosyVoice3), which fail loading.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">can_override_mixed_max_tokens</span></code></p></td>
 <td><p><em>(optional)</em> Per node, <code class="docutils literal notranslate"><span class="pre">true</span></code> to let a walk inside a combined walk take a budget
 of its own under the step’s. See <em>Chunked prefill budgets</em> below.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">speculate_mid_prefill</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">speculate_mid_prefill</span></code></p></td>
 <td><p><em>(optional, default true)</em> Per node, <code class="docutils literal notranslate"><span class="pre">true</span></code>/<code class="docutils literal notranslate"><span class="pre">false</span></code> for every walk it chunks,
 or a mapping of walk -&gt; <code class="docutils literal notranslate"><span class="pre">true</span></code>/<code class="docutils literal notranslate"><span class="pre">false</span></code>. On, a prompt mid-prefill takes its
 next chunk in the step speculated during the current one, so a lone long prompt
@@ -1146,7 +1205,7 @@ pays no scheduling gap between chunks; other ready work still goes first after
 every prompt step. Off, the next chunk waits for the current one to land. Naming
 a node or walk the model does not chunk fails loading.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">batch_builder</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">batch_builder</span></code></p></td>
 <td><p><em>(optional, default</em> <code class="docutils literal notranslate"><span class="pre">fifo</span></code> <em>)</em> How the worker composes a step under a token
 budget (<code class="docutils literal notranslate"><span class="pre">max_batch_tokens</span></code>). <code class="docutils literal notranslate"><span class="pre">fifo</span></code> serves prompts in the order they started:
 a prompt mid-prefill takes the budget before a newer one, so it finishes first,
@@ -1154,12 +1213,13 @@ and prompts short enough for an equal share still go in whole. <code class="docu
 splits the budget max-min fair over every waiting prompt, so each advances every
 step and all finish late together.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">min_chunk_tokens</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">min_chunk_tokens</span></code></p></td>
 <td><p><em>(optional, default 128)</em> The fewest tokens a prompt cut by chunked prefill runs
 in a step, or the whole budget if that is smaller; with less left, it waits a step. A positive int, for every
-chunked walk. See <em>Chunked prefill budgets</em> below.</p></td>
+chunked walk. Where a node cuts whole KV pages (Qwen3.5 with its prefix cache on), it rounds
+up to a page. See <em>Chunked prefill budgets</em> below.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">rebuild_host_mb</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">rebuild_host_mb</span></code></p></td>
 <td><p><em>(optional, default 64)</em> MiB of pinned host memory a worker serving a node whose model
 declares a rebuild policy sets aside at startup for its requests’ prompt ids, 8 B a token (int64),
 which a request dropped from the KV cache is rebuilt from. A request the pool can’t hold
@@ -1167,7 +1227,7 @@ keeps no ids, so it is never dropped on that node, though it can still move to t
 with <code class="docutils literal notranslate"><span class="pre">cpu_offload_pages</span></code>. A TP, SP or CFG node never drops a request, so it
 keeps no ids and sets no memory aside. A non-negative int, and 0 keeps no ids.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">warmup_requests</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">warmup_requests</span></code></p></td>
 <td><p><em>(optional)</em> Requests the server runs after the workers are ready and before it
 binds, so no client pays a shape’s first-request cost (torch.compile of a step,
 a cold cache). Each entry is a <code class="docutils literal notranslate"><span class="pre">/generate</span></code> request in yaml form: <code class="docutils literal notranslate"><span class="pre">text</span></code>,
@@ -1187,13 +1247,13 @@ replicated VAE, the entry first runs once alone, so that graph also warms its
 one-request shape before the copies reach it together. A malformed or failing warmup
 is logged and skipped.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">dist_timeout_s</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">dist_timeout_s</span></code></p></td>
 <td><p><em>(optional)</em> Timeout in seconds for the NCCL world group and its parallel
 subgroups during weight load and warmup; serving keeps PyTorch’s default.
 Unset keeps PyTorch’s default throughout. Raise it only where weight load,
 JIT or CUDA-graph capture can exceed that default.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">tp_allreduce</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">tp_allreduce</span></code></p></td>
 <td><p><em>(optional)</em> Small-message all-reduce path of every TP, SP and CFG group:
 <code class="docutils literal notranslate"><span class="pre">nccl</span></code> (default), <code class="docutils literal notranslate"><span class="pre">symm_oneshot</span></code>, <code class="docutils literal notranslate"><span class="pre">symm_multimem</span></code> or <code class="docutils literal notranslate"><span class="pre">flashinfer</span></code>;
 any other value fails at startup. <code class="docutils literal notranslate"><span class="pre">flashinfer</span></code> sends 2-D bf16 CUDA messages
@@ -1208,24 +1268,24 @@ differs from NCCL’s, so bf16 results can differ at the last bit. Falls back
 to NCCL, with a warning, where the chosen path cannot be set up on every
 rank of the group.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">tp_allreduce_max_kb</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">tp_allreduce_max_kb</span></code></p></td>
 <td><p><em>(optional)</em> Largest message, in KiB, the non-NCCL path takes;
 larger ones go to NCCL. It is also the size of the buffer each group
 rendezvouses. Default 512.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">tp_async_sched</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">tp_async_sched</span></code></p></td>
 <td><p><em>(optional)</em> Async scheduling for the parallel nodes: <code class="docutils literal notranslate"><span class="pre">true</span></code>
 (default), <code class="docutils literal notranslate"><span class="pre">false</span></code> or a list of node names (see <code class="docutils literal notranslate"><span class="pre">MSTAR_TP_ASYNC_SCHED</span></code>, which
 overrides it).</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">preprocess_workers</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">preprocess_workers</span></code></p></td>
 <td><p><em>(optional)</em> Requests the data worker prepares at once, for a model that
 declares <code class="docutils literal notranslate"><span class="pre">PREPROCESS_PARALLEL</span></code>. Default: as many as fit the CPUs left
 beside the API server’s intra-op threads (<code class="docutils literal notranslate"><span class="pre">preprocess_torch_threads</span></code>),
 at most 8; <code class="docutils literal notranslate"><span class="pre">1</span></code> prepares inline. It must be a positive integer, for any
 model: the server refuses to start on another value. See <a class="reference internal" href="adding_models.html"><span class="doc">Adding a New Model</span></a>.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">knobs</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">knobs</span></code></p></td>
 <td><p><em>(optional)</em> Engine knobs for this deployment, by name: <code class="docutils literal notranslate"><span class="pre">device_loopback</span></code>,
 <code class="docutils literal notranslate"><span class="pre">sampler_ingraph_scatter</span></code>, <code class="docutils literal notranslate"><span class="pre">sampler_slots</span></code>, <code class="docutils literal notranslate"><span class="pre">ingraph_decode_rope</span></code>,
 <code class="docutils literal notranslate"><span class="pre">kv_chain_lazy_steps</span></code>, <code class="docutils literal notranslate"><span class="pre">kv_pinned_indptrs</span></code>,
@@ -1333,7 +1393,15 @@ budgets:</p>
 the model budgets or with a budget per walk; null turns a walk’s chunking off. A prompt
 that is cut runs at least <code class="docutils literal notranslate"><span class="pre">min_chunk_tokens</span></code> tokens a step (default 128), or the whole
 budget if that is smaller. When less than that is left of a step’s budget, the prompt waits
-for the next step rather than running the step over its budget.</p>
+for the next step rather than running the step over its budget. Under <code class="docutils literal notranslate"><span class="pre">fifo</span></code> the first
+prompt in line, started or not, keeps that much of each step from the other prompts, so a
+stream of short ones cannot hold it off.</p>
+<p>A node whose resources keep state only on a grid of tokens counted from where a chunk starts
+(<code class="docutils literal notranslate"><span class="pre">Resource.chunk_alignment</span></code>) cuts its prompts to whole multiples of that grid, so each
+chunk starts on it. Qwen3.5 with its prefix cache on cuts whole KV pages (128 tokens by
+default), since its GDN snapshots sit on page boundaries. There <code class="docutils literal notranslate"><span class="pre">min_chunk_tokens</span></code> rounds
+up to a page, a budget under a page fails loading, and one under three pages logs a warning:
+a step can then leave up to a page, less one token, of its budget unused.</p>
 <p>Most chunked walks run inside a combined walk, which batches a node’s prompts and its
 decode rows into one step: <code class="docutils literal notranslate"><span class="pre">mixed</span></code> for Qwen3.5’s and Orpheus’s LLM, <code class="docutils literal notranslate"><span class="pre">mixed_text</span></code> for
 BAGEL’s, <code class="docutils literal notranslate"><span class="pre">thinker_mixed</span></code> for Qwen3-Omni’s Thinker. Such a step runs under the combined
@@ -1422,7 +1490,7 @@ before it spawns the workers, run every worker as its client so their kernels ov
 and quit the daemon at shutdown. The daemon uses a private pipe directory, so other
 processes on the GPU are unaffected. <code class="docutils literal notranslate"><span class="pre">nvidia-cuda-mps-control</span></code> (part of the NVIDIA
 driver) must be on <code class="docutils literal notranslate"><span class="pre">PATH</span></code>. The <code class="docutils literal notranslate"><span class="pre">*_split.yaml</span></code> configs for Whisper, Qwen3-ASR, the three
-Chatterbox models and OmniVoice set it, and so does <code class="docutils literal notranslate"><span class="pre">qwen3tts_split.yaml</span></code> (the 0.6B).</p>
+Chatterbox models, OmniVoice and CosyVoice3 set it, and so does <code class="docutils literal notranslate"><span class="pre">qwen3tts_split.yaml</span></code> (the 0.6B).</p>
 <p><strong>A light node beside a heavy one, on one worker.</strong> <code class="docutils literal notranslate"><span class="pre">side_stream:</span> <span class="pre">true</span></code> on a node
 group runs that node’s steps on a lane of their own instead of the worker’s main chain:
 they take no turn on it, run on a second CUDA stream beside its steps, and whatever

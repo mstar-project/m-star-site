@@ -597,6 +597,7 @@ window.runMermaid = runMermaid;</script>
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../_autosummary/mstar.conductor.html">mstar.conductor</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.conductor.lora_ops.html">mstar.conductor.lora_ops</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.conductor.mps.html">mstar.conductor.mps</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.conductor.request_info.html">mstar.conductor.request_info</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.conductor.workers.html">mstar.conductor.workers</a></li>
@@ -704,6 +705,11 @@ window.runMermaid = runMermaid;</script>
 </ul>
 </details></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.model.media_limits.html">mstar.model.media_limits</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../_autosummary/mstar.model.minimax_h3.html">mstar.model.minimax_h3</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.minimax_h3.components.html">mstar.model.minimax_h3.components</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.minimax_h3.tests.html">mstar.model.minimax_h3.tests</a></li>
+</ul>
+</details></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.model.multimodal.html">mstar.model.multimodal</a></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../_autosummary/mstar.model.muse.html">mstar.model.muse</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.muse.components.html">mstar.model.muse.components</a></li>
@@ -713,7 +719,6 @@ window.runMermaid = runMermaid;</script>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../_autosummary/mstar.model.nemotron_duplex.html">mstar.model.nemotron_duplex</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.nemotron_duplex.components.html">mstar.model.nemotron_duplex.components</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.nemotron_duplex.realtime_api.html">mstar.model.nemotron_duplex.realtime_api</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../_autosummary/mstar.model.omnilingual_asr.html">mstar.model.omnilingual_asr</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -743,7 +748,6 @@ window.runMermaid = runMermaid;</script>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../_autosummary/mstar.model.qwen3_5.html">mstar.model.qwen3_5</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.qwen3_5.components.html">mstar.model.qwen3_5.components</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.qwen3_5.config.html">mstar.model.qwen3_5.config</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.qwen3_5.video.html">mstar.model.qwen3_5.video</a></li>
 </ul>
 </details></li>
@@ -831,6 +835,7 @@ window.runMermaid = runMermaid;</script>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.worker.chunk_loops.html">mstar.worker.chunk_loops</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.worker.host_copies.html">mstar.worker.host_copies</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.worker.host_pool.html">mstar.worker.host_pool</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.worker.lora_loads.html">mstar.worker.lora_loads</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.worker.node_manager_utils.html">mstar.worker.node_manager_utils</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.worker.phase_timer.html">mstar.worker.phase_timer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.worker.rebuild.html">mstar.worker.rebuild</a></li>
@@ -1080,13 +1085,27 @@ window.runMermaid = runMermaid;</script>
 
 
 
+<div class="viewcode-block" id="ClientAudio">
+<a class="viewcode-back" href="../../../_autosummary/mstar.streaming.topology.html#mstar.streaming.topology.ClientAudio">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ClientAudio</span><span class="p">(</span><span class="n">NamedTuple</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""What an audio client stream carries: mono audio at ``sample_rate``.</span>
+<span class="sd">    ``frame_samples`` is the frame its consumer computes on: the stream's</span>
+<span class="sd">    producer (the data worker) sends whole frames on every route, holding</span>
+<span class="sd">    the rest for the next append, and turns appends into items itself when</span>
+<span class="sd">    every client stream declares one."""</span>
+    <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">frame_samples</span><span class="p">:</span> <span class="nb">int</span></div>
+
+
+
 <div class="viewcode-block" id="Connection">
 <a class="viewcode-back" href="../../../_autosummary/mstar.streaming.topology.html#mstar.streaming.topology.Connection">[docs]</a>
 <span class="nd">@dataclass</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">Connection</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""Defines a streaming connection between two partitions, or from the</span>
 <span class="sd">    client (``from_partition=CLIENT``) into one. Only a client stream takes</span>
-<span class="sd">    ``limits``: a partition's output is bounded by the model itself."""</span>
+<span class="sd">    ``limits`` (a partition's output is bounded by the model itself) or</span>
+<span class="sd">    ``audio``."""</span>
     <span class="n">from_partition</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">to_partition</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">edge_name</span><span class="p">:</span> <span class="nb">str</span>
@@ -1105,7 +1124,8 @@ window.runMermaid = runMermaid;</script>
     <span class="c1"># producer worker calls it for each pass that emits on the edge, and the</span>
     <span class="c1"># pass's items run under the consumer walk it returns: the producer, which</span>
     <span class="c1"># owns the consumer's walk, decides it, and the consumer only applies it.</span>
-    <span class="n">consumer_walk</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">ProducerWalkCtx</span><span class="p">],</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span></div>
+    <span class="n">consumer_walk</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">ProducerWalkCtx</span><span class="p">],</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">audio</span><span class="p">:</span> <span class="n">ClientAudio</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span></div>
 
 
 
@@ -1127,8 +1147,11 @@ window.runMermaid = runMermaid;</script>
         <span class="k">for</span> <span class="n">conn</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">connections</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">conn</span><span class="o">.</span><span class="n">to_partition</span> <span class="o">==</span> <span class="n">CLIENT</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"the client only produces streams; </span><span class="si">{</span><span class="n">conn</span><span class="o">.</span><span class="n">edge_name</span><span class="si">!r}</span><span class="s2"> flows into it"</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">conn</span><span class="o">.</span><span class="n">limits</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">conn</span><span class="o">.</span><span class="n">from_partition</span> <span class="o">!=</span> <span class="n">CLIENT</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">conn</span><span class="o">.</span><span class="n">edge_name</span><span class="si">!r}</span><span class="s2"> has limits but is not a client stream"</span><span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">conn</span><span class="o">.</span><span class="n">limits</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">conn</span><span class="o">.</span><span class="n">audio</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="n">conn</span><span class="o">.</span><span class="n">from_partition</span> <span class="o">!=</span> <span class="n">CLIENT</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">conn</span><span class="o">.</span><span class="n">edge_name</span><span class="si">!r}</span><span class="s2"> has limits or audio but is not a client stream"</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="p">(</span><span class="n">conn</span><span class="o">.</span><span class="n">audio</span><span class="o">.</span><span class="n">_asdict</span><span class="p">()</span> <span class="k">if</span> <span class="n">conn</span><span class="o">.</span><span class="n">audio</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">{})</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">or</span> <span class="n">value</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">conn</span><span class="o">.</span><span class="n">edge_name</span><span class="si">!r}</span><span class="s2">'s audio </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> must be a positive integer, not </span><span class="si">{</span><span class="n">value</span><span class="si">!r}</span><span class="s2">"</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">conn</span><span class="o">.</span><span class="n">consumer_walk</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">conn</span><span class="o">.</span><span class="n">from_partition</span> <span class="o">==</span> <span class="n">CLIENT</span><span class="p">:</span>
                 <span class="c1"># the hook runs on the producer worker, and the client has none</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"client stream </span><span class="si">{</span><span class="n">conn</span><span class="o">.</span><span class="n">edge_name</span><span class="si">!r}</span><span class="s2"> cannot drive its consumer's walk"</span><span class="p">)</span>

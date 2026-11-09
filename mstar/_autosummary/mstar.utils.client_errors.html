@@ -244,6 +244,7 @@
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="mstar.conductor.html">mstar.conductor</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="mstar.conductor.lora_ops.html">mstar.conductor.lora_ops</a></li>
 <li class="toctree-l3"><a class="reference internal" href="mstar.conductor.mps.html">mstar.conductor.mps</a></li>
 <li class="toctree-l3"><a class="reference internal" href="mstar.conductor.request_info.html">mstar.conductor.request_info</a></li>
 <li class="toctree-l3"><a class="reference internal" href="mstar.conductor.workers.html">mstar.conductor.workers</a></li>
@@ -351,6 +352,11 @@
 </ul>
 </details></li>
 <li class="toctree-l3"><a class="reference internal" href="mstar.model.media_limits.html">mstar.model.media_limits</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="mstar.model.minimax_h3.html">mstar.model.minimax_h3</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="mstar.model.minimax_h3.components.html">mstar.model.minimax_h3.components</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mstar.model.minimax_h3.tests.html">mstar.model.minimax_h3.tests</a></li>
+</ul>
+</details></li>
 <li class="toctree-l3"><a class="reference internal" href="mstar.model.multimodal.html">mstar.model.multimodal</a></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="mstar.model.muse.html">mstar.model.muse</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="mstar.model.muse.components.html">mstar.model.muse.components</a></li>
@@ -360,7 +366,6 @@
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="mstar.model.nemotron_duplex.html">mstar.model.nemotron_duplex</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="mstar.model.nemotron_duplex.components.html">mstar.model.nemotron_duplex.components</a></li>
-<li class="toctree-l4"><a class="reference internal" href="mstar.model.nemotron_duplex.realtime_api.html">mstar.model.nemotron_duplex.realtime_api</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="mstar.model.omnilingual_asr.html">mstar.model.omnilingual_asr</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -390,7 +395,6 @@
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="mstar.model.qwen3_5.html">mstar.model.qwen3_5</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="mstar.model.qwen3_5.components.html">mstar.model.qwen3_5.components</a></li>
-<li class="toctree-l4"><a class="reference internal" href="mstar.model.qwen3_5.config.html">mstar.model.qwen3_5.config</a></li>
 <li class="toctree-l4"><a class="reference internal" href="mstar.model.qwen3_5.video.html">mstar.model.qwen3_5.video</a></li>
 </ul>
 </details></li>
@@ -478,6 +482,7 @@
 <li class="toctree-l3"><a class="reference internal" href="mstar.worker.chunk_loops.html">mstar.worker.chunk_loops</a></li>
 <li class="toctree-l3"><a class="reference internal" href="mstar.worker.host_copies.html">mstar.worker.host_copies</a></li>
 <li class="toctree-l3"><a class="reference internal" href="mstar.worker.host_pool.html">mstar.worker.host_pool</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mstar.worker.lora_loads.html">mstar.worker.lora_loads</a></li>
 <li class="toctree-l3"><a class="reference internal" href="mstar.worker.node_manager_utils.html">mstar.worker.node_manager_utils</a></li>
 <li class="toctree-l3"><a class="reference internal" href="mstar.worker.phase_timer.html">mstar.worker.phase_timer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="mstar.worker.rebuild.html">mstar.worker.rebuild</a></li>
@@ -741,14 +746,16 @@
 </div>
 <dl class="py function">
 <dt class="sig sig-object py" id="mstar.utils.client_errors.client_error_text">
-<span class="sig-prename descclassname"><span class="pre">mstar.utils.client_errors.</span></span><span class="sig-name descname"><span class="pre">client_error_text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">exc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">what</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">log</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">logger</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">traceback</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mstar/utils/client_errors.html#client_error_text"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mstar.utils.client_errors.client_error_text" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">mstar.utils.client_errors.</span></span><span class="sig-name descname"><span class="pre">client_error_text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">exc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">what</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">log</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">logger</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">traceback</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">refusal</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mstar/utils/client_errors.html#client_error_text"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mstar.utils.client_errors.client_error_text" title="Link to this definition">#</a></dt>
 <dd><p>Return <code class="docutils literal notranslate"><span class="pre">(text,</span> <span class="pre">error_id)</span></code>: what a client may see for <code class="docutils literal notranslate"><span class="pre">exc</span></code>.</p>
 <p>A <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> or <code class="docutils literal notranslate"><span class="pre">TypeError</span></code> is a refusal raised on purpose, so it
 keeps its message (prefixed with the type name when <code class="docutils literal notranslate"><span class="pre">type_name</span></code>), with
 absolute paths cut to their base names. Anything else becomes
 <code class="docutils literal notranslate"><span class="pre">internal</span> <span class="pre">error</span> <span class="pre">(error</span> <span class="pre">id</span> <span class="pre">&lt;id&gt;)</span></code>. Either way the full error and its
 traceback (left out when <code class="docutils literal notranslate"><span class="pre">traceback</span></code> is False, for an error already
-logged where it happened) go to <code class="docutils literal notranslate"><span class="pre">log</span></code> as <code class="docutils literal notranslate"><span class="pre">&lt;what&gt;</span> <span class="pre">[error</span> <span class="pre">id</span> <span class="pre">&lt;id&gt;]</span></code>.</p>
+logged where it happened) go to <code class="docutils literal notranslate"><span class="pre">log</span></code> as <code class="docutils literal notranslate"><span class="pre">&lt;what&gt;</span> <span class="pre">[error</span> <span class="pre">id</span> <span class="pre">&lt;id&gt;]</span></code>.
+<code class="docutils literal notranslate"><span class="pre">refusal</span></code> overrides that type check, for a caller that knows whether
+the request was refused.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -757,6 +764,7 @@ logged where it happened) go to <code class="docutils literal notranslate"><span
 <li><p><strong>log</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/logging.html#logging.Logger" title="(in Python v3.12)"><em>Logger</em></a>)</p></li>
 <li><p><strong>type_name</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/functions.html#bool" title="(in Python v3.12)"><em>bool</em></a>)</p></li>
 <li><p><strong>traceback</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/functions.html#bool" title="(in Python v3.12)"><em>bool</em></a>)</p></li>
+<li><p><strong>refusal</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/functions.html#bool" title="(in Python v3.12)"><em>bool</em></a><em> | </em><em>None</em>)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>

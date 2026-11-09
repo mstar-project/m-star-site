@@ -597,6 +597,7 @@ window.runMermaid = runMermaid;</script>
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../_autosummary/mstar.conductor.html">mstar.conductor</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.conductor.lora_ops.html">mstar.conductor.lora_ops</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.conductor.mps.html">mstar.conductor.mps</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.conductor.request_info.html">mstar.conductor.request_info</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.conductor.workers.html">mstar.conductor.workers</a></li>
@@ -704,6 +705,11 @@ window.runMermaid = runMermaid;</script>
 </ul>
 </details></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.model.media_limits.html">mstar.model.media_limits</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../_autosummary/mstar.model.minimax_h3.html">mstar.model.minimax_h3</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.minimax_h3.components.html">mstar.model.minimax_h3.components</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.minimax_h3.tests.html">mstar.model.minimax_h3.tests</a></li>
+</ul>
+</details></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.model.multimodal.html">mstar.model.multimodal</a></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../_autosummary/mstar.model.muse.html">mstar.model.muse</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.muse.components.html">mstar.model.muse.components</a></li>
@@ -713,7 +719,6 @@ window.runMermaid = runMermaid;</script>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../_autosummary/mstar.model.nemotron_duplex.html">mstar.model.nemotron_duplex</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.nemotron_duplex.components.html">mstar.model.nemotron_duplex.components</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.nemotron_duplex.realtime_api.html">mstar.model.nemotron_duplex.realtime_api</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../_autosummary/mstar.model.omnilingual_asr.html">mstar.model.omnilingual_asr</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -743,7 +748,6 @@ window.runMermaid = runMermaid;</script>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../_autosummary/mstar.model.qwen3_5.html">mstar.model.qwen3_5</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.qwen3_5.components.html">mstar.model.qwen3_5.components</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.qwen3_5.config.html">mstar.model.qwen3_5.config</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.qwen3_5.video.html">mstar.model.qwen3_5.video</a></li>
 </ul>
 </details></li>
@@ -831,6 +835,7 @@ window.runMermaid = runMermaid;</script>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.worker.chunk_loops.html">mstar.worker.chunk_loops</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.worker.host_copies.html">mstar.worker.host_copies</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.worker.host_pool.html">mstar.worker.host_pool</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.worker.lora_loads.html">mstar.worker.lora_loads</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.worker.node_manager_utils.html">mstar.worker.node_manager_utils</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.worker.phase_timer.html">mstar.worker.phase_timer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.worker.rebuild.html">mstar.worker.rebuild</a></li>
@@ -1023,6 +1028,7 @@ window.runMermaid = runMermaid;</script>
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">base64</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">heapq</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">http.client</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">io</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">ipaddress</span>
@@ -1222,27 +1228,34 @@ window.runMermaid = runMermaid;</script>
 
 
 
-<div class="viewcode-block" id="save_base64_audio">
-<a class="viewcode-back" href="../../../_autosummary/mstar.api_server.media_io.html#mstar.api_server.media_io.save_base64_audio">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">save_base64_audio</span><span class="p">(</span><span class="n">b64</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">upload_dir</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">decoder</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">"""Persist bare base64 that passes :func:`check_ref_audio`; return its path,</span>
-<span class="sd">    or None (leaving nothing behind) when it is not base64 or not loadable audio.</span>
+<span class="c1">#: The refusal of a bare-base64 ``ref_audio`` that is not audio the model decodes.</span>
+<span class="n">BARE_REF_AUDIO_REFUSAL</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s2">"server file paths are refused; ref_audio must be a data URL, an http(s) URL "</span>
+    <span class="s2">"or base64 audio the model can decode"</span>
+<span class="p">)</span>
 
-<span class="sd">    A path such as ``/etc/passwd`` is valid base64 too, so the alphabet cannot</span>
-<span class="sd">    tell them apart; the decoder can. A clip that is audio but too long raises</span>
-<span class="sd">    :class:`RefAudioTooLongError`.</span>
-<span class="sd">    """</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">_</span><span class="p">,</span> <span class="n">path</span> <span class="o">=</span> <span class="n">save_base64</span><span class="p">(</span><span class="n">b64</span><span class="p">,</span> <span class="s2">"wav"</span><span class="p">,</span> <span class="s2">"audio"</span><span class="p">,</span> <span class="n">upload_dir</span><span class="p">)</span>
-    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
-        <span class="k">return</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="check_saved_ref_audio">
+<a class="viewcode-back" href="../../../_autosummary/mstar.api_server.media_io.html#mstar.api_server.media_io.check_saved_ref_audio">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">check_saved_ref_audio</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">decoder</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">bare</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">""":func:`check_ref_audio` for a request's reference clip, saved at ``path``;</span>
+<span class="sd">    on failure the clip is deleted and ValueError says why. ``bare`` is a clip sent</span>
+<span class="sd">    as bare base64: a path such as ``/etc/passwd`` is valid base64 too, so the</span>
+<span class="sd">    alphabet cannot tell them apart and the decoder decides, and one that does not</span>
+<span class="sd">    open gets :data:`BARE_REF_AUDIO_REFUSAL`. A clip that opens but runs too long</span>
+<span class="sd">    raises :class:`RefAudioTooLongError` either way.</span>
+
+<span class="sd">    Both frontends call it: the Python adapters after saving the clip, and the Rust</span>
+<span class="sd">    frontend's bridge for a clip ``mstar-server`` saved, so the model's own loader</span>
+<span class="sd">    is the judge on both."""</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">check_ref_audio</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">decoder</span><span class="p">)</span>
     <span class="k">except</span> <span class="n">RefAudioTooLongError</span><span class="p">:</span>
         <span class="k">raise</span>
     <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
-        <span class="k">return</span> <span class="kc">None</span>
-    <span class="k">return</span> <span class="n">path</span></div>
+        <span class="k">if</span> <span class="n">bare</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">BARE_REF_AUDIO_REFUSAL</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
+        <span class="k">raise</span></div>
 
 
 
@@ -1637,6 +1650,40 @@ window.runMermaid = runMermaid;</script>
 
 
 
+<span class="k">class</span><span class="w"> </span><span class="nc">_UploadReaper</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""One thread runs every deferred cleanup at its deadline: a thread per</span>
+<span class="sd">    request, each asleep for the delay, came to thousands under image load."""</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cv</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Condition</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_due</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span> <span class="n">Path</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_order</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_thread</span><span class="p">:</span> <span class="n">Thread</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">schedule</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_paths</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span> <span class="n">upload_dir</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">delay_s</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cv</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_order</span> <span class="o">+=</span> <span class="mi">1</span>  <span class="c1"># a tiebreak: the dicts don't compare</span>
+            <span class="n">heapq</span><span class="o">.</span><span class="n">heappush</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_due</span><span class="p">,</span> <span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">monotonic</span><span class="p">()</span> <span class="o">+</span> <span class="n">delay_s</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_order</span><span class="p">,</span> <span class="n">file_paths</span><span class="p">,</span> <span class="n">upload_dir</span><span class="p">))</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_thread</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_thread</span><span class="o">.</span><span class="n">is_alive</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_thread</span> <span class="o">=</span> <span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_run</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"upload-cleanup"</span><span class="p">,</span> <span class="n">daemon</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_cv</span><span class="o">.</span><span class="n">notify</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_run</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cv</span><span class="p">:</span>
+                <span class="k">while</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_due</span> <span class="ow">or</span> <span class="p">(</span><span class="n">wait</span> <span class="o">:=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_due</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">time</span><span class="o">.</span><span class="n">monotonic</span><span class="p">())</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_cv</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="n">wait</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_due</span> <span class="k">else</span> <span class="kc">None</span><span class="p">)</span>
+                <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">file_paths</span><span class="p">,</span> <span class="n">upload_dir</span> <span class="o">=</span> <span class="n">heapq</span><span class="o">.</span><span class="n">heappop</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_due</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">remove_uploads</span><span class="p">(</span><span class="n">file_paths</span><span class="p">,</span> <span class="n">upload_dir</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>  <span class="c1"># noqa: BLE001 — the other requests' cleanups still run</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">"Deleting a request's uploads failed"</span><span class="p">)</span>
+
+
+<span class="n">_REAPER</span> <span class="o">=</span> <span class="n">_UploadReaper</span><span class="p">()</span>
+
+
 <div class="viewcode-block" id="schedule_upload_cleanup">
 <a class="viewcode-back" href="../../../_autosummary/mstar.api_server.media_io.html#mstar.api_server.media_io.schedule_upload_cleanup">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">schedule_upload_cleanup</span><span class="p">(</span><span class="n">file_paths</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">upload_dir</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -1644,12 +1691,7 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">    request that was submitted and may not have been read yet."""</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">file_paths</span><span class="p">:</span>
         <span class="k">return</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">_cleanup</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">UPLOAD_CLEANUP_DELAY_S</span><span class="p">)</span>
-        <span class="n">remove_uploads</span><span class="p">(</span><span class="n">file_paths</span><span class="p">,</span> <span class="n">upload_dir</span><span class="p">)</span>
-
-    <span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">_cleanup</span><span class="p">,</span> <span class="n">daemon</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">start</span><span class="p">()</span></div>
+    <span class="n">_REAPER</span><span class="o">.</span><span class="n">schedule</span><span class="p">(</span><span class="n">file_paths</span><span class="p">,</span> <span class="n">upload_dir</span><span class="p">,</span> <span class="n">UPLOAD_CLEANUP_DELAY_S</span><span class="p">)</span></div>
 
 
 
@@ -1881,6 +1923,11 @@ window.runMermaid = runMermaid;</script>
         <span class="n">n</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">half</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">half</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
         <span class="n">cutoff</span> <span class="o">=</span> <span class="n">rolloff</span> <span class="o">*</span> <span class="mf">0.5</span> <span class="o">/</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">up</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">down</span><span class="p">)</span>          <span class="c1"># cycles per upsampled sample</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">kernel</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">cutoff</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sinc</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">cutoff</span> <span class="o">*</span> <span class="n">n</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">kaiser</span><span class="p">(</span><span class="n">n</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">beta</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">up</span>
+        <span class="c1"># the kernel by phase: row p weighs inputs -span..span around the one</span>
+        <span class="c1"># an output's center falls p upsampled samples past</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_span</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">half</span> <span class="o">//</span> <span class="bp">self</span><span class="o">.</span><span class="n">up</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">up</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_span</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_span</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">up</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">half</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_phases</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">((</span><span class="n">idx</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">idx</span> <span class="o">&lt;=</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">half</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">kernel</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">half</span><span class="p">)],</span> <span class="mf">0.0</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
 
 <div class="viewcode-block" id="StreamResampler.reset">
@@ -1922,16 +1969,15 @@ window.runMermaid = runMermaid;</script>
         <span class="k">if</span> <span class="n">k_end</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_k_out</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_buf</span><span class="o">.</span><span class="n">size</span><span class="p">:</span>
             <span class="n">n</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_k_out</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">k_end</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_k_out</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_k_out</span><span class="p">,</span> <span class="n">k_end</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
-        <span class="n">span</span> <span class="o">=</span> <span class="n">half</span> <span class="o">//</span> <span class="n">up</span> <span class="o">+</span> <span class="mi">1</span>
-        <span class="n">taps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="n">span</span><span class="p">,</span> <span class="n">span</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:]</span>
+        <span class="n">span</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_span</span>
+        <span class="c1"># inputs before the stream and past what has arrived are silence</span>
+        <span class="n">windows</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">lib</span><span class="o">.</span><span class="n">stride_tricks</span><span class="o">.</span><span class="n">sliding_window_view</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">span</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_buf</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">span</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]),</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">span</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
         <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">k0</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_k_out</span><span class="p">,</span> <span class="n">k_end</span><span class="p">,</span> <span class="mi">4096</span><span class="p">):</span>              <span class="c1"># bounds the gather to 4096 rows</span>
-            <span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">k0</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">k0</span> <span class="o">+</span> <span class="mi">4096</span><span class="p">,</span> <span class="n">k_end</span><span class="p">))[:,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">down</span>   <span class="c1"># centers, upsampled</span>
-            <span class="n">ns</span> <span class="o">=</span> <span class="n">t</span> <span class="o">//</span> <span class="n">up</span> <span class="o">+</span> <span class="n">taps</span>                                  <span class="c1"># candidate input indices</span>
-            <span class="n">idx</span> <span class="o">=</span> <span class="n">t</span> <span class="o">-</span> <span class="n">ns</span> <span class="o">*</span> <span class="n">up</span> <span class="o">+</span> <span class="n">half</span>
-            <span class="n">ok</span> <span class="o">=</span> <span class="p">(</span><span class="n">idx</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">idx</span> <span class="o">&lt;=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">half</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">ns</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">ns</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_in</span><span class="p">)</span>
-            <span class="n">vals</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_buf</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">ns</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_base</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_buf</span><span class="o">.</span><span class="n">size</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)]</span>
-            <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">ok</span><span class="p">,</span> <span class="n">vals</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">kernel</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">half</span><span class="p">)],</span> <span class="mf">0.0</span><span class="p">))</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+            <span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">k0</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">k0</span> <span class="o">+</span> <span class="mi">4096</span><span class="p">,</span> <span class="n">k_end</span><span class="p">))</span> <span class="o">*</span> <span class="n">down</span>      <span class="c1"># centers, upsampled</span>
+            <span class="c1"># row t // up - base holds the inputs within span of the center's</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s2">"ij,ij-&gt;i"</span><span class="p">,</span> <span class="n">windows</span><span class="p">[</span><span class="n">t</span> <span class="o">//</span> <span class="n">up</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_base</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_phases</span><span class="p">[</span><span class="n">t</span> <span class="o">%</span> <span class="n">up</span><span class="p">]))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_k_out</span> <span class="o">=</span> <span class="n">k_end</span>
         <span class="n">keep</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_base</span><span class="p">,</span> <span class="o">-</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="n">k_end</span> <span class="o">*</span> <span class="n">down</span> <span class="o">-</span> <span class="n">half</span><span class="p">)</span> <span class="o">//</span> <span class="n">up</span><span class="p">))</span>  <span class="c1"># first input the next output needs</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_buf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_buf</span><span class="p">[</span><span class="n">keep</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_base</span><span class="p">:]</span>
@@ -1940,15 +1986,74 @@ window.runMermaid = runMermaid;</script>
 
 
 
+<span class="c1"># G.711 (8 kHz telephony), coded as CPython's audioop and Sun's g711.c code it:</span>
+<span class="c1"># mu-law from 14-bit magnitudes, A-law from 13-bit ones.</span>
+<span class="n">_ULAW_SEG_END</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mh">0x3F</span><span class="p">,</span> <span class="mh">0x7F</span><span class="p">,</span> <span class="mh">0xFF</span><span class="p">,</span> <span class="mh">0x1FF</span><span class="p">,</span> <span class="mh">0x3FF</span><span class="p">,</span> <span class="mh">0x7FF</span><span class="p">,</span> <span class="mh">0xFFF</span><span class="p">,</span> <span class="mh">0x1FFF</span><span class="p">])</span>
+<span class="n">_ALAW_SEG_END</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mh">0x1F</span><span class="p">,</span> <span class="mh">0x3F</span><span class="p">,</span> <span class="mh">0x7F</span><span class="p">,</span> <span class="mh">0xFF</span><span class="p">,</span> <span class="mh">0x1FF</span><span class="p">,</span> <span class="mh">0x3FF</span><span class="p">,</span> <span class="mh">0x7FF</span><span class="p">,</span> <span class="mh">0xFFF</span><span class="p">])</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_ulaw_table</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+    <span class="n">u</span> <span class="o">=</span> <span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">256</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0xFF</span>
+    <span class="n">exponent</span><span class="p">,</span> <span class="n">mantissa</span> <span class="o">=</span> <span class="p">(</span><span class="n">u</span> <span class="o">&gt;&gt;</span> <span class="mi">4</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mi">7</span><span class="p">,</span> <span class="n">u</span> <span class="o">&amp;</span> <span class="mh">0xF</span>
+    <span class="n">magnitude</span> <span class="o">=</span> <span class="p">(((</span><span class="n">mantissa</span> <span class="o">&lt;&lt;</span> <span class="mi">3</span><span class="p">)</span> <span class="o">+</span> <span class="mh">0x84</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">exponent</span><span class="p">)</span> <span class="o">-</span> <span class="mh">0x84</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">u</span> <span class="o">&amp;</span> <span class="mh">0x80</span><span class="p">,</span> <span class="o">-</span><span class="n">magnitude</span><span class="p">,</span> <span class="n">magnitude</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">"&lt;i2"</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_alaw_table</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">256</span><span class="p">)</span> <span class="o">^</span> <span class="mh">0x55</span>
+    <span class="n">exponent</span><span class="p">,</span> <span class="n">mantissa</span> <span class="o">=</span> <span class="p">(</span><span class="n">a</span> <span class="o">&gt;&gt;</span> <span class="mi">4</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mi">7</span><span class="p">,</span> <span class="n">a</span> <span class="o">&amp;</span> <span class="mh">0xF</span>
+    <span class="n">magnitude</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">exponent</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="n">mantissa</span> <span class="o">&lt;&lt;</span> <span class="mi">4</span><span class="p">)</span> <span class="o">+</span> <span class="mi">8</span><span class="p">,</span>
+                         <span class="p">((</span><span class="n">mantissa</span> <span class="o">&lt;&lt;</span> <span class="mi">4</span><span class="p">)</span> <span class="o">+</span> <span class="mh">0x108</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">exponent</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">a</span> <span class="o">&amp;</span> <span class="mh">0x80</span><span class="p">,</span> <span class="n">magnitude</span><span class="p">,</span> <span class="o">-</span><span class="n">magnitude</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">"&lt;i2"</span><span class="p">)</span>
+
+
+<span class="n">_G711_DECODE</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"audio/pcmu"</span><span class="p">:</span> <span class="n">_ulaw_table</span><span class="p">(),</span> <span class="s2">"audio/pcma"</span><span class="p">:</span> <span class="n">_alaw_table</span><span class="p">()}</span>
+
+
+<div class="viewcode-block" id="g711_decode">
+<a class="viewcode-back" href="../../../_autosummary/mstar.api_server.media_io.html#mstar.api_server.media_io.g711_decode">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">g711_decode</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span> <span class="n">law</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""G.711 bytes (``law`` is ``"audio/pcmu"`` or ``"audio/pcma"``) -&gt; int16 samples."""</span>
+    <span class="k">return</span> <span class="n">_G711_DECODE</span><span class="p">[</span><span class="n">law</span><span class="p">][</span><span class="n">np</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)]</span></div>
+
+
+
+<div class="viewcode-block" id="g711_encode">
+<a class="viewcode-back" href="../../../_autosummary/mstar.api_server.media_io.html#mstar.api_server.media_io.g711_encode">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">g711_encode</span><span class="p">(</span><span class="n">pcm</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">law</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""int16 samples -&gt; G.711 bytes, one per sample."""</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">pcm</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">law</span> <span class="o">==</span> <span class="s2">"audio/pcmu"</span><span class="p">:</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span> <span class="o">&gt;&gt;</span> <span class="mi">2</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">x</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">,</span> <span class="mh">0x7F</span><span class="p">,</span> <span class="mh">0xFF</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="mi">8159</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="mh">0x84</span> <span class="o">&gt;&gt;</span> <span class="mi">2</span><span class="p">)</span>   <span class="c1"># audioop's 14-bit clip</span>
+        <span class="n">seg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">searchsorted</span><span class="p">(</span><span class="n">_ULAW_SEG_END</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+        <span class="n">code</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">seg</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="mi">4</span><span class="p">)</span> <span class="o">|</span> <span class="p">((</span><span class="n">x</span> <span class="o">&gt;&gt;</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">seg</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span> <span class="o">&amp;</span> <span class="mh">0xF</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span> <span class="o">&gt;&gt;</span> <span class="mi">3</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">x</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">,</span> <span class="mh">0xD5</span><span class="p">,</span> <span class="mh">0x55</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">x</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="o">-</span><span class="n">x</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">seg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">searchsorted</span><span class="p">(</span><span class="n">_ALAW_SEG_END</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+        <span class="n">code</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">seg</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="mi">4</span><span class="p">)</span> <span class="o">|</span> <span class="p">((</span><span class="n">x</span> <span class="o">&gt;&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">seg</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">7</span><span class="p">))</span> <span class="o">&amp;</span> <span class="mh">0xF</span><span class="p">)</span>
+    <span class="n">code</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">seg</span> <span class="o">&gt;=</span> <span class="mi">8</span><span class="p">,</span> <span class="mh">0x7F</span><span class="p">,</span> <span class="n">code</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">code</span> <span class="o">^</span> <span class="n">mask</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span><span class="o">.</span><span class="n">tobytes</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="to_pcm16">
+<a class="viewcode-back" href="../../../_autosummary/mstar.api_server.media_io.html#mstar.api_server.media_io.to_pcm16">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">to_pcm16</span><span class="p">(</span><span class="n">audio</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Float waveform -&gt; little-endian int16 samples. The inverse of reading</span>
+<span class="sd">    PCM16 as ``int16 / 32768``, so 16-bit audio comes back sample for sample."""</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">rint</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">audio</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span> <span class="o">*</span> <span class="mf">32768.0</span><span class="p">),</span> <span class="o">-</span><span class="mi">32768</span><span class="p">,</span> <span class="mi">32767</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">"&lt;i2"</span><span class="p">)</span></div>
+
+
+
 <div class="viewcode-block" id="write_wav">
 <a class="viewcode-back" href="../../../_autosummary/mstar.api_server.media_io.html#mstar.api_server.media_io.write_wav">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">write_wav</span><span class="p">(</span><span class="n">audio</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">16000</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">"""Float waveform -&gt; 16-bit PCM WAV file at ``path``. The inverse of</span>
-<span class="sd">    reading PCM16 as ``int16 / 32768``, so 16-bit audio comes back sample for</span>
-<span class="sd">    sample."""</span>
-    <span class="n">scaled</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">rint</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">audio</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span> <span class="o">*</span> <span class="mf">32768.0</span><span class="p">)</span>
-    <span class="n">pcm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">scaled</span><span class="p">,</span> <span class="o">-</span><span class="mi">32768</span><span class="p">,</span> <span class="mi">32767</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">"&lt;i2"</span><span class="p">)</span><span class="o">.</span><span class="n">tobytes</span><span class="p">()</span>
-    <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">write_bytes</span><span class="p">(</span><span class="n">pcm16_to_wav_bytes</span><span class="p">(</span><span class="n">pcm</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">))</span>
+<span class="w">    </span><span class="sd">"""Float waveform -&gt; 16-bit PCM WAV file at ``path`` (see :func:`to_pcm16`)."""</span>
+    <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">write_bytes</span><span class="p">(</span><span class="n">pcm16_to_wav_bytes</span><span class="p">(</span><span class="n">to_pcm16</span><span class="p">(</span><span class="n">audio</span><span class="p">)</span><span class="o">.</span><span class="n">tobytes</span><span class="p">(),</span> <span class="n">sample_rate</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">path</span></div>
 
 

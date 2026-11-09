@@ -244,6 +244,7 @@
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="_autosummary/mstar.conductor.html">mstar.conductor</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.conductor.lora_ops.html">mstar.conductor.lora_ops</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.conductor.mps.html">mstar.conductor.mps</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.conductor.request_info.html">mstar.conductor.request_info</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.conductor.workers.html">mstar.conductor.workers</a></li>
@@ -351,6 +352,11 @@
 </ul>
 </details></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.model.media_limits.html">mstar.model.media_limits</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="_autosummary/mstar.model.minimax_h3.html">mstar.model.minimax_h3</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.model.minimax_h3.components.html">mstar.model.minimax_h3.components</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.model.minimax_h3.tests.html">mstar.model.minimax_h3.tests</a></li>
+</ul>
+</details></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.model.multimodal.html">mstar.model.multimodal</a></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="_autosummary/mstar.model.muse.html">mstar.model.muse</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.model.muse.components.html">mstar.model.muse.components</a></li>
@@ -360,7 +366,6 @@
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="_autosummary/mstar.model.nemotron_duplex.html">mstar.model.nemotron_duplex</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.model.nemotron_duplex.components.html">mstar.model.nemotron_duplex.components</a></li>
-<li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.model.nemotron_duplex.realtime_api.html">mstar.model.nemotron_duplex.realtime_api</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="_autosummary/mstar.model.omnilingual_asr.html">mstar.model.omnilingual_asr</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -390,7 +395,6 @@
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="_autosummary/mstar.model.qwen3_5.html">mstar.model.qwen3_5</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.model.qwen3_5.components.html">mstar.model.qwen3_5.components</a></li>
-<li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.model.qwen3_5.config.html">mstar.model.qwen3_5.config</a></li>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.model.qwen3_5.video.html">mstar.model.qwen3_5.video</a></li>
 </ul>
 </details></li>
@@ -478,6 +482,7 @@
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.chunk_loops.html">mstar.worker.chunk_loops</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.host_copies.html">mstar.worker.host_copies</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.host_pool.html">mstar.worker.host_pool</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.lora_loads.html">mstar.worker.lora_loads</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.node_manager_utils.html">mstar.worker.node_manager_utils</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.phase_timer.html">mstar.worker.phase_timer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.rebuild.html">mstar.worker.rebuild</a></li>
@@ -980,58 +985,53 @@ deployment option <code class="docutils literal notranslate"><span class="pre">m
 BAGEL defaults this option to true (see <a class="reference internal" href="models.html"><span class="doc">Supported Models</span></a>).
 Off by default: capture costs one graph per (batch size, token bucket)
 and the eager flash-attn path is already fast. The win is removing
-per-layer launch overhead on small images.</p></td>
+per-layer launch overhead on small images. The serving config’s
+<code class="docutils literal notranslate"><span class="pre">prefill_token_buckets:</span> <span class="pre">{vit_encoder:</span> <span class="pre">{vit_block_loop:</span> <span class="pre">[...]}}</span></code> sets
+the token buckets (see <a class="reference internal" href="serving.html"><span class="doc">Serving</span></a>).</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_VIT_ACCELERATOR_GRAPH_TOKEN_BUCKETS</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">512,1024,2048,4096,4900</span></code></p></td>
-<td><p>Comma-separated token-count buckets to capture, when
-<code class="docutils literal notranslate"><span class="pre">MSTAR_VIT_ACCELERATOR_GRAPH=1</span></code>. A batch longer than the largest bucket runs
-eagerly. <code class="docutils literal notranslate"><span class="pre">4900</span></code> is <code class="docutils literal notranslate"><span class="pre">70*70</span></code>, the exact length the <code class="docutils literal notranslate"><span class="pre">vllm</span></code>
-preprocess option emits.</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_VIT_ACCELERATOR_GRAPH_BATCH_SIZES</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_VIT_ACCELERATOR_GRAPH_BATCH_SIZES</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">1,2,4</span></code></p></td>
 <td><p>Comma-separated batch sizes to capture. Read only when
 <code class="docutils literal notranslate"><span class="pre">MSTAR_VIT_BATCHING=1</span></code>; otherwise only batch size 1 is captured.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">COSMOS3_DISABLE_ACCELERATOR_GRAPH</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">COSMOS3_DISABLE_ACCELERATOR_GRAPH</span></code></p></td>
 <td><p>unset</p></td>
 <td><p>Cosmos3: any nonempty value disables denoise, prefill and reasoner
 decode capture. The deployment option
 <code class="docutils literal notranslate"><span class="pre">model_kwargs.accelerator_graph:</span> <span class="pre">false</span></code> also disables all these
 captures and cannot be overridden by this variable.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">COSMOS3_DISABLE_PREFILL_ACCELERATOR_GRAPH</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">COSMOS3_DISABLE_PREFILL_ACCELERATOR_GRAPH</span></code></p></td>
 <td><p>unset</p></td>
 <td><p>Cosmos3: any nonempty value disables only the understanding-tower
 prefill capture. Denoise and reasoner decode captures remain eligible
 when <code class="docutils literal notranslate"><span class="pre">model_kwargs.accelerator_graph</span></code> is true.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_OMNIVOICE_MODEL_PATH</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_OMNIVOICE_MODEL_PATH</span></code></p></td>
 <td><p>unset</p></td>
 <td><p>OmniVoice: load weights from this local directory instead of the
 checkpoint the registry names. For serving a fine-tune of the same
 architecture off a mounted volume, where the registry entry would
 otherwise pull the public weights from the Hub.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_ASR_DATA</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_ASR_DATA</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">data/asr</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">test/asr</span></code> (GPU parity tests): the set <code class="docutils literal notranslate"><span class="pre">benchmark.asr_data</span></code> built.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_WHISPER_REPO</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_WHISPER_REPO</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">openai/whisper-large-v3-turbo</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">test/asr/test_whisper_parity.py</span></code>: the Whisper checkpoint to compare.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_QWEN_ASR_REPO</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_QWEN_ASR_REPO</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">Qwen/Qwen3-ASR-1.7B</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">test/asr/test_qwen3_asr_parity.py</span></code>: the Qwen3-ASR checkpoint to compare.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_QWEN_ASR_REF</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_QWEN_ASR_REF</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">refs/Qwen3-ASR</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">test/asr/test_qwen3_asr_parity.py</span></code>: a checkout of the qwen-asr SDK,
 the reference transcripts come from.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_QWEN_ASR_REF_SITE</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_QWEN_ASR_REF_SITE</span></code></p></td>
 <td><p>unset</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">test/asr/test_qwen3_asr_parity.py</span></code>: a directory holding transformers
 4.57, put first on the path of the subprocess that runs the SDK (whose
@@ -1076,8 +1076,11 @@ message on every WebSocket route unless the config sets
 <td><p>Mount the app under a URL sub-path. Set it when an ingress routes the
 deployment at a prefix and does not strip that prefix before the
 request reaches the pod (Run:AI serves a workload at
-<code class="docutils literal notranslate"><span class="pre">/&lt;project&gt;/&lt;job-name&gt;/</span></code>, for instance); without it FastAPI 404s
-every route. Empty by default, so a direct deployment is unaffected.</p></td>
+<code class="docutils literal notranslate"><span class="pre">/&lt;project&gt;/&lt;job-name&gt;/</span></code>, for instance); without it every route
+404s. A path under the prefix is routed without it, and any other path
+as sent, on both frontends (Starlette’s <code class="docutils literal notranslate"><span class="pre">root_path</span></code>; <code class="docutils literal notranslate"><span class="pre">route_path</span></code>
+in <code class="docutils literal notranslate"><span class="pre">rust/server/src/main.rs</span></code>). Empty by default, so a direct
+deployment is unaffected.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_MAX_IMAGES_PER_REQUEST</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">10</span></code></p></td>
@@ -1155,14 +1158,30 @@ sets it from <code class="docutils literal notranslate"><span class="pre">--api-
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_REQUEST_TIMEOUT_S</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">600</span></code></p></td>
-<td><p>Per-request budget in the Rust frontend; on expiry the client gets
-an error and the request is aborted in the backend.</p></td>
+<td><p>Per-request budget in the Rust frontend, in seconds; on expiry the
+client gets an error and the request is aborted in the backend.
+<code class="docutils literal notranslate"><span class="pre">mstar</span> <span class="pre">serve</span> <span class="pre">--rust-frontend</span></code> sets it from <code class="docutils literal notranslate"><span class="pre">--timeout</span></code>
+(<code class="docutils literal notranslate"><span class="pre">launch_rust_server</span></code>).</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_SAMPLE_RATE</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">24000</span></code></p></td>
-<td><p>Sample rate stamped on <code class="docutils literal notranslate"><span class="pre">/v1/audio/speech</span></code> WAV output.</p></td>
+<td><p>Sample rate stamped on the Rust frontend’s WAV output.
+<code class="docutils literal notranslate"><span class="pre">mstar</span> <span class="pre">serve</span> <span class="pre">--rust-frontend</span></code> sets it to the model’s
+<code class="docutils literal notranslate"><span class="pre">get_output_sample_rate(&quot;audio&quot;)</span></code>, as the Python frontend reads it.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_ALLOW_REMOTE</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_LIBSNDFILE</span></code></p></td>
+<td><p>unset</p></td>
+<td><p>The libsndfile the Rust frontend opens at startup to encode <code class="docutils literal notranslate"><span class="pre">mp3</span></code>,
+<code class="docutils literal notranslate"><span class="pre">flac</span></code> and <code class="docutils literal notranslate"><span class="pre">opus</span></code> speech (<code class="docutils literal notranslate"><span class="pre">rust/server/src/sndfile.rs</span></code>), called as
+<code class="docutils literal notranslate"><span class="pre">soundfile.write</span></code> calls it, so the files are the Python frontend’s
+byte for byte (an Ogg stream’s random serial aside). Unset, only <code class="docutils literal notranslate"><span class="pre">wav</span></code>
+and <code class="docutils literal notranslate"><span class="pre">pcm</span></code> are produced, as on the Python frontend without
+<code class="docutils literal notranslate"><span class="pre">soundfile</span></code>. <code class="docutils literal notranslate"><span class="pre">launch_rust_server</span></code> sets it to the library
+<code class="docutils literal notranslate"><span class="pre">soundfile</span></code> loaded (<code class="docutils literal notranslate"><span class="pre">soundfile_library</span></code>) and drops an inherited
+value; it is opened at run time, never linked, as its LAME encoder is
+LGPL.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_ALLOW_REMOTE</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">0</span></code></p></td>
 <td><p>Allow <code class="docutils literal notranslate"><span class="pre">http(s)</span></code> media URLs in requests, fetched server-side by both
 frontends (<code class="docutils literal notranslate"><span class="pre">media_io.save_remote_url</span></code> and <code class="docutils literal notranslate"><span class="pre">save_remote_url</span></code> in
@@ -1179,7 +1198,7 @@ against the system trust store on the Python frontend and against
 the bundled Mozilla roots (<code class="docutils literal notranslate"><span class="pre">webpki-roots</span></code>) on the Rust frontend,
 so a private CA added to the system store is trusted by Python only.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_REMOTE_ALLOWED_HOSTS</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_REMOTE_ALLOWED_HOSTS</span></code></p></td>
 <td><p>unset</p></td>
 <td><p>Comma-separated hosts and <code class="docutils literal notranslate"><span class="pre">*.suffix</span></code> patterns (<code class="docutils literal notranslate"><span class="pre">*.example.com</span></code>
 matches its subdomains, not <code class="docutils literal notranslate"><span class="pre">example.com</span></code>). When set, only these
@@ -1191,23 +1210,23 @@ such as <code class="docutils literal notranslate"><span class="pre">[::1]</span
 by the same two functions; the Rust frontend reads it once at
 startup.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_REMOTE_MAX_BYTES</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_REMOTE_MAX_BYTES</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">67108864</span></code></p></td>
 <td><p>Largest remote media file fetched (64 MiB), checked against
 <code class="docutils literal notranslate"><span class="pre">Content-Length</span></code> and while streaming. Read like
 <code class="docutils literal notranslate"><span class="pre">MSTAR_REMOTE_ALLOWED_HOSTS</span></code>.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_MAX_CONCURRENT_REQUESTS</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">256</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_MAX_CONCURRENT_REQUESTS</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">512</span></code></p></td>
 <td><p>Admission cap on in-flight generation requests; beyond it clients
 get an immediate 503 instead of queueing into the request timeout.
 <code class="docutils literal notranslate"><span class="pre">/health</span></code>, <code class="docutils literal notranslate"><span class="pre">/metrics</span></code> and <code class="docutils literal notranslate"><span class="pre">/v1/models</span></code> bypass the cap.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_MAX_BODY_MB</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_MAX_BODY_MB</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">128</span></code></p></td>
 <td><p>Request body limit (multipart uploads included).</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_TOKENIZE_PARALLEL</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_TOKENIZE_PARALLEL</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">1</span></code></p></td>
 <td><p>When a long prompt is encoded as parallel chunks, set
 <code class="docutils literal notranslate"><span class="pre">TOKENIZERS_PARALLELISM=true</span></code> for the process first: the Rust
@@ -1215,15 +1234,15 @@ tokenizer only uses its thread pool while that variable reads true,
 and serving environments often export it false. <code class="docutils literal notranslate"><span class="pre">0</span></code> leaves the
 variable as it is (the chunked encode then runs serially).</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_OPENAI_ADAPTER</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_OPENAI_ADAPTER</span></code></p></td>
 <td><p>set by the launcher</p></td>
 <td><p>The class name of the model’s adapter in <code class="docutils literal notranslate"><span class="pre">ADAPTER_REGISTRY</span></code>
 (<code class="docutils literal notranslate"><span class="pre">openai_adapter_class</span></code> in <code class="docutils literal notranslate"><span class="pre">mstar/api_server/rust_frontend.py</span></code>), which
 picks the OpenAI translation <code class="docutils literal notranslate"><span class="pre">mstar-server</span></code> uses
-(<code class="docutils literal notranslate"><span class="pre">Adapter::from_python</span></code>). <code class="docutils literal notranslate"><span class="pre">mstar-serve</span> <span class="pre">--rust-frontend</span></code> always sets it;
+(<code class="docutils literal notranslate"><span class="pre">adapters::from_python</span></code>, which looks it up in <code class="docutils literal notranslate"><span class="pre">ADAPTERS</span></code>). <code class="docutils literal notranslate"><span class="pre">mstar-serve</span> <span class="pre">--rust-frontend</span></code> always sets it;
 a <code class="docutils literal notranslate"><span class="pre">mstar-server</span></code> started by hand without it answers 404 on <code class="docutils literal notranslate"><span class="pre">/v1/*</span></code>.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_TOKENIZER</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_TOKENIZER</span></code></p></td>
 <td><p>unset</p></td>
 <td><p>Path to a HuggingFace <code class="docutils literal notranslate"><span class="pre">tokenizer.json</span></code> enabling frontend
 tokenization. Leave unset with the Python backend — its preprocess
@@ -1238,16 +1257,9 @@ ingest.</p></td>
 <p>The Rust frontend serves no <code class="docutils literal notranslate"><span class="pre">/generate/ws</span></code>, so a model’s live client input
 (appends to a running request, see <a class="reference internal" href="clients.html"><span class="doc">Using a Server</span></a>) needs the Python frontend;
 over <code class="docutils literal notranslate"><span class="pre">/generate</span></code> such a model’s input ends when the request is submitted.</p>
-<p>It also carries no audio encoder or media muxer (the Python frontend
-uses <code class="docutils literal notranslate"><span class="pre">soundfile</span></code> / <code class="docutils literal notranslate"><span class="pre">ffmpeg</span></code>), so two surfaces degrade:</p>
+<p>It also carries no media muxer (the Python frontend uses <code class="docutils literal notranslate"><span class="pre">ffmpeg</span></code>), so one
+surface degrades:</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">/v1/audio/speech</span></code> produces only <code class="docutils literal notranslate"><span class="pre">wav</span></code> and <code class="docutils literal notranslate"><span class="pre">pcm</span></code>. Any other
-<code class="docutils literal notranslate"><span class="pre">response_format</span></code> (<code class="docutils literal notranslate"><span class="pre">mp3</span></code>, <code class="docutils literal notranslate"><span class="pre">opus</span></code>, <code class="docutils literal notranslate"><span class="pre">flac</span></code>, …) is rejected with a 400
-rather than silently returned as WAV. Run the Python frontend for compressed
-containers.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">/v1/audio/speech</span></code> refuses <code class="docutils literal notranslate"><span class="pre">ref_audio</span></code> (Qwen3-TTS voice cloning) with a
-400: the Python frontend decodes the clip and checks its length before
-submitting it, and the Rust frontend has no decoder to do that with.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">/v1/videos/generations</span></code> (Cosmos3) returns the <strong>video-only</strong> mp4. When a
 request sets <code class="docutils literal notranslate"><span class="pre">generate_sound</span></code>, Cosmos3 generates a separate audio track that
 mstar muxes into the mp4 as an AAC track; the Rust frontend cannot mux it, so
