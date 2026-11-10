@@ -14,9 +14,12 @@ mstar.engine.resources.kv.config
    .. autosummary::
    
       instance_size
+      mark_unpausable
       opening_prefix_caches
       prefix_caches_by_rank
+      rebuild_refusal
       refuse_undeclared_labels
+      step_end
       unrestorable
       without_layouts
    

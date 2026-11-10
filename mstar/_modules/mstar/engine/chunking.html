@@ -705,6 +705,10 @@ window.runMermaid = runMermaid;</script>
 </ul>
 </details></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.model.media_limits.html">mstar.model.media_limits</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../_autosummary/mstar.model.minicpm_o.html">mstar.model.minicpm_o</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.minicpm_o.components.html">mstar.model.minicpm_o.components</a></li>
+</ul>
+</details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../_autosummary/mstar.model.minimax_h3.html">mstar.model.minimax_h3</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.minimax_h3.components.html">mstar.model.minimax_h3.components</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/mstar.model.minimax_h3.tests.html">mstar.model.minimax_h3.tests</a></li>
@@ -842,6 +846,7 @@ window.runMermaid = runMermaid;</script>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.worker.lora_loads.html">mstar.worker.lora_loads</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.worker.node_manager_utils.html">mstar.worker.node_manager_utils</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.worker.phase_timer.html">mstar.worker.phase_timer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.worker.preemption.html">mstar.worker.preemption</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.worker.rebuild.html">mstar.worker.rebuild</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.worker.rid_table.html">mstar.worker.rid_table</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.worker.scheduled_batch.html">mstar.worker.scheduled_batch</a></li>
@@ -1092,6 +1097,8 @@ window.runMermaid = runMermaid;</script>
         <span class="bp">self</span><span class="o">.</span><span class="n">_min_chunk_tokens</span> <span class="o">=</span> <span class="n">DEFAULT_MIN_CHUNK_TOKENS</span>
         <span class="c1"># (rid, node) -&gt; a chunked row's whole input, prepared on its first chunk</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">prepared</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="n">NodeInputs</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="c1"># (rid, node) -&gt; a prompt's whole input, out of `prepared` while its rebuild runs the steps before it</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">aside</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="n">NodeInputs</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
 
 <div class="viewcode-block" id="ChunkingManagement.policy">
 <a class="viewcode-back" href="../../../_autosummary/mstar.engine.chunking.html#mstar.engine.chunking.ChunkingManagement.policy">[docs]</a>
@@ -1335,13 +1342,29 @@ window.runMermaid = runMermaid;</script>
         <span class="bp">self</span><span class="o">.</span><span class="n">prepared</span><span class="o">.</span><span class="n">pop</span><span class="p">((</span><span class="n">rid</span><span class="p">,</span> <span class="n">node_name</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span></div>
 
 
+<div class="viewcode-block" id="ChunkingManagement.set_aside">
+<a class="viewcode-back" href="../../../_autosummary/mstar.engine.chunking.html#mstar.engine.chunking.ChunkingManagement.set_aside">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_aside</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rid</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">node_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Move a prompt's whole input out of `prepared`, where its rebuild's rows prepare their own."""</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">aside</span><span class="p">[(</span><span class="n">rid</span><span class="p">,</span> <span class="n">node_name</span><span class="p">)]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prepared</span><span class="o">.</span><span class="n">pop</span><span class="p">((</span><span class="n">rid</span><span class="p">,</span> <span class="n">node_name</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="ChunkingManagement.restore">
+<a class="viewcode-back" href="../../../_autosummary/mstar.engine.chunking.html#mstar.engine.chunking.ChunkingManagement.restore">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">restore</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rid</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">node_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Put a prompt's whole input back, for its rebuild and then its own chunks to cut from."""</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prepared</span><span class="p">[(</span><span class="n">rid</span><span class="p">,</span> <span class="n">node_name</span><span class="p">)]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">aside</span><span class="o">.</span><span class="n">pop</span><span class="p">((</span><span class="n">rid</span><span class="p">,</span> <span class="n">node_name</span><span class="p">))</span></div>
+
+
 <div class="viewcode-block" id="ChunkingManagement.forget_request">
 <a class="viewcode-back" href="../../../_autosummary/mstar.engine.chunking.html#mstar.engine.chunking.ChunkingManagement.forget_request">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">forget_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rid</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="c1"># over a snapshot: this runs on the main thread, while the gpu thread</span>
         <span class="c1"># may still be adding the next step's rows to `prepared`</span>
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">[</span><span class="n">key</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prepared</span><span class="p">)</span> <span class="k">if</span> <span class="n">key</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">rid</span><span class="p">]:</span>
-            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">prepared</span><span class="p">[</span><span class="n">key</span><span class="p">]</span></div>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">prepared</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">[</span><span class="n">key</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">aside</span> <span class="k">if</span> <span class="n">key</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">rid</span><span class="p">]:</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">aside</span><span class="p">[</span><span class="n">key</span><span class="p">]</span></div>
 </div>
 
 </pre></div>
