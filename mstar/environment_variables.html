@@ -1001,7 +1001,7 @@ the token buckets (see <a class="reference internal" href="serving.html"><span c
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_VIT_ACCELERATOR_GRAPH_BATCH_SIZES</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">1,2,4</span></code></p></td>
-<td><p>Comma-separated batch sizes to capture. Read only when
+<td><p>Comma-separated batch sizes to capture; empty captures none. Read only when
 <code class="docutils literal notranslate"><span class="pre">MSTAR_VIT_BATCHING=1</span></code>; otherwise only batch size 1 is captured.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">COSMOS3_DISABLE_ACCELERATOR_GRAPH</span></code></p></td>
@@ -1201,7 +1201,44 @@ base model’s names and the served LoRA adapters
 Unset serves the base model alone. Not for deployments to set:
 <code class="docutils literal notranslate"><span class="pre">launch_rust_server</span></code> sets it from the API server’s <code class="docutils literal notranslate"><span class="pre">ServedModels</span></code>.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_ALLOW_REMOTE</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_TRANSCRIPTION</span></code></p></td>
+<td><p>unset</p></td>
+<td><p>What the Rust frontend’s <code class="docutils literal notranslate"><span class="pre">/v1/audio/transcriptions</span></code> needs from the
+served model, as JSON: the kwargs it declares, the deployment’s
+<code class="docutils literal notranslate"><span class="pre">max_concurrent_requests</span></code>, the adapter’s language tables, and the
+pydantic version its error text cites. Not for deployments to set:
+<code class="docutils literal notranslate"><span class="pre">launch_rust_server</span></code> sets it from <code class="docutils literal notranslate"><span class="pre">transcription_facts</span></code> for a model
+with a transcription surface, and drops an inherited value.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_OPENPI</span></code></p></td>
+<td><p>unset</p></td>
+<td><p>The deployment’s openpi policy (its <code class="docutils literal notranslate"><span class="pre">openpi:</span></code> block as the API server
+checked it, the metadata frame packed), as JSON; unset serves no socket
+at <code class="docutils literal notranslate"><span class="pre">/</span></code>. Not for deployments to set: <code class="docutils literal notranslate"><span class="pre">launch_rust_server</span></code> sets it from
+<code class="docutils literal notranslate"><span class="pre">openpi_facts</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_WS_MAX_BYTES</span></code></p></td>
+<td><p>the body limit</p></td>
+<td><p>The largest WebSocket message the Rust frontend reads, in bytes: the
+config’s <code class="docutils literal notranslate"><span class="pre">ws_max_message_mb</span></code>. Not for deployments to set:
+<code class="docutils literal notranslate"><span class="pre">launch_rust_server</span></code> sets it.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_CLIENT_STREAMS</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[]</span></code></p></td>
+<td><p>The model’s client streams, as JSON: on <code class="docutils literal notranslate"><span class="pre">/generate/ws</span></code> a request to a
+model with any is a live call. Not for deployments to set:
+<code class="docutils literal notranslate"><span class="pre">launch_rust_server</span></code> sets it from <code class="docutils literal notranslate"><span class="pre">APIServer.client_streams</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_REALTIME</span></code></p></td>
+<td><p>unset</p></td>
+<td><p>What the Rust frontend’s <code class="docutils literal notranslate"><span class="pre">/v1/realtime</span></code> runs with, as JSON: for a
+model with an audio client stream, what a conversation needs from it
+(<code class="docutils literal notranslate"><span class="pre">conversation_facts</span></code>); for realtime transcription, the ONNX Runtime
+library <code class="docutils literal notranslate"><span class="pre">onnxruntime</span></code> loads, Silero’s weights, why Smart Turn did not
+load (if it didn’t), and the model’s tokenizer. Not for deployments to
+set: <code class="docutils literal notranslate"><span class="pre">launch_rust_server</span></code> sets it from <code class="docutils literal notranslate"><span class="pre">realtime_facts</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_ALLOW_REMOTE</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">0</span></code></p></td>
 <td><p>Allow <code class="docutils literal notranslate"><span class="pre">http(s)</span></code> media URLs in requests, fetched server-side by both
 frontends (<code class="docutils literal notranslate"><span class="pre">media_io.save_remote_url</span></code> and <code class="docutils literal notranslate"><span class="pre">save_remote_url</span></code> in
@@ -1218,7 +1255,7 @@ against the system trust store on the Python frontend and against
 the bundled Mozilla roots (<code class="docutils literal notranslate"><span class="pre">webpki-roots</span></code>) on the Rust frontend,
 so a private CA added to the system store is trusted by Python only.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_REMOTE_ALLOWED_HOSTS</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_REMOTE_ALLOWED_HOSTS</span></code></p></td>
 <td><p>unset</p></td>
 <td><p>Comma-separated hosts and <code class="docutils literal notranslate"><span class="pre">*.suffix</span></code> patterns (<code class="docutils literal notranslate"><span class="pre">*.example.com</span></code>
 matches its subdomains, not <code class="docutils literal notranslate"><span class="pre">example.com</span></code>). When set, only these
@@ -1230,23 +1267,23 @@ such as <code class="docutils literal notranslate"><span class="pre">[::1]</span
 by the same two functions; the Rust frontend reads it once at
 startup.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_REMOTE_MAX_BYTES</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_REMOTE_MAX_BYTES</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">67108864</span></code></p></td>
 <td><p>Largest remote media file fetched (64 MiB), checked against
 <code class="docutils literal notranslate"><span class="pre">Content-Length</span></code> and while streaming. Read like
 <code class="docutils literal notranslate"><span class="pre">MSTAR_REMOTE_ALLOWED_HOSTS</span></code>.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_MAX_CONCURRENT_REQUESTS</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_MAX_CONCURRENT_REQUESTS</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">512</span></code></p></td>
 <td><p>Admission cap on in-flight generation requests; beyond it clients
 get an immediate 503 instead of queueing into the request timeout.
 <code class="docutils literal notranslate"><span class="pre">/health</span></code>, <code class="docutils literal notranslate"><span class="pre">/metrics</span></code> and <code class="docutils literal notranslate"><span class="pre">/v1/models</span></code> bypass the cap.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_MAX_BODY_MB</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_MAX_BODY_MB</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">128</span></code></p></td>
 <td><p>Request body limit (multipart uploads included).</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_TOKENIZE_PARALLEL</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_TOKENIZE_PARALLEL</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">1</span></code></p></td>
 <td><p>When a long prompt is encoded as parallel chunks, set
 <code class="docutils literal notranslate"><span class="pre">TOKENIZERS_PARALLELISM=true</span></code> for the process first: the Rust
@@ -1254,7 +1291,7 @@ tokenizer only uses its thread pool while that variable reads true,
 and serving environments often export it false. <code class="docutils literal notranslate"><span class="pre">0</span></code> leaves the
 variable as it is (the chunked encode then runs serially).</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_OPENAI_ADAPTER</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_OPENAI_ADAPTER</span></code></p></td>
 <td><p>set by the launcher</p></td>
 <td><p>The class name of the model’s adapter in <code class="docutils literal notranslate"><span class="pre">ADAPTER_REGISTRY</span></code>
 (<code class="docutils literal notranslate"><span class="pre">openai_adapter_class</span></code> in <code class="docutils literal notranslate"><span class="pre">mstar/api_server/rust_frontend.py</span></code>), which
@@ -1262,7 +1299,7 @@ picks the OpenAI translation <code class="docutils literal notranslate"><span cl
 (<code class="docutils literal notranslate"><span class="pre">adapters::from_python</span></code>, which looks it up in <code class="docutils literal notranslate"><span class="pre">ADAPTERS</span></code>). <code class="docutils literal notranslate"><span class="pre">mstar-serve</span> <span class="pre">--rust-frontend</span></code> always sets it;
 a <code class="docutils literal notranslate"><span class="pre">mstar-server</span></code> started by hand without it answers 404 on <code class="docutils literal notranslate"><span class="pre">/v1/*</span></code>.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_TOKENIZER</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_TOKENIZER</span></code></p></td>
 <td><p>unset</p></td>
 <td><p>Path to a HuggingFace <code class="docutils literal notranslate"><span class="pre">tokenizer.json</span></code> enabling frontend
 tokenization. Leave unset with the Python backend — its preprocess
@@ -1274,9 +1311,10 @@ ingest.</p></td>
 </div>
 <section id="rust-frontend-limitations">
 <h3>Rust frontend limitations<a class="headerlink" href="#rust-frontend-limitations" title="Link to this heading">#</a></h3>
-<p>The Rust frontend serves no <code class="docutils literal notranslate"><span class="pre">/generate/ws</span></code>, so a model’s live client input
-(appends to a running request, see <a class="reference internal" href="clients.html"><span class="doc">Using a Server</span></a>) needs the Python frontend;
-over <code class="docutils literal notranslate"><span class="pre">/generate</span></code> such a model’s input ends when the request is submitted.</p>
+<p>The Rust frontend serves every route the Python frontend serves but LoRA’s
+runtime updates (<code class="docutils literal notranslate"><span class="pre">/v1/load_lora_adapter</span></code> and <code class="docutils literal notranslate"><span class="pre">/v1/unload_lora_adapter</span></code>, see
+<a class="reference internal" href="models.html"><span class="doc">Supported Models</span></a>): <code class="docutils literal notranslate"><span class="pre">mstar</span> <span class="pre">serve</span></code> refuses <code class="docutils literal notranslate"><span class="pre">--rust-frontend</span></code> with
+<code class="docutils literal notranslate"><span class="pre">runtime_updates:</span> <span class="pre">true</span></code>.</p>
 </section>
 </section>
 <section id="request-media">
