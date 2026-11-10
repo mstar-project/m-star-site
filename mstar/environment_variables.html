@@ -55,7 +55,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="0.2.1" />
-    <meta name="docbuild:last-update" content="Nov 09, 2026"/>
+    <meta name="docbuild:last-update" content="Nov 10, 2026"/>
   
     
     <script src="_static/searchtools.js"></script>
@@ -492,6 +492,7 @@
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.rebuild.html">mstar.worker.rebuild</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.rid_table.html">mstar.worker.rid_table</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.scheduled_batch.html">mstar.worker.scheduled_batch</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.scheduling_policy.html">mstar.worker.scheduling_policy</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.spec_rows.html">mstar.worker.spec_rows</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.stream_buffers.html">mstar.worker.stream_buffers</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.worker_metrics.html">mstar.worker.worker_metrics</a></li>
@@ -1001,15 +1002,16 @@ the token buckets (see <a class="reference internal" href="serving.html"><span c
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">COSMOS3_DISABLE_ACCELERATOR_GRAPH</span></code></p></td>
 <td><p>unset</p></td>
 <td><p>Cosmos3: any nonempty value disables denoise, prefill and reasoner
-decode capture. The deployment option
+captures. The deployment option
 <code class="docutils literal notranslate"><span class="pre">model_kwargs.accelerator_graph:</span> <span class="pre">false</span></code> also disables all these
 captures and cannot be overridden by this variable.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">COSMOS3_DISABLE_PREFILL_ACCELERATOR_GRAPH</span></code></p></td>
 <td><p>unset</p></td>
 <td><p>Cosmos3: any nonempty value disables only the understanding-tower
-prefill capture. Denoise and reasoner decode captures remain eligible
-when <code class="docutils literal notranslate"><span class="pre">model_kwargs.accelerator_graph</span></code> is true.</p></td>
+prefill captures: the DiT’s prompt prefill and the reasoner’s text,
+mixed and vision prefills. Denoise and reasoner decode captures remain
+eligible when <code class="docutils literal notranslate"><span class="pre">model_kwargs.accelerator_graph</span></code> is true.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_OMNIVOICE_MODEL_PATH</span></code></p></td>
 <td><p>unset</p></td>
@@ -1186,7 +1188,15 @@ and <code class="docutils literal notranslate"><span class="pre">pcm</span></cod
 value; it is opened at run time, never linked, as its LAME encoder is
 LGPL.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_ALLOW_REMOTE</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_SERVED_MODELS</span></code></p></td>
+<td><p>unset</p></td>
+<td><p>The names a Rust-frontend request’s <code class="docutils literal notranslate"><span class="pre">model</span></code> may carry, as JSON: the
+base model’s names and the served LoRA adapters
+(<code class="docutils literal notranslate"><span class="pre">api_server/served_models.py</span></code>, <code class="docutils literal notranslate"><span class="pre">rust/server/src/served_models.rs</span></code>).
+Unset serves the base model alone. Not for deployments to set:
+<code class="docutils literal notranslate"><span class="pre">launch_rust_server</span></code> sets it from the API server’s <code class="docutils literal notranslate"><span class="pre">ServedModels</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_ALLOW_REMOTE</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">0</span></code></p></td>
 <td><p>Allow <code class="docutils literal notranslate"><span class="pre">http(s)</span></code> media URLs in requests, fetched server-side by both
 frontends (<code class="docutils literal notranslate"><span class="pre">media_io.save_remote_url</span></code> and <code class="docutils literal notranslate"><span class="pre">save_remote_url</span></code> in
@@ -1203,7 +1213,7 @@ against the system trust store on the Python frontend and against
 the bundled Mozilla roots (<code class="docutils literal notranslate"><span class="pre">webpki-roots</span></code>) on the Rust frontend,
 so a private CA added to the system store is trusted by Python only.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_REMOTE_ALLOWED_HOSTS</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_REMOTE_ALLOWED_HOSTS</span></code></p></td>
 <td><p>unset</p></td>
 <td><p>Comma-separated hosts and <code class="docutils literal notranslate"><span class="pre">*.suffix</span></code> patterns (<code class="docutils literal notranslate"><span class="pre">*.example.com</span></code>
 matches its subdomains, not <code class="docutils literal notranslate"><span class="pre">example.com</span></code>). When set, only these
@@ -1215,23 +1225,23 @@ such as <code class="docutils literal notranslate"><span class="pre">[::1]</span
 by the same two functions; the Rust frontend reads it once at
 startup.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_REMOTE_MAX_BYTES</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_REMOTE_MAX_BYTES</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">67108864</span></code></p></td>
 <td><p>Largest remote media file fetched (64 MiB), checked against
 <code class="docutils literal notranslate"><span class="pre">Content-Length</span></code> and while streaming. Read like
 <code class="docutils literal notranslate"><span class="pre">MSTAR_REMOTE_ALLOWED_HOSTS</span></code>.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_MAX_CONCURRENT_REQUESTS</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_MAX_CONCURRENT_REQUESTS</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">512</span></code></p></td>
 <td><p>Admission cap on in-flight generation requests; beyond it clients
 get an immediate 503 instead of queueing into the request timeout.
 <code class="docutils literal notranslate"><span class="pre">/health</span></code>, <code class="docutils literal notranslate"><span class="pre">/metrics</span></code> and <code class="docutils literal notranslate"><span class="pre">/v1/models</span></code> bypass the cap.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_MAX_BODY_MB</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_MAX_BODY_MB</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">128</span></code></p></td>
 <td><p>Request body limit (multipart uploads included).</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_TOKENIZE_PARALLEL</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_TOKENIZE_PARALLEL</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">1</span></code></p></td>
 <td><p>When a long prompt is encoded as parallel chunks, set
 <code class="docutils literal notranslate"><span class="pre">TOKENIZERS_PARALLELISM=true</span></code> for the process first: the Rust
@@ -1239,7 +1249,7 @@ tokenizer only uses its thread pool while that variable reads true,
 and serving environments often export it false. <code class="docutils literal notranslate"><span class="pre">0</span></code> leaves the
 variable as it is (the chunked encode then runs serially).</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_OPENAI_ADAPTER</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_OPENAI_ADAPTER</span></code></p></td>
 <td><p>set by the launcher</p></td>
 <td><p>The class name of the model’s adapter in <code class="docutils literal notranslate"><span class="pre">ADAPTER_REGISTRY</span></code>
 (<code class="docutils literal notranslate"><span class="pre">openai_adapter_class</span></code> in <code class="docutils literal notranslate"><span class="pre">mstar/api_server/rust_frontend.py</span></code>), which
@@ -1247,7 +1257,7 @@ picks the OpenAI translation <code class="docutils literal notranslate"><span cl
 (<code class="docutils literal notranslate"><span class="pre">adapters::from_python</span></code>, which looks it up in <code class="docutils literal notranslate"><span class="pre">ADAPTERS</span></code>). <code class="docutils literal notranslate"><span class="pre">mstar-serve</span> <span class="pre">--rust-frontend</span></code> always sets it;
 a <code class="docutils literal notranslate"><span class="pre">mstar-server</span></code> started by hand without it answers 404 on <code class="docutils literal notranslate"><span class="pre">/v1/*</span></code>.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_TOKENIZER</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_TOKENIZER</span></code></p></td>
 <td><p>unset</p></td>
 <td><p>Path to a HuggingFace <code class="docutils literal notranslate"><span class="pre">tokenizer.json</span></code> enabling frontend
 tokenization. Leave unset with the Python backend — its preprocess
@@ -1262,16 +1272,6 @@ ingest.</p></td>
 <p>The Rust frontend serves no <code class="docutils literal notranslate"><span class="pre">/generate/ws</span></code>, so a model’s live client input
 (appends to a running request, see <a class="reference internal" href="clients.html"><span class="doc">Using a Server</span></a>) needs the Python frontend;
 over <code class="docutils literal notranslate"><span class="pre">/generate</span></code> such a model’s input ends when the request is submitted.</p>
-<p>It also carries no media muxer (the Python frontend uses <code class="docutils literal notranslate"><span class="pre">ffmpeg</span></code>), so one
-surface degrades:</p>
-<ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">/v1/videos/generations</span></code> (Cosmos3) returns the <strong>video-only</strong> mp4. When a
-request sets <code class="docutils literal notranslate"><span class="pre">generate_sound</span></code>, Cosmos3 generates a separate audio track that
-mstar muxes into the mp4 as an AAC track; the Rust frontend cannot mux it, so
-the audio is dropped and a warning is logged. Do not set <code class="docutils literal notranslate"><span class="pre">generate_sound</span></code> on
-the Rust frontend (it spends compute on a track the client won’t receive), or
-run the Python frontend for sound video.</p></li>
-</ul>
 </section>
 </section>
 <section id="request-media">
@@ -1496,7 +1496,9 @@ that holds its rows, so the ladder bounds both the rows per step and
 the graph memory; narrow it (for example
 <code class="docutils literal notranslate"><span class="pre">1,2,4,8,16,32</span></code>) on a memory-tight GPU or for an A/B against the
 former ladder. <code class="docutils literal notranslate"><span class="pre">MSTAR_QWEN35_DECODE_BUCKETS</span></code> overrides it for
-Qwen3.5 alone.</p></td>
+Qwen3.5 alone; Canary, Canary-Qwen, Qwen3-ASR, Orpheus, Higgs-Audio
+and Command A+ pin their own, so it reaches Qwen3.5, Glimmer and the
+Cosmos3 reasoner (which defaults to <code class="docutils literal notranslate"><span class="pre">1,2,4,8,16,24,32,48,64</span></code>).</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_LAZY_PUBLISH</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">1</span></code></p></td>
@@ -1589,9 +1591,11 @@ the sampler writes each request’s last token to a slot-addressed
 master and the next step reads its input ids from it, so the worker
 routes the signal with no tensor (no per-request store, hold or
 cleanup per step). Only nodes that declare the read
-(<code class="docutils literal notranslate"><span class="pre">DeviceLoopback</span></code>: the decode walks of Qwen3.5, Higgs Audio, Qwen3-ASR and
-Whisper, which also keeps its timestamp rule state in the sampler’s
-declared loop-back state) and only when the sampler has graph
+(<code class="docutils literal notranslate"><span class="pre">DeviceLoopback</span></code>: the decode walks of Qwen3.5, Glimmer, Higgs Audio,
+Qwen3-ASR, the Cosmos3 reasoner, Qwen3-Omni’s text-only Thinker and Whisper, which also keeps its timestamp rule state in
+the sampler’s declared loop-back state; the other
+<code class="docutils literal notranslate"><span class="pre">SampledTokenDecoder</span></code> nodes turn it off with
+<code class="docutils literal notranslate"><span class="pre">device_loopback</span> <span class="pre">=</span> <span class="pre">None</span></code>) and only when the sampler has graph
 buffers; the sampler keeps the masters for those nodes alone, so a
 node that takes its tokens on the host does not pay the eager-step
 master write. <code class="docutils literal notranslate"><span class="pre">0</span></code> keeps every node on the per-request tensor path.</p></td>
@@ -1617,9 +1621,9 @@ once for <code class="docutils literal notranslate"><span class="pre">MSTAR_SAMP
 when the runner admits it (<code class="docutils literal notranslate"><span class="pre">SamplerResource.reserve</span></code>): past them it
 waits, as for a recurrent state slot, until a removed request frees
 one. Only for a node that reads its tokens back on the device
-(Qwen3.5, Qwen3-ASR, Whisper) with the device loop-back on, on one
-rank: above one, where admission doesn’t decide, the masters grow and
-the scatter runs after the replay, as with <code class="docutils literal notranslate"><span class="pre">0</span></code>.</p></td>
+(Qwen3.5, Qwen3-ASR, Whisper, the Cosmos3 reasoner) with the device
+loop-back on, on one rank: above one, where admission doesn’t decide,
+the masters grow and the scatter runs after the replay, as with <code class="docutils literal notranslate"><span class="pre">0</span></code>.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MSTAR_SAMPLER_SLOTS</span></code></p></td>
 <td><p>config’s <code class="docutils literal notranslate"><span class="pre">knobs:</span> <span class="pre">sampler_slots</span></code>, else <code class="docutils literal notranslate"><span class="pre">4096</span></code></p></td>
@@ -1834,7 +1838,7 @@ By M* Team
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Nov 09, 2026.
+  Last updated on Nov 10, 2026.
   <br/>
 </p>
   </div>

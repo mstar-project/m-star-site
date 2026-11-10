@@ -55,7 +55,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="0.2.1" />
-    <meta name="docbuild:last-update" content="Nov 09, 2026"/>
+    <meta name="docbuild:last-update" content="Nov 10, 2026"/>
   
     
     <script src="_static/searchtools.js"></script>
@@ -492,6 +492,7 @@
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.rebuild.html">mstar.worker.rebuild</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.rid_table.html">mstar.worker.rid_table</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.scheduled_batch.html">mstar.worker.scheduled_batch</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.scheduling_policy.html">mstar.worker.scheduling_policy</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.spec_rows.html">mstar.worker.spec_rows</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.stream_buffers.html">mstar.worker.stream_buffers</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.worker_metrics.html">mstar.worker.worker_metrics</a></li>
@@ -1012,6 +1013,12 @@ other version they fall back to FlashInfer’s own <code class="docutils literal
 (see <a class="reference internal" href="#flash-attn-lingbot-world">flash-attn (LingBot-World)</a>).</p></li>
 <li><p><strong>flash-attn-4</strong> — Waypoint’s flex-attention <code class="docutils literal notranslate"><span class="pre">FLASH</span></code> backend. <strong>Not installed by any
 extra</strong>; install it separately (see <a class="reference internal" href="#flash-attn-4-waypoint-fa3-sm90-kernel">flash-attn-4 (Waypoint, FA3 sm90 kernel)</a>).</p></li>
+<li><p><strong>fa3-fwd</strong> — FlashAttention-3 forward, the <code class="docutils literal notranslate"><span class="pre">dense</span></code> attention backend (Cosmos3’s dense
+passes, its reasoner’s vision tower). The wheel is built against one CUDA major: 0.0.2 for a
+CUDA 12 torch (<code class="docutils literal notranslate"><span class="pre">+cu12x</span></code>), 0.0.3 for CUDA 13 (<code class="docutils literal notranslate"><span class="pre">+cu130</span></code>). The extras take the latest, so next
+to a CUDA 12 torch install <code class="docutils literal notranslate"><span class="pre">fa3-fwd==0.0.2</span></code>. A mismatched wheel fails to import, and every
+<code class="docutils literal notranslate"><span class="pre">dense</span></code> attention then runs on FlashInfer with a warning at startup; check with
+<code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-c</span> <span class="pre">&quot;import</span> <span class="pre">fa3_fwd_interface&quot;</span></code>.</p></li>
 <li><p><strong>mooncake-transfer-engine</strong> (0.3.13.post1 or newer) — RDMA tensor transport for
 multi-GPU, disaggregated deployments. Single-node deployments can use shared-memory
 (<code class="docutils literal notranslate"><span class="pre">SHM</span></code>) or <code class="docutils literal notranslate"><span class="pre">TCP</span></code> transport instead (see <a class="reference internal" href="serving.html"><span class="doc">Serving</span></a>, which also covers the network
@@ -1302,9 +1309,9 @@ sources a build was made from.</p>
 <p>The OpenAI routes take the model’s adapter from the same registry as the Python
 frontend (<code class="docutils literal notranslate"><span class="pre">ADAPTER_REGISTRY</span></code> in <code class="docutils literal notranslate"><span class="pre">mstar/api_server/openai/adapters.py</span></code>):
 <code class="docutils literal notranslate"><span class="pre">mstar-server</span></code> ports adapter classes, not model names, so every model of a
-ported class is served. Chat, speech and images are served for every model the
-Python frontend serves them for. The Wan2.2 and LTX-2.5 video adapters, and the
-transcription and realtime routes, are not ported yet (<code class="docutils literal notranslate"><span class="pre">NOT_PORTED</span></code> in
+ported class is served. Chat, speech, images and videos are served for every
+model the Python frontend serves them for. The transcription and realtime
+routes are not ported yet (<code class="docutils literal notranslate"><span class="pre">NOT_PORTED</span></code> in
 <code class="docutils literal notranslate"><span class="pre">test/rust/test_rust_openai_adapters.py</span></code>); there <code class="docutils literal notranslate"><span class="pre">mstar-server</span></code> answers 404,
 logs a warning at startup, and <code class="docutils literal notranslate"><span class="pre">/generate</span></code> still works.</p>
 </section>
@@ -1455,7 +1462,7 @@ By M* Team
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Nov 09, 2026.
+  Last updated on Nov 10, 2026.
   <br/>
 </p>
   </div>

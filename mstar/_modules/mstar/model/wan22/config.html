@@ -410,7 +410,7 @@ window.runMermaid = runMermaid;</script>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="0.2.1" />
-    <meta name="docbuild:last-update" content="Nov 09, 2026"/>
+    <meta name="docbuild:last-update" content="Nov 10, 2026"/>
   
     
     <script src="../../../../_static/searchtools.js"></script>
@@ -845,6 +845,7 @@ window.runMermaid = runMermaid;</script>
 <li class="toctree-l3"><a class="reference internal" href="../../../../_autosummary/mstar.worker.rebuild.html">mstar.worker.rebuild</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../_autosummary/mstar.worker.rid_table.html">mstar.worker.rid_table</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../_autosummary/mstar.worker.scheduled_batch.html">mstar.worker.scheduled_batch</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../_autosummary/mstar.worker.scheduling_policy.html">mstar.worker.scheduling_policy</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../_autosummary/mstar.worker.spec_rows.html">mstar.worker.spec_rows</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../_autosummary/mstar.worker.stream_buffers.html">mstar.worker.stream_buffers</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../_autosummary/mstar.worker.worker_metrics.html">mstar.worker.worker_metrics</a></li>
@@ -1060,7 +1061,6 @@ window.runMermaid = runMermaid;</script>
     <span class="n">text_max_seq_len</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">512</span>
 
     <span class="c1"># Wan2.2-VAE (vae/config.json)</span>
-    <span class="n">vae_z_dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">48</span>
     <span class="n">vae_scale_factor_spatial</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">16</span>  <span class="c1"># pixels per latent cell (H and W)</span>
     <span class="n">vae_scale_factor_temporal</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span>  <span class="c1"># frames per latent frame</span>
 
@@ -1080,7 +1080,7 @@ window.runMermaid = runMermaid;</script>
     <span class="n">default_negative_prompt</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span>
     <span class="n">video_fps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">24</span>
 
-    <span class="c1"># Ceiling on the denoise loop; the per-request step count is clamped to it.</span>
+    <span class="c1"># The denoise loop's max_iters; the conductor refuses a num_inference_steps past it.</span>
     <span class="n">max_denoise_steps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span>
 
     <span class="c1"># Ceiling on a request's height x width x num_frames (about 3.6x the default</span>
@@ -1256,7 +1256,7 @@ By M* Team
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Nov 09, 2026.
+  Last updated on Nov 10, 2026.
   <br/>
 </p>
   </div>

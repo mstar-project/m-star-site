@@ -55,7 +55,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="0.2.1" />
-    <meta name="docbuild:last-update" content="Nov 09, 2026"/>
+    <meta name="docbuild:last-update" content="Nov 10, 2026"/>
   
     
     <script src="../_static/searchtools.js"></script>
@@ -492,6 +492,7 @@
 <li class="toctree-l3"><a class="reference internal" href="mstar.worker.rebuild.html">mstar.worker.rebuild</a></li>
 <li class="toctree-l3"><a class="reference internal" href="mstar.worker.rid_table.html">mstar.worker.rid_table</a></li>
 <li class="toctree-l3"><a class="reference internal" href="mstar.worker.scheduled_batch.html">mstar.worker.scheduled_batch</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mstar.worker.scheduling_policy.html">mstar.worker.scheduling_policy</a></li>
 <li class="toctree-l3"><a class="reference internal" href="mstar.worker.spec_rows.html">mstar.worker.spec_rows</a></li>
 <li class="toctree-l3"><a class="reference internal" href="mstar.worker.stream_buffers.html">mstar.worker.stream_buffers</a></li>
 <li class="toctree-l3"><a class="reference internal" href="mstar.worker.worker_metrics.html">mstar.worker.worker_metrics</a></li>
@@ -1123,10 +1124,12 @@ will run for that rid and its output discarded — the standard
 <p><code class="docutils literal notranslate"><span class="pre">END_PARTITION</span></code> ends the request’s partition after this pass, so
 the conductor starts no further walk: e.g. a prefill whose sampled
 token is a stop token, before its decode loop exists. Return it only
-from a row outside any loop: from inside one, the request fails with
-an internal error. Use it only when nothing else must run for the
-partition (a later walk, a loop’s final-only publication); the
-model’s transition still decides those.</p>
+from a row outside any loop, a chunked prefill’s included (its chunk
+Loop ends on the final chunk’s pass, and a row mid-prefill decides no
+stop): from inside another loop, the request fails with an internal
+error. Use it only when nothing else must run for the
+partition (a later step of its walk plan, a loop’s final-only
+publication): it ends the partition whatever the plan has left.</p>
 <p>A <code class="docutils literal notranslate"><span class="pre">StopCheck</span></code> also names outputs of this step that are not routed
 (<code class="docutils literal notranslate"><span class="pre">StopCheck.withheld</span></code>), decided off the same read; it may withhold
 without stopping.</p>
@@ -2150,10 +2153,12 @@ will run for that rid and its output discarded — the standard
 <p><code class="docutils literal notranslate"><span class="pre">END_PARTITION</span></code> ends the request’s partition after this pass, so
 the conductor starts no further walk: e.g. a prefill whose sampled
 token is a stop token, before its decode loop exists. Return it only
-from a row outside any loop: from inside one, the request fails with
-an internal error. Use it only when nothing else must run for the
-partition (a later walk, a loop’s final-only publication); the
-model’s transition still decides those.</p>
+from a row outside any loop, a chunked prefill’s included (its chunk
+Loop ends on the final chunk’s pass, and a row mid-prefill decides no
+stop): from inside another loop, the request fails with an internal
+error. Use it only when nothing else must run for the
+partition (a later step of its walk plan, a loop’s final-only
+publication): it ends the partition whatever the plan has left.</p>
 <p>A <code class="docutils literal notranslate"><span class="pre">StopCheck</span></code> also names outputs of this step that are not routed
 (<code class="docutils literal notranslate"><span class="pre">StopCheck.withheld</span></code>), decided off the same read; it may withhold
 without stopping.</p>
@@ -3667,7 +3672,7 @@ By M* Team
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Nov 09, 2026.
+  Last updated on Nov 10, 2026.
   <br/>
 </p>
   </div>

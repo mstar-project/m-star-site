@@ -55,7 +55,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="0.2.1" />
-    <meta name="docbuild:last-update" content="Nov 09, 2026"/>
+    <meta name="docbuild:last-update" content="Nov 10, 2026"/>
   
     
     <script src="_static/searchtools.js"></script>
@@ -492,6 +492,7 @@
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.rebuild.html">mstar.worker.rebuild</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.rid_table.html">mstar.worker.rid_table</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.scheduled_batch.html">mstar.worker.scheduled_batch</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.scheduling_policy.html">mstar.worker.scheduling_policy</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.spec_rows.html">mstar.worker.spec_rows</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.stream_buffers.html">mstar.worker.stream_buffers</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.worker_metrics.html">mstar.worker.worker_metrics</a></li>
@@ -769,11 +770,13 @@ decoder, and samples the first transcript token.</p>
 sampling restricted to the language tokens; <code class="docutils literal notranslate"><span class="pre">prefill_prompt</span></code> then
 appends <code class="docutils literal notranslate"><span class="pre">&lt;|task|&gt;[&lt;|notimestamps|&gt;]</span></code> after the detected token.</p>
 </dd>
-<dt><code class="docutils literal notranslate"><span class="pre">decode</span></code></dt><dd><p>a dynamic loop, one token per step, until <code class="docutils literal notranslate"><span class="pre">&lt;|endoftext|&gt;</span></code> or the
-448-position table is full. The Whisper timestamp rules (first token a
-timestamp, timestamps in monotonic pairs, timestamp-vs-text
-log-probability test) are applied inside the captured forward from a
-four-integer state that travels with the token, so the worker’s
+<dt><code class="docutils literal notranslate"><span class="pre">decode</span></code></dt><dd><p>a dynamic loop, one token per step, until <code class="docutils literal notranslate"><span class="pre">&lt;|endoftext|&gt;</span></code>, the
+request’s <code class="docutils literal notranslate"><span class="pre">max_tokens</span></code> or the end of the 448-position table.
+<code class="docutils literal notranslate"><span class="pre">max_tokens</span></code> counts the prompt walk’s token, so a budget of one, or an
+<code class="docutils literal notranslate"><span class="pre">&lt;|endoftext|&gt;</span></code> sampled there, runs no decode step. The Whisper
+timestamp rules (first token a timestamp, timestamps in monotonic pairs,
+timestamp-vs-text log-probability test) are applied inside the captured
+forward from a four-integer state that travels with the token, so the worker’s
 speculative next-step launch never sees a stale history.</p>
 </dd>
 <dt><code class="docutils literal notranslate"><span class="pre">align</span></code></dt><dd><p>only when word timestamps were asked for: one teacher-forced pass over
@@ -1001,7 +1004,7 @@ By M* Team
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Nov 09, 2026.
+  Last updated on Nov 10, 2026.
   <br/>
 </p>
   </div>

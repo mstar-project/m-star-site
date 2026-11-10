@@ -55,7 +55,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="0.2.1" />
-    <meta name="docbuild:last-update" content="Nov 09, 2026"/>
+    <meta name="docbuild:last-update" content="Nov 10, 2026"/>
   
     
     <script src="../_static/searchtools.js"></script>
@@ -492,6 +492,7 @@
 <li class="toctree-l3"><a class="reference internal" href="mstar.worker.rebuild.html">mstar.worker.rebuild</a></li>
 <li class="toctree-l3"><a class="reference internal" href="mstar.worker.rid_table.html">mstar.worker.rid_table</a></li>
 <li class="toctree-l3"><a class="reference internal" href="mstar.worker.scheduled_batch.html">mstar.worker.scheduled_batch</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mstar.worker.scheduling_policy.html">mstar.worker.scheduling_policy</a></li>
 <li class="toctree-l3"><a class="reference internal" href="mstar.worker.spec_rows.html">mstar.worker.spec_rows</a></li>
 <li class="toctree-l3"><a class="reference internal" href="mstar.worker.stream_buffers.html">mstar.worker.stream_buffers</a></li>
 <li class="toctree-l3"><a class="reference internal" href="mstar.worker.worker_metrics.html">mstar.worker.worker_metrics</a></li>
@@ -748,6 +749,7 @@
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.model.command_a_plus.config.CommandAPlusTextConfig.rope_theta"><code class="docutils literal notranslate"><span class="pre">CommandAPlusTextConfig.rope_theta</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.model.command_a_plus.config.CommandAPlusTextConfig.shared_intermediate_size"><code class="docutils literal notranslate"><span class="pre">CommandAPlusTextConfig.shared_intermediate_size</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.model.command_a_plus.config.CommandAPlusTextConfig.sliding_window"><code class="docutils literal notranslate"><span class="pre">CommandAPlusTextConfig.sliding_window</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.model.command_a_plus.config.CommandAPlusTextConfig.stop_token_ids"><code class="docutils literal notranslate"><span class="pre">CommandAPlusTextConfig.stop_token_ids</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.model.command_a_plus.config.CommandAPlusTextConfig.vocab_size"><code class="docutils literal notranslate"><span class="pre">CommandAPlusTextConfig.vocab_size</span></code></a></li>
 </ul>
 </li>
@@ -985,6 +987,11 @@
 <span class="sig-name descname"><span class="pre">sliding_window</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.12/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span><a class="headerlink" href="#mstar.model.command_a_plus.config.CommandAPlusTextConfig.sliding_window" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
+<dl class="py property">
+<dt class="sig sig-object py" id="mstar.model.command_a_plus.config.CommandAPlusTextConfig.stop_token_ids">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">stop_token_ids</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#frozenset" title="(in Python v3.12)"><span class="pre">frozenset</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.12/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#mstar.model.command_a_plus.config.CommandAPlusTextConfig.stop_token_ids" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
 <dl class="py attribute">
 <dt class="sig sig-object py" id="mstar.model.command_a_plus.config.CommandAPlusTextConfig.vocab_size">
 <span class="sig-name descname"><span class="pre">vocab_size</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.12/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span><a class="headerlink" href="#mstar.model.command_a_plus.config.CommandAPlusTextConfig.vocab_size" title="Link to this definition">#</a></dt>
@@ -1161,6 +1168,7 @@
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.model.command_a_plus.config.CommandAPlusTextConfig.rope_theta"><code class="docutils literal notranslate"><span class="pre">CommandAPlusTextConfig.rope_theta</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.model.command_a_plus.config.CommandAPlusTextConfig.shared_intermediate_size"><code class="docutils literal notranslate"><span class="pre">CommandAPlusTextConfig.shared_intermediate_size</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.model.command_a_plus.config.CommandAPlusTextConfig.sliding_window"><code class="docutils literal notranslate"><span class="pre">CommandAPlusTextConfig.sliding_window</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.model.command_a_plus.config.CommandAPlusTextConfig.stop_token_ids"><code class="docutils literal notranslate"><span class="pre">CommandAPlusTextConfig.stop_token_ids</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.model.command_a_plus.config.CommandAPlusTextConfig.vocab_size"><code class="docutils literal notranslate"><span class="pre">CommandAPlusTextConfig.vocab_size</span></code></a></li>
 </ul>
 </li>
@@ -1212,7 +1220,7 @@ By M* Team
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Nov 09, 2026.
+  Last updated on Nov 10, 2026.
   <br/>
 </p>
   </div>

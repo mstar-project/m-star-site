@@ -410,7 +410,7 @@ window.runMermaid = runMermaid;</script>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="0.2.1" />
-    <meta name="docbuild:last-update" content="Nov 09, 2026"/>
+    <meta name="docbuild:last-update" content="Nov 10, 2026"/>
   
     
     <script src="../../../_static/searchtools.js"></script>
@@ -845,6 +845,7 @@ window.runMermaid = runMermaid;</script>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.worker.rebuild.html">mstar.worker.rebuild</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.worker.rid_table.html">mstar.worker.rid_table</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.worker.scheduled_batch.html">mstar.worker.scheduled_batch</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.worker.scheduling_policy.html">mstar.worker.scheduling_policy</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.worker.spec_rows.html">mstar.worker.spec_rows</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.worker.stream_buffers.html">mstar.worker.stream_buffers</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.worker.worker_metrics.html">mstar.worker.worker_metrics</a></li>
@@ -1515,6 +1516,44 @@ window.runMermaid = runMermaid;</script>
 
 
 
+<div class="viewcode-block" id="SentencePieceDetokenizer">
+<a class="viewcode-back" href="../../../_autosummary/mstar.model.utils.html#mstar.model.utils.SentencePieceDetokenizer">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SentencePieceDetokenizer</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Per-token detokenization for SentencePiece-style vocabularies (``▁``</span>
+<span class="sd">    marks a word start, ``&lt;0xNN&gt;`` pieces are byte fallback), read from an HF</span>
+<span class="sd">    ``tokenizer.json``. Same contract as :class:`ByteLevelDetokenizer`: bytes</span>
+<span class="sd">    per token, so a character split across byte pieces reassembles client-side.</span>
+<span class="sd">    """</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tokenizer_json</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">extra_skip_ids</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">()):</span>
+        <span class="n">vocab</span> <span class="o">=</span> <span class="n">tokenizer_json</span><span class="p">[</span><span class="s2">"model"</span><span class="p">][</span><span class="s2">"vocab"</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">vocab</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>  <span class="c1"># Unigram: [piece, score] pairs</span>
+            <span class="n">vocab</span> <span class="o">=</span> <span class="p">{</span><span class="n">piece</span><span class="p">:</span> <span class="n">idx</span> <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="p">(</span><span class="n">piece</span><span class="p">,</span> <span class="n">_</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">vocab</span><span class="p">)}</span>
+        <span class="n">vocab</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">vocab</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">added</span> <span class="ow">in</span> <span class="n">tokenizer_json</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"added_tokens"</span><span class="p">,</span> <span class="p">[]):</span>
+            <span class="n">vocab</span><span class="p">[</span><span class="n">added</span><span class="p">[</span><span class="s2">"content"</span><span class="p">]]</span> <span class="o">=</span> <span class="n">added</span><span class="p">[</span><span class="s2">"id"</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pieces</span> <span class="o">=</span> <span class="p">{</span><span class="n">idx</span><span class="p">:</span> <span class="n">piece</span> <span class="k">for</span> <span class="n">piece</span><span class="p">,</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">vocab</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">skip_ids</span> <span class="o">=</span> <span class="p">{</span><span class="n">a</span><span class="p">[</span><span class="s2">"id"</span><span class="p">]</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">tokenizer_json</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"added_tokens"</span><span class="p">,</span> <span class="p">[])</span> <span class="k">if</span> <span class="n">a</span><span class="p">[</span><span class="s2">"special"</span><span class="p">]}</span> <span class="o">|</span> <span class="nb">set</span><span class="p">(</span><span class="n">extra_skip_ids</span><span class="p">)</span>
+
+<div class="viewcode-block" id="SentencePieceDetokenizer.token_bytes">
+<a class="viewcode-back" href="../../../_autosummary/mstar.model.utils.html#mstar.model.utils.SentencePieceDetokenizer.token_bytes">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">token_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">token_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
+        <span class="n">piece</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pieces</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">token_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">piece</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">token_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">skip_ids</span><span class="p">:</span>
+            <span class="k">return</span> <span class="sa">b</span><span class="s2">""</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">piece</span><span class="p">)</span> <span class="o">==</span> <span class="mi">6</span> <span class="ow">and</span> <span class="n">piece</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"&lt;0x"</span><span class="p">)</span> <span class="ow">and</span> <span class="n">piece</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">"&gt;"</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">bytes</span><span class="p">([</span><span class="nb">int</span><span class="p">(</span><span class="n">piece</span><span class="p">[</span><span class="mi">3</span><span class="p">:</span><span class="mi">5</span><span class="p">],</span> <span class="mi">16</span><span class="p">)])</span>
+        <span class="k">return</span> <span class="n">piece</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"▁"</span><span class="p">,</span> <span class="s2">" "</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">"utf-8"</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SentencePieceDetokenizer.to_bytes">
+<a class="viewcode-back" href="../../../_autosummary/mstar.model.utils.html#mstar.model.utils.SentencePieceDetokenizer.to_bytes">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">token_ids</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">b</span><span class="s2">""</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">token_bytes</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">token_ids</span><span class="p">)</span></div>
+</div>
+
+
+
 <div class="viewcode-block" id="TextOutput">
 <a class="viewcode-back" href="../../../_autosummary/mstar.model.utils.html#mstar.model.utils.TextOutput">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">TextOutput</span><span class="p">(</span><span class="n">NamedTuple</span><span class="p">):</span>
@@ -1522,7 +1561,7 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">    declares it, and ``Model.postprocess`` and ``Model.postprocess_inline``</span>
 <span class="sd">    derive their text paths from it."""</span>
 
-    <span class="n">detokenizer</span><span class="p">:</span> <span class="n">ByteLevelDetokenizer</span> <span class="o">|</span> <span class="n">TextChunkDetokenizer</span>
+    <span class="n">detokenizer</span><span class="p">:</span> <span class="n">ByteLevelDetokenizer</span> <span class="o">|</span> <span class="n">TextChunkDetokenizer</span> <span class="o">|</span> <span class="n">SentencePieceDetokenizer</span>
     <span class="c1"># ids that end a reply, dropped unless the request sets ``ignore_eos``</span>
     <span class="n">stop_token_ids</span><span class="p">:</span> <span class="n">Container</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">()</span></div>
 
@@ -1561,6 +1600,7 @@ window.runMermaid = runMermaid;</script>
 <a class="viewcode-back" href="../../../_autosummary/mstar.model.utils.html#mstar.model.utils.load_generation_defaults">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">load_generation_defaults</span><span class="p">(</span>
     <span class="n">checkpoint_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span> <span class="n">stage</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
+    <span class="n">switch_only</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""The sampling defaults ``checkpoint_dir/generation_config.json`` declares.</span>
 
@@ -1568,6 +1608,8 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">    ``prefix`` selects one stage's keys in a multi-stage file (``"talker_"`` reads</span>
 <span class="sd">    ``talker_temperature``) and ``stage`` prefixes the returned names</span>
 <span class="sd">    (``"code_predictor_"``). ``do_sample: false`` is greedy: temperature 0.</span>
+<span class="sd">    ``switch_only`` reads ``do_sample`` alone, for a file that is the backbone's</span>
+<span class="sd">    chat preset rather than the model's own recipe.</span>
 <span class="sd">    Returns ``{}`` when there is no file, so the caller's own defaults apply.</span>
 <span class="sd">    """</span>
     <span class="k">if</span> <span class="n">checkpoint_dir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -1581,7 +1623,7 @@ window.runMermaid = runMermaid;</script>
         <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">"Unreadable </span><span class="si">%s</span><span class="s2">; using the model's own defaults"</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">{}</span>
     <span class="n">out</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="k">for</span> <span class="n">hf_key</span><span class="p">,</span> <span class="n">knob</span> <span class="ow">in</span> <span class="n">_KNOBS</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="k">for</span> <span class="n">hf_key</span><span class="p">,</span> <span class="n">knob</span> <span class="ow">in</span> <span class="p">({}</span> <span class="k">if</span> <span class="n">switch_only</span> <span class="k">else</span> <span class="n">_KNOBS</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="n">value</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="n">hf_key</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">out</span><span class="p">[</span><span class="n">stage</span> <span class="o">+</span> <span class="n">knob</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
@@ -1791,44 +1833,6 @@ window.runMermaid = runMermaid;</script>
                 <span class="s2">"max_concurrent_requests"</span>
             <span class="p">)</span></div>
 
-
-
-<div class="viewcode-block" id="SentencePieceDetokenizer">
-<a class="viewcode-back" href="../../../_autosummary/mstar.model.utils.html#mstar.model.utils.SentencePieceDetokenizer">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">SentencePieceDetokenizer</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">"""Per-token detokenization for SentencePiece-style vocabularies (``▁``</span>
-<span class="sd">    marks a word start, ``&lt;0xNN&gt;`` pieces are byte fallback), read from an HF</span>
-<span class="sd">    ``tokenizer.json``. Same contract as :class:`ByteLevelDetokenizer`: bytes</span>
-<span class="sd">    per token, so a character split across byte pieces reassembles client-side.</span>
-<span class="sd">    """</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tokenizer_json</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">extra_skip_ids</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">()):</span>
-        <span class="n">vocab</span> <span class="o">=</span> <span class="n">tokenizer_json</span><span class="p">[</span><span class="s2">"model"</span><span class="p">][</span><span class="s2">"vocab"</span><span class="p">]</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">vocab</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>  <span class="c1"># Unigram: [piece, score] pairs</span>
-            <span class="n">vocab</span> <span class="o">=</span> <span class="p">{</span><span class="n">piece</span><span class="p">:</span> <span class="n">idx</span> <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="p">(</span><span class="n">piece</span><span class="p">,</span> <span class="n">_</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">vocab</span><span class="p">)}</span>
-        <span class="n">vocab</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">vocab</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">added</span> <span class="ow">in</span> <span class="n">tokenizer_json</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"added_tokens"</span><span class="p">,</span> <span class="p">[]):</span>
-            <span class="n">vocab</span><span class="p">[</span><span class="n">added</span><span class="p">[</span><span class="s2">"content"</span><span class="p">]]</span> <span class="o">=</span> <span class="n">added</span><span class="p">[</span><span class="s2">"id"</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">pieces</span> <span class="o">=</span> <span class="p">{</span><span class="n">idx</span><span class="p">:</span> <span class="n">piece</span> <span class="k">for</span> <span class="n">piece</span><span class="p">,</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">vocab</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">skip_ids</span> <span class="o">=</span> <span class="p">{</span><span class="n">a</span><span class="p">[</span><span class="s2">"id"</span><span class="p">]</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">tokenizer_json</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"added_tokens"</span><span class="p">,</span> <span class="p">[])</span> <span class="k">if</span> <span class="n">a</span><span class="p">[</span><span class="s2">"special"</span><span class="p">]}</span> <span class="o">|</span> <span class="nb">set</span><span class="p">(</span><span class="n">extra_skip_ids</span><span class="p">)</span>
-
-<div class="viewcode-block" id="SentencePieceDetokenizer.piece_bytes">
-<a class="viewcode-back" href="../../../_autosummary/mstar.model.utils.html#mstar.model.utils.SentencePieceDetokenizer.piece_bytes">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">piece_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">token_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
-        <span class="n">piece</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pieces</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">token_id</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">piece</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">token_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">skip_ids</span><span class="p">:</span>
-            <span class="k">return</span> <span class="sa">b</span><span class="s2">""</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">piece</span><span class="p">)</span> <span class="o">==</span> <span class="mi">6</span> <span class="ow">and</span> <span class="n">piece</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"&lt;0x"</span><span class="p">)</span> <span class="ow">and</span> <span class="n">piece</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">"&gt;"</span><span class="p">):</span>
-            <span class="k">return</span> <span class="nb">bytes</span><span class="p">([</span><span class="nb">int</span><span class="p">(</span><span class="n">piece</span><span class="p">[</span><span class="mi">3</span><span class="p">:</span><span class="mi">5</span><span class="p">],</span> <span class="mi">16</span><span class="p">)])</span>
-        <span class="k">return</span> <span class="n">piece</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"▁"</span><span class="p">,</span> <span class="s2">" "</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">"utf-8"</span><span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="SentencePieceDetokenizer.to_bytes">
-<a class="viewcode-back" href="../../../_autosummary/mstar.model.utils.html#mstar.model.utils.SentencePieceDetokenizer.to_bytes">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">to_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">token_ids</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
-        <span class="k">return</span> <span class="sa">b</span><span class="s2">""</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">piece_bytes</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">token_ids</span><span class="p">)</span></div>
-</div>
-
 </pre></div>
 
                 </article>
@@ -1876,7 +1880,7 @@ By M* Team
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Nov 09, 2026.
+  Last updated on Nov 10, 2026.
   <br/>
 </p>
   </div>

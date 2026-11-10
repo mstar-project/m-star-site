@@ -19,23 +19,23 @@ mstar.model.multimodal
       check_plan
       expand_media_pads
       find_media_spans
-      initial_prefill_args
       media_encoders
       media_grids
       media_layout
       media_prefill_step
+      media_rows_between
       media_walk_name
       media_walk_names
       media_walks
       messages_from_parts
-      next_prefill_args
       parts_from_modalities
       prefill_plan
+      span_name
       splice_media
       split_around_spans
+      split_spans
       text_combined_walks
       vision_encoder
-      walk_input_edges
    
    
 
@@ -48,7 +48,6 @@ mstar.model.multimodal
       MediaEncoder
       MediaPads
       MediaSpan
-      PrefillStep
       PromptPart
       Turn
    

@@ -410,7 +410,7 @@ window.runMermaid = runMermaid;</script>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="0.2.1" />
-    <meta name="docbuild:last-update" content="Nov 09, 2026"/>
+    <meta name="docbuild:last-update" content="Nov 10, 2026"/>
   
     
     <script src="../../../_static/searchtools.js"></script>
@@ -845,6 +845,7 @@ window.runMermaid = runMermaid;</script>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.worker.rebuild.html">mstar.worker.rebuild</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.worker.rid_table.html">mstar.worker.rid_table</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.worker.scheduled_batch.html">mstar.worker.scheduled_batch</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.worker.scheduling_policy.html">mstar.worker.scheduling_policy</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.worker.spec_rows.html">mstar.worker.spec_rows</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.worker.stream_buffers.html">mstar.worker.stream_buffers</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/mstar.worker.worker_metrics.html">mstar.worker.worker_metrics</a></li>
@@ -2691,10 +2692,12 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">        ``END_PARTITION`` ends the request's partition after this pass, so</span>
 <span class="sd">        the conductor starts no further walk: e.g. a prefill whose sampled</span>
 <span class="sd">        token is a stop token, before its decode loop exists. Return it only</span>
-<span class="sd">        from a row outside any loop: from inside one, the request fails with</span>
-<span class="sd">        an internal error. Use it only when nothing else must run for the</span>
-<span class="sd">        partition (a later walk, a loop's final-only publication); the</span>
-<span class="sd">        model's transition still decides those.</span>
+<span class="sd">        from a row outside any loop, a chunked prefill's included (its chunk</span>
+<span class="sd">        Loop ends on the final chunk's pass, and a row mid-prefill decides no</span>
+<span class="sd">        stop): from inside another loop, the request fails with an internal</span>
+<span class="sd">        error. Use it only when nothing else must run for the</span>
+<span class="sd">        partition (a later step of its walk plan, a loop's final-only</span>
+<span class="sd">        publication): it ends the partition whatever the plan has left.</span>
 
 <span class="sd">        A ``StopCheck`` also names outputs of this step that are not routed</span>
 <span class="sd">        (``StopCheck.withheld``), decided off the same read; it may withhold</span>
@@ -3084,7 +3087,7 @@ By M* Team
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Nov 09, 2026.
+  Last updated on Nov 10, 2026.
   <br/>
 </p>
   </div>

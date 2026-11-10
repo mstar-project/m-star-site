@@ -55,7 +55,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="0.2.1" />
-    <meta name="docbuild:last-update" content="Nov 09, 2026"/>
+    <meta name="docbuild:last-update" content="Nov 10, 2026"/>
   
     
     <script src="_static/searchtools.js"></script>
@@ -492,6 +492,7 @@
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.rebuild.html">mstar.worker.rebuild</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.rid_table.html">mstar.worker.rid_table</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.scheduled_batch.html">mstar.worker.scheduled_batch</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.scheduling_policy.html">mstar.worker.scheduling_policy</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.spec_rows.html">mstar.worker.spec_rows</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.stream_buffers.html">mstar.worker.stream_buffers</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.worker.worker_metrics.html">mstar.worker.worker_metrics</a></li>
@@ -808,8 +809,9 @@ to coordinate multi-engine pipelines, including async producer/consumer partitio
 <ol class="arabic simple">
 <li><p>The API server receives a request, loads media, and calls the model’s
 <code class="docutils literal notranslate"><span class="pre">process_prompt</span></code> to produce the initial tensors.</p></li>
-<li><p>The conductor seeds the initial graph walk (e.g. <code class="docutils literal notranslate"><span class="pre">prefill</span></code>) and asks the model for
-the next forward-pass arguments after each graph walk completes.</p></li>
+<li><p>The conductor asks the model once, at ingest, for each partition’s walk plan
+(<code class="docutils literal notranslate"><span class="pre">walk_plan</span></code>: e.g. <code class="docutils literal notranslate"><span class="pre">prefill</span></code> then <code class="docutils literal notranslate"><span class="pre">decode</span></code>), and runs it: it sends each walk its
+inputs and moves to the next walk as each one completes.</p></li>
 <li><p>Workers execute the ready graph nodes on GPU through the engine. The engine declares
 and admits each step’s resource work around the forward pass. Workers then route the
 output tensors to downstream nodes and workers.</p></li>
@@ -902,7 +904,7 @@ By M* Team
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Nov 09, 2026.
+  Last updated on Nov 10, 2026.
   <br/>
 </p>
   </div>
