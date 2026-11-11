@@ -55,7 +55,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="0.2.1" />
-    <meta name="docbuild:last-update" content="Nov 10, 2026"/>
+    <meta name="docbuild:last-update" content="Nov 11, 2026"/>
   
     
     <script src="_static/searchtools.js"></script>
@@ -270,6 +270,13 @@
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.engine.resources.sampler.html">mstar.engine.resources.sampler</a></li>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.engine.resources.spec.html">mstar.engine.resources.spec</a></li>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.engine.resources.step.html">mstar.engine.resources.step</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="_autosummary/mstar.engine.state.html">mstar.engine.state</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.engine.state.adapters.html">mstar.engine.state.adapters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.engine.state.analysis.html">mstar.engine.state.analysis</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.engine.state.calls.html">mstar.engine.state.calls</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.engine.state.contract.html">mstar.engine.state.contract</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.engine.windowing.html">mstar.engine.windowing</a></li>
@@ -800,8 +807,8 @@ down with it. SIGINT and SIGTERM shutdowns are unaffected.</p>
 <code class="docutils literal notranslate"><span class="pre">prefill</span></code>, <code class="docutils literal notranslate"><span class="pre">decode</span></code>, <code class="docutils literal notranslate"><span class="pre">image_gen</span></code>) via <code class="docutils literal notranslate"><span class="pre">get_graph_walk_graphs()</span></code>.</p></li>
 <li><p><strong>Disaggregated.</strong> Logical computation nodes map to physical workers via the YAML
 config’s <code class="docutils literal notranslate"><span class="pre">node_groups</span></code> (node names → GPU ranks).</p></li>
-<li><p><strong>Models declare, the engine executes.</strong> A model declares its resources in
-<code class="docutils literal notranslate"><span class="pre">get_node_resources()</span></code>, and declares what each step does to them in
+<li><p><strong>Models declare, the engine executes.</strong> A model declares its state in
+<code class="docutils literal notranslate"><span class="pre">declare_state()</span></code> and any other resources in <code class="docutils literal notranslate"><span class="pre">get_node_resources()</span></code>, and declares what each step does to them in
 <code class="docutils literal notranslate"><span class="pre">NodeSubmodule.declare_step()</span></code>. The engine performs admission, planning, capture and
 commit. A step that cannot be admitted therefore becomes backpressure that the scheduler
 can resolve by eviction, instead of an error inside a forward pass.</p></li>
@@ -909,7 +916,7 @@ By M* Team
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Nov 10, 2026.
+  Last updated on Nov 11, 2026.
   <br/>
 </p>
   </div>
