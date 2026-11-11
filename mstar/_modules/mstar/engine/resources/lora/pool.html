@@ -751,6 +751,12 @@ window.runMermaid = runMermaid;</script>
 </ul>
 </details></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../../_autosummary/mstar.model.parakeet.html">mstar.model.parakeet</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../../_autosummary/mstar.model.phi4mm.html">mstar.model.phi4mm</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../_autosummary/mstar.model.phi4mm.components.html">mstar.model.phi4mm.components</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../_autosummary/mstar.model.phi4mm.config.html">mstar.model.phi4mm.config</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../_autosummary/mstar.model.phi4mm.tests.html">mstar.model.phi4mm.tests</a></li>
+</ul>
+</details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../../../_autosummary/mstar.model.pi05.html">mstar.model.pi05</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../_autosummary/mstar.model.pi05.components.html">mstar.model.pi05.components</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../_autosummary/mstar.model.pi05.config.html">mstar.model.pi05.config</a></li>
@@ -2308,6 +2314,15 @@ window.runMermaid = runMermaid;</script>
     <span class="k">def</span><span class="w"> </span><span class="nf">force_double_buffer</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># each plan stages its addressing into a buffer a replay reads</span>
         <span class="k">return</span> <span class="kc">True</span>
+
+<div class="viewcode-block" id="LoraAdapterPool.resident_refusal">
+<a class="viewcode-back" href="../../../../../_autosummary/mstar.engine.resources.lora.pool.html#mstar.engine.resources.lora.pool.LoraAdapterPool.resident_refusal">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">resident_refusal</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># never holds a node back: its addressing comes from the step's segments and</span>
+        <span class="c1"># this pool's own slots, not from a plan a resident step skips, so a resident</span>
+        <span class="c1"># step plans it on the host as any other (memoized for a steady batch)</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
 
     <span class="c1"># Engine lifecycle</span>
 

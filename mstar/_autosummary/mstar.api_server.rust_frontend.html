@@ -398,6 +398,12 @@
 </ul>
 </details></li>
 <li class="toctree-l3"><a class="reference internal" href="mstar.model.parakeet.html">mstar.model.parakeet</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="mstar.model.phi4mm.html">mstar.model.phi4mm</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="mstar.model.phi4mm.components.html">mstar.model.phi4mm.components</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mstar.model.phi4mm.config.html">mstar.model.phi4mm.config</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mstar.model.phi4mm.tests.html">mstar.model.phi4mm.tests</a></li>
+</ul>
+</details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="mstar.model.pi05.html">mstar.model.pi05</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="mstar.model.pi05.components.html">mstar.model.pi05.components</a></li>
 <li class="toctree-l4"><a class="reference internal" href="mstar.model.pi05.config.html">mstar.model.pi05.config</a></li>
@@ -809,6 +815,7 @@ prompt_parts, streaming, accepts_chunks, report_usage}</p>
 <div class="line">{t:”windows”, rid, sub, op, plan, …}</div>
 <div class="line">{t:”live”, rid, sub, op, call, …, stream?, audio?(bin)}</div>
 <div class="line">{t:”end_of_turn”, rid, sub, audio(bin)}</div>
+<div class="line">{t:”lora”, rid, sub, op, lora_name, lora_path?}</div>
 </div>
 </dd>
 <dt>bridge -&gt; frontend:  {t:”chunk”, rid, sub, modality, data(bin), metadata}</dt><dd><div class="line-block">
@@ -821,6 +828,8 @@ prompt_parts, streaming, accepts_chunks, report_usage}</p>
 <div class="line">{t:”windows”, rid, sub, metadata:{duration, single, windows} | {error}}</div>
 <div class="line">{t:”live”, rid, sub, metadata:{taking | accepted | rejected | error, status, error_id?}}</div>
 <div class="line">{t:”end_of_turn”, rid, sub, metadata:{p} | {error}}</div>
+<div class="line">{t:”lora”, rid, sub, metadata:{text} | {error:{status, message}}}</div>
+<div class="line">{t:”served”, adapters}   (unsolicited, on every change)</div>
 </div>
 </dd>
 </dl>
