@@ -14,8 +14,14 @@ mstar.engine.resources.context\_parallel
    .. autosummary::
    
       gather_merge
+      local_indptrs
       merge
-      positions_over_sp
+      merge_lse
+      position_pools
+      ring_hop
+      stripe_owners
+      zigzag_capture
+      zigzag_rows
    
    
 
@@ -27,6 +33,16 @@ mstar.engine.resources.context\_parallel
    
       ContextParallel
       ContextParallelWrapper
+      KeyRows
+      OneSlotPages
+      OwnTokensKernel
+      RingAttentionWrapper
+      SPContextParallelWrapper
+      SPPlacement
+      ShareCapture
+      TPContextParallelWrapper
+      TPPlacement
+      ZigzagWrapper
    
    
 

@@ -269,6 +269,7 @@
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.engine.resources.rms_norm.html">mstar.engine.resources.rms_norm</a></li>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.engine.resources.runner.html">mstar.engine.resources.runner</a></li>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.engine.resources.sampler.html">mstar.engine.resources.sampler</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.engine.resources.sequence_shard.html">mstar.engine.resources.sequence_shard</a></li>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.engine.resources.spec.html">mstar.engine.resources.spec</a></li>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.engine.resources.step.html">mstar.engine.resources.step</a></li>
 </ul>
@@ -1578,6 +1579,28 @@ to 2048 for <code class="docutils literal notranslate"><span class="pre">prefill
 since the LLM’s 2048-token step budget (<code class="docutils literal notranslate"><span class="pre">MAX_BATCH_TOKENS</span></code>) caps both and at
 the default <code class="docutils literal notranslate"><span class="pre">min_chunk_tokens</span></code> no step passes it. Each bucket adds captures
 and startup time.</p>
+<p>On <code class="docutils literal notranslate"><span class="pre">sp_size</span></code> above 1 the LLM declares a sequence shard (<code class="docutils literal notranslate"><span class="pre">llm_shard</span></code>, its
+prefill and mixed walks; decode never splits, and its compiled frame keeps the
+bracket out). With its KV pool stored by position (<code class="docutils literal notranslate"><span class="pre">kv_cache:</span>
+<span class="pre">{context_parallel:</span> <span class="pre">true}</span></code>) and the shard’s default <code class="docutils literal notranslate"><span class="pre">exchange</span></code> (<code class="docutils literal notranslate"><span class="pre">none</span></code>), every step
+runs copied, each rank attending its share of the stored context (more KV
+capacity, no faster prefill). Over KV stored by head the LLM on SP ranks is
+refused unless the deployment sets <code class="docutils literal notranslate"><span class="pre">llm_shard:</span> <span class="pre">{exchange:</span> <span class="pre">ulysses}</span></code>, which
+has run on CPU only. With <code class="docutils literal notranslate"><span class="pre">llm_shard:</span> <span class="pre">{exchange:</span> <span class="pre">all_gather}</span></code> a
+step of at least <code class="docutils literal notranslate"><span class="pre">llm_shard.min_tokens</span></code> tokens splits over
+the SP ranks: each runs the layers on its part of the prompt, attention gathers
+the step’s queries, keys and values, and the gated DeltaNet layers trade tokens
+for heads (<code class="docutils literal notranslate"><span class="pre">ulysses</span></code>, or <code class="docutils literal notranslate"><span class="pre">state_passing</span></code> where
+their heads per TP rank don’t divide by <code class="docutils literal notranslate"><span class="pre">sp_size</span></code>). The DeltaNet split runs
+eagerly only, so the LLM never splits a captured step: the shard sets its own floor for
+each of its text prefill, vision prefill and mixed walks, one past that walk’s largest
+captured bucket (<a class="reference internal" href="serving.html"><span class="doc">Serving</span></a>). A prompt that fits a bucket runs copied in its graph, a longer
+one runs eagerly and splits, and decode keeps its graphs; <code class="docutils literal notranslate"><span class="pre">llm_shard.min_tokens</span></code>
+only raises the floor. Chunked prefill is off
+on SP ranks, so a long prompt splits whole.
+The recurrent state is held whole on every SP rank, so decode is unchanged. No
+shipped config splits yet: a TP2 x SP2 9B config lands with its GPU parity run.
+Prefix caching stays on at one rank as before; above one rank it is off.</p>
 <p>A captured decode step builds its rotary tables inside the graph from the
 planned positions, rather than staging tables built eagerly before the replay
 (that build sat on the per-step critical path: +13% output tok/s at c=32 on
@@ -1942,10 +1965,26 @@ requests, so requests past that queue and can fall below it and pause. Set
 <code class="docutils literal notranslate"><span class="pre">codec_chunk_schedule:</span> <span class="pre">[]</span></code> under the deployment YAML’s <code class="docutils literal notranslate"><span class="pre">model_kwargs</span></code> to
 start with a 25-frame chunk instead: first audio comes later, and the
 Talker needs only about 1.0 to 1.3x real time.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">configs/qwen3omni_thinker_tp4_sp2.yaml</span></code> (GPU-tested before its last merge of main; a rerun is pending) runs the
+Thinker on 8 GPUs as 4 TP ranks by 2 SP ranks, for long prompts. Its KV pool
+is stored by position over each SP pair (<code class="docutils literal notranslate"><span class="pre">context_parallel</span></code>). A prefill of
+at least <code class="docutils literal notranslate"><span class="pre">min_tokens</span></code> tokens (on the <code class="docutils literal notranslate"><span class="pre">thinker_shard</span></code> resource) splits over
+the pair: each rank runs the layers on its half of the tokens, and attention
+gathers the step’s queries, keys and values (<code class="docutils literal notranslate"><span class="pre">exchange:</span> <span class="pre">all_gather</span></code> on
+<code class="docutils literal notranslate"><span class="pre">thinker_shard</span></code>; with the Thinker’s default, <code class="docutils literal notranslate"><span class="pre">none</span></code>, it runs every step copied, and over KV
+stored by head a Thinker on SP ranks is refused unless the deployment sets <code class="docutils literal notranslate"><span class="pre">exchange:</span> <span class="pre">ulysses</span></code>,
+which has run on CPU only). Decode and
+shorter prefills run copied on both ranks, each attending its half of the
+stored context, and the two partials are merged. A captured prefill decides on its bucket’s size.
+<code class="docutils literal notranslate"><span class="pre">min_tokens</span></code> is 16384: on 8 H100s all-gather prefilled faster than
+the copied path from 16K-token prompts and slower at 4K to 8K. The config serves prompts up to the
+model’s own 65536 positions (greedy outputs were checked to 60K; the 64K and 128K rows measured time and
+memory only). Chunked prefill is off on SP ranks, so a prompt prefills in one step.</p></li>
 <li><p>Numerics: the Thinker’s q/k RMSNorm and multimodal RoPE run in one kernel
 with the KV write, in fp32 throughout and rounded once, where the unfused ops
 (and Hugging Face) round to bf16 after the norm and after each step of the
-rotation: no less accurate, but not bit-exact. The code predictor (shared
+rotation: no less accurate, but not bit-exact. (A Thinker step that splits
+over SP ranks runs unfused, through the exchange, and so does a copied prefill; a decode step keeps the fused kernel.) The code predictor (shared
 with Qwen3-TTS, see its notes) runs each projection with its RMSNorm folded
 in and its residual add in the same Triton kernel (<code class="docutils literal notranslate"><span class="pre">cp_linear</span></code>), and its
 attention as another (<code class="docutils literal notranslate"><span class="pre">cp_attend</span></code>), neither bit-exact with the unfused
@@ -3070,7 +3109,9 @@ tokens over a pair of ranks (<code class="docutils literal notranslate"><span cl
 self-attention) to cut one request’s latency. Split the guidance branches
 first (<code class="docutils literal notranslate"><span class="pre">cfg_size:</span> <span class="pre">2</span></code>), then add <code class="docutils literal notranslate"><span class="pre">sp_size</span></code> on top: on two GPUs,
 <code class="docutils literal notranslate"><span class="pre">sp_size:</span> <span class="pre">2</span></code> alone is slower than <code class="docutils literal notranslate"><span class="pre">cfg_size:</span> <span class="pre">2</span></code>.
-<code class="docutils literal notranslate"><span class="pre">sp_size</span></code> must divide the dit’s 24 attention heads. Under concurrency, data
+<code class="docutils literal notranslate"><span class="pre">sp_size</span></code> must divide the dit’s 24 attention heads, and SP needs the
+ragged resource (<code class="docutils literal notranslate"><span class="pre">backend:</span> <span class="pre">sdpa</span></code> on <code class="docutils literal notranslate"><span class="pre">dit_self_attn</span></code> runs outside the engine’s resources, so
+it is refused on SP ranks). Under concurrency, data
 parallelism stays the throughput layout: at 1280x704x81 and 4 concurrent, four
 replicas (<code class="docutils literal notranslate"><span class="pre">wan22_dp2.yaml</span></code>’s layout over four ranks) serve 8.6 videos/min
 against 7.2 for this layout on H200s, and 11.0 against 7.4 in a separate run on
@@ -3105,12 +3146,16 @@ in VAE tiles, as the card does for this decode.</p></li>
 <code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/v1/videos/generations</span></code> returns one mp4 with the audio muxed in as AAC
 (<code class="docutils literal notranslate"><span class="pre">&quot;audio&quot;:</span> <span class="pre">false</span></code> in the body for video alone); the mux needs the <code class="docutils literal notranslate"><span class="pre">ffmpeg</span></code> binary
 on the server’s <code class="docutils literal notranslate"><span class="pre">PATH</span></code> and falls back to video only without it.</p>
-<p><code class="docutils literal notranslate"><span class="pre">ltx2_5_sp2</span></code> shards the video tokens (Ulysses): each rank holds the whole DiT and
-half the tokens, and only the video self-attention exchanges them (one all-to-all
-each way); the cross-attentions run on each rank’s own tokens, and the audio queries
-over the video merge the ranks’ partial attentions. <code class="docutils literal notranslate"><span class="pre">ltx2_5_tp2</span></code> shards the
-weights instead and all-reduces after every block’s attentions and feed-forwards.</p>
-<p>Performance (2x H100, warm; diffusers with the same recipe and seeds):</p>
+<p><code class="docutils literal notranslate"><span class="pre">ltx2_5_sp2</span></code> splits each step’s video tokens over the two ranks (the DiT’s sequence
+shard): each rank holds the whole DiT and half the tokens, and only the video
+self-attention exchanges them (Ulysses, one all-to-all each way); the cross-attentions
+run on each rank’s own tokens, and the audio queries over the video merge the ranks’
+partial attentions. The attention resources do the exchanges, so it needs
+the ragged resources (<code class="docutils literal notranslate"><span class="pre">backend:</span> <span class="pre">sdpa</span></code> on one is refused on SP ranks where it reads split
+keys). <code class="docutils literal notranslate"><span class="pre">ltx2_5_tp2</span></code> shards
+the weights instead and all-reduces after every block’s attentions and feed-forwards.</p>
+<p>Performance (2x H100, warm; diffusers with the same recipe and seeds; the <code class="docutils literal notranslate"><span class="pre">ltx2_5_sp2</span></code> column
+was measured before the exchanges moved into the attention resources):</p>
 <div class="pst-scrollable-table-container"><table class="table">
 <thead>
 <tr class="row-odd"><th class="head"></th>
@@ -3197,7 +3242,8 @@ another tile count compiles again. A 768p clip’s share decodes in 2.1 s instea
 on one H200, within 62.9 dB of eager.</p></li>
 </ul>
 <p>The attention kernel is a resource’s setting: <code class="docutils literal notranslate"><span class="pre">backend:</span> <span class="pre">sdpa</span></code> on the <code class="docutils literal notranslate"><span class="pre">dit_attn</span></code> and
-<code class="docutils literal notranslate"><span class="pre">refiner_attn</span></code> resources runs the reference’s kernel, and FlashInfer runs without it.</p>
+<code class="docutils literal notranslate"><span class="pre">refiner_attn</span></code> resources runs the reference’s kernel, and FlashInfer runs without it. SDPA on
+<code class="docutils literal notranslate"><span class="pre">dit_attn</span></code> is refused on SP ranks, which every shipped config but <code class="docutils literal notranslate"><span class="pre">minimax_h3_2gpu.yaml</span></code> is.</p>
 <p>Async scheduling is on for the DiT and the decoder, the default for parallel nodes
 (<code class="docutils literal notranslate"><span class="pre">tp_async_sched:</span> <span class="pre">false</span></code> turns it off); on and off measured within noise. Runtime needs:
 PyAV, transformers’ image processor (a server that can’t import it, e.g. next to a
@@ -3208,10 +3254,12 @@ in use once loaded), so they need 141 GB GPUs (H200); no config has been run on 
 “highest”), were bit-identical to diffusers’ MiniMax-H3 pipeline end to end (latents, frames,
 waveform), measured at <code class="docutils literal notranslate"><span class="pre">f6260f2677</span></code>; with <code class="docutils literal notranslate"><span class="pre">--exact</span></code> the script exits nonzero when one isn’t.
 FA3 and the compiled DiT are not bit-exact. Served at 768p (50 steps, SP2 on H200, three
-seeds), clips are 23.7-32.8 dB (video) and 17.8-22.3 dB (audio) from diffusers’, where the
+seeds), measured on main’s earlier SP path, before the DiT and the decoder moved onto the sequence
+shard, clips are 23.7-32.8 dB (video) and 17.8-22.3 dB (audio) from diffusers’, where the
 reference on another SDPA kernel is 23.5-33.1 and 21.6-22.3 dB from itself; per seed, the
 served clip is below that spread on one seed’s video and another’s audio.</p>
-<p>Seconds per clip, one request at a time, each engine on the same H200s (M* on torch
+<p>Seconds per clip, one request at a time, each engine on the same H200s, M* measured before the
+DiT and the decoder moved onto the sequence shard (M* on torch
 2.12.1+cu132 and FlashInfer 0.7.2; text only, 1344x768, 124 frames, 49 DiT forwards, seed 0,
 median of 3 after a warmup; <code class="docutils literal notranslate"><span class="pre">benchmark/minimax_h3/bench_video.py</span> <span class="pre">--seed</span> <span class="pre">0</span></code> sends these
 requests):</p>
