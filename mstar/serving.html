@@ -55,7 +55,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="0.2.1" />
-    <meta name="docbuild:last-update" content="Nov 11, 2026"/>
+    <meta name="docbuild:last-update" content="Nov 12, 2026"/>
   
     
     <script src="_static/searchtools.js"></script>
@@ -260,6 +260,7 @@
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.engine.resources.admission.html">mstar.engine.resources.admission</a></li>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.engine.resources.attn.html">mstar.engine.resources.attn</a></li>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.engine.resources.base.html">mstar.engine.resources.base</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.engine.resources.context_parallel.html">mstar.engine.resources.context_parallel</a></li>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.engine.resources.dsa.html">mstar.engine.resources.dsa</a></li>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.engine.resources.kv.html">mstar.engine.resources.kv</a></li>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.engine.resources.lora.html">mstar.engine.resources.lora</a></li>
@@ -273,10 +274,11 @@
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="_autosummary/mstar.engine.state.html">mstar.engine.state</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.engine.state.adapters.html">mstar.engine.state.adapters</a></li>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.engine.state.analysis.html">mstar.engine.state.analysis</a></li>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.engine.state.calls.html">mstar.engine.state.calls</a></li>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.engine.state.contract.html">mstar.engine.state.contract</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.engine.state.host_fields.html">mstar.engine.state.host_fields</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.engine.state.state_op.html">mstar.engine.state.state_op</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.engine.windowing.html">mstar.engine.windowing</a></li>
@@ -1365,7 +1367,8 @@ them by that name:</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">resources</span><span class="p">:</span>
 <span class="w">  </span><span class="nt">kv_cache</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">max_num_pages</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1024</span><span class="w">      </span><span class="c1"># also: page_size, max_seq_len, cpu_offload_pages,</span>
-<span class="w">                             </span><span class="c1"># prefix_cache, prefix_cache_salt, prefix_cache_tp</span>
+<span class="w">                             </span><span class="c1"># prefix_cache, prefix_cache_salt, prefix_cache_tp,</span>
+<span class="w">                             </span><span class="c1"># context_parallel</span>
 <span class="w">  </span><span class="nt">talker_attn</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">flashinfer_backend</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">fa2</span><span class="w">  </span><span class="c1"># also: backend (flashinfer / dense), decode_tensor_cores, decode_fmha</span>
 <span class="w">  </span><span class="nt">vit_attn</span><span class="p">:</span><span class="w">                  </span><span class="c1"># a cacheless (ragged) attention resource</span>
@@ -1380,6 +1383,9 @@ its encoder context, can therefore size each one separately. If a block names a 
 that the model does not declare, or sets a key that the resource does not accept, loading
 fails. A misspelled setting is never silently ignored. A top-level <code class="docutils literal notranslate"><span class="pre">kv_cache:</span></code> block is
 no longer read. It raises an error with a message describing the migration.</p>
+<p><code class="docutils literal notranslate"><span class="pre">backend:</span> <span class="pre">sdpa</span></code> on the resource of a declared read within a step runs each read on it
+through torch’s SDPA, as a DiT’s reference pipeline does, and builds no resource, so its block
+takes no other key. A read whose queries come packed can’t run on SDPA, and loading refuses it.</p>
 <p><code class="docutils literal notranslate"><span class="pre">greedy_capture:</span> <span class="pre">false</span></code> on a sampler stops all-greedy steps from taking each row’s
 argmax, and the engine from capturing a twin of each batched bucket for them. A sampler
 whose vocabulary is past 4096 has them by default (see <code class="docutils literal notranslate"><span class="pre">SamplerSpec</span></code> in
@@ -1396,6 +1402,12 @@ ranks. Loading fails otherwise. A cache that keeps
 a sliding window (<code class="docutils literal notranslate"><span class="pre">AttentionConfig.sliding_window</span></code>) has no prefix cache yet: its
 <code class="docutils literal notranslate"><span class="pre">prefix_cache</span></code> goes off (logged at info), and a serving config that sets
 <code class="docutils literal notranslate"><span class="pre">prefix_cache:</span> <span class="pre">true</span></code> on it is refused.</p>
+<p><code class="docutils literal notranslate"><span class="pre">context_parallel:</span> <span class="pre">true</span></code> splits each request’s positions over the ranks that would
+otherwise hold the same KV heads: the TP ranks that share a KV head, or the node’s SP ranks
+when it has them, which is how a model with no sequence parallelism of its own (such as
+Qwen3.5) runs on <code class="docutils literal notranslate"><span class="pre">sp_size</span></code> above 1. Raise <code class="docutils literal notranslate"><span class="pre">max_num_pages</span></code> by that factor to turn the
+freed memory into context. <strong>Context parallelism</strong> in <a class="reference internal" href="adding_models.html"><span class="doc">Adding a New Model</span></a> covers when each mode applies and
+what it refuses.</p>
 <p>A request waits at the head of its pool’s queue until its reservation fits beside the
 reservations already admitted. A request behind it starts first when its own pages fit, output
 included, less the cached part of its prompt that running requests keep from eviction and, on a
@@ -2247,7 +2259,7 @@ By M* Team
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Nov 11, 2026.
+  Last updated on Nov 12, 2026.
   <br/>
 </p>
   </div>

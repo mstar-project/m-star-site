@@ -55,7 +55,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="0.2.1" />
-    <meta name="docbuild:last-update" content="Nov 11, 2026"/>
+    <meta name="docbuild:last-update" content="Nov 12, 2026"/>
   
     
     <script src="../_static/searchtools.js"></script>
@@ -260,6 +260,7 @@
 <li class="toctree-l4"><a class="reference internal" href="mstar.engine.resources.admission.html">mstar.engine.resources.admission</a></li>
 <li class="toctree-l4"><a class="reference internal" href="mstar.engine.resources.attn.html">mstar.engine.resources.attn</a></li>
 <li class="toctree-l4"><a class="reference internal" href="mstar.engine.resources.base.html">mstar.engine.resources.base</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mstar.engine.resources.context_parallel.html">mstar.engine.resources.context_parallel</a></li>
 <li class="toctree-l4"><a class="reference internal" href="mstar.engine.resources.dsa.html">mstar.engine.resources.dsa</a></li>
 <li class="toctree-l4"><a class="reference internal" href="mstar.engine.resources.kv.html">mstar.engine.resources.kv</a></li>
 <li class="toctree-l4"><a class="reference internal" href="mstar.engine.resources.lora.html">mstar.engine.resources.lora</a></li>
@@ -273,10 +274,11 @@
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="mstar.engine.state.html">mstar.engine.state</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l4"><a class="reference internal" href="mstar.engine.state.adapters.html">mstar.engine.state.adapters</a></li>
 <li class="toctree-l4"><a class="reference internal" href="mstar.engine.state.analysis.html">mstar.engine.state.analysis</a></li>
 <li class="toctree-l4"><a class="reference internal" href="mstar.engine.state.calls.html">mstar.engine.state.calls</a></li>
 <li class="toctree-l4"><a class="reference internal" href="mstar.engine.state.contract.html">mstar.engine.state.contract</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mstar.engine.state.host_fields.html">mstar.engine.state.host_fields</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mstar.engine.state.state_op.html">mstar.engine.state.state_op</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3"><a class="reference internal" href="mstar.engine.windowing.html">mstar.engine.windowing</a></li>
@@ -830,6 +832,7 @@
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.engine.resources.step.StepContext.plan_results"><code class="docutils literal notranslate"><span class="pre">StepContext.plan_results</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.engine.resources.step.StepContext.real_rows"><code class="docutils literal notranslate"><span class="pre">StepContext.real_rows()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.engine.resources.step.StepContext.rebuild_rids"><code class="docutils literal notranslate"><span class="pre">StepContext.rebuild_rids</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.engine.resources.step.StepContext.repeats"><code class="docutils literal notranslate"><span class="pre">StepContext.repeats</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.engine.resources.step.StepContext.replays"><code class="docutils literal notranslate"><span class="pre">StepContext.replays</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.engine.resources.step.StepContext.request_ids"><code class="docutils literal notranslate"><span class="pre">StepContext.request_ids</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.engine.resources.step.StepContext.request_walks"><code class="docutils literal notranslate"><span class="pre">StepContext.request_walks</span></code></a></li>
@@ -846,6 +849,7 @@
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.engine.resources.step.StepHandle"><code class="docutils literal notranslate"><span class="pre">StepHandle</span></code></a><ul class="pst-show_toc_level nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.engine.resources.step.StepHandle.begin_step"><code class="docutils literal notranslate"><span class="pre">StepHandle.begin_step()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.engine.resources.step.StepHandle.check_step"><code class="docutils literal notranslate"><span class="pre">StepHandle.check_step()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.engine.resources.step.StepHandle.commit_step"><code class="docutils literal notranslate"><span class="pre">StepHandle.commit_step()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.engine.resources.step.StepHandle.end_step"><code class="docutils literal notranslate"><span class="pre">StepHandle.end_step()</span></code></a></li>
 </ul>
 </li>
@@ -853,6 +857,7 @@
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.engine.resources.step.SubmoduleStep.begin_calls"><code class="docutils literal notranslate"><span class="pre">SubmoduleStep.begin_calls()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.engine.resources.step.SubmoduleStep.cg_key_info"><code class="docutils literal notranslate"><span class="pre">SubmoduleStep.cg_key_info</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.engine.resources.step.SubmoduleStep.check_calls"><code class="docutils literal notranslate"><span class="pre">SubmoduleStep.check_calls()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.engine.resources.step.SubmoduleStep.commit_calls"><code class="docutils literal notranslate"><span class="pre">SubmoduleStep.commit_calls()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.engine.resources.step.SubmoduleStep.ctx"><code class="docutils literal notranslate"><span class="pre">SubmoduleStep.ctx</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.engine.resources.step.SubmoduleStep.end_calls"><code class="docutils literal notranslate"><span class="pre">SubmoduleStep.end_calls()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.engine.resources.step.SubmoduleStep.get"><code class="docutils literal notranslate"><span class="pre">SubmoduleStep.get()</span></code></a></li>
@@ -1363,7 +1368,7 @@ __init__ is the expensive way to do that.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="mstar.engine.resources.step.StepContext">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">mstar.engine.resources.step.</span></span><span class="sig-name descname"><span class="pre">StepContext</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">request_ids:</span> <span class="pre">collections.abc.Sequence[int],</span> <span class="pre">graph_walk:</span> <span class="pre">str,</span> <span class="pre">slot:</span> <span class="pre">int,</span> <span class="pre">capture:</span> <span class="pre">bool,</span> <span class="pre">is_preplan:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False,</span> <span class="pre">plan_phase:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'res.plan',</span> <span class="pre">plan_results:</span> <span class="pre">dict[str,</span> <span class="pre">typing.Any]</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;,</span> <span class="pre">slot_lease:</span> <span class="pre">mstar.engine.resources.step.SlotLease</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">piecewise_leases:</span> <span class="pre">'Mapping[str,</span> <span class="pre">SlotLease]'</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;,</span> <span class="pre">_padded_request_ids:</span> <span class="pre">collections.abc.Sequence[int]</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">_real_rids:</span> <span class="pre">frozenset</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">request_walks:</span> <span class="pre">collections.abc.Mapping[int,</span> <span class="pre">str]</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;,</span> <span class="pre">force_prefill:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False,</span> <span class="pre">resident:</span> <span class="pre">Any</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">resident_plan:</span> <span class="pre">Any</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">chunk_tokens_after:</span> <span class="pre">collections.abc.Mapping[int,</span> <span class="pre">int]</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;,</span> <span class="pre">reserve_whole_prefill:</span> <span class="pre">mstar.engine.resources.step.PerReqSetting</span> <span class="pre">=</span> <span class="pre">PerReqSetting(value=&lt;SettingValue.SET:</span> <span class="pre">1&gt;,</span> <span class="pre">set_rids=None),</span> <span class="pre">rebuild_rids:</span> <span class="pre">frozenset[int]</span> <span class="pre">=</span> <span class="pre">frozenset(),</span> <span class="pre">lean:</span> <span class="pre">frozenset[str]</span> <span class="pre">=</span> <span class="pre">frozenset()</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mstar/engine/resources/step.html#StepContext"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mstar.engine.resources.step.StepContext" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">mstar.engine.resources.step.</span></span><span class="sig-name descname"><span class="pre">StepContext</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">request_ids:</span> <span class="pre">collections.abc.Sequence[int],</span> <span class="pre">graph_walk:</span> <span class="pre">str,</span> <span class="pre">slot:</span> <span class="pre">int,</span> <span class="pre">capture:</span> <span class="pre">bool,</span> <span class="pre">is_preplan:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False,</span> <span class="pre">plan_phase:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'res.plan',</span> <span class="pre">plan_results:</span> <span class="pre">dict[str,</span> <span class="pre">typing.Any]</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;,</span> <span class="pre">slot_lease:</span> <span class="pre">mstar.engine.resources.step.SlotLease</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">piecewise_leases:</span> <span class="pre">'Mapping[str,</span> <span class="pre">SlotLease]'</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;,</span> <span class="pre">_padded_request_ids:</span> <span class="pre">collections.abc.Sequence[int]</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">_real_rids:</span> <span class="pre">frozenset</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">request_walks:</span> <span class="pre">collections.abc.Mapping[int,</span> <span class="pre">str]</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;,</span> <span class="pre">force_prefill:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False,</span> <span class="pre">repeats:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">1,</span> <span class="pre">resident:</span> <span class="pre">Any</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">resident_plan:</span> <span class="pre">Any</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">chunk_tokens_after:</span> <span class="pre">collections.abc.Mapping[int,</span> <span class="pre">int]</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;,</span> <span class="pre">reserve_whole_prefill:</span> <span class="pre">mstar.engine.resources.step.PerReqSetting</span> <span class="pre">=</span> <span class="pre">PerReqSetting(value=&lt;SettingValue.SET:</span> <span class="pre">1&gt;,</span> <span class="pre">set_rids=None),</span> <span class="pre">rebuild_rids:</span> <span class="pre">frozenset[int]</span> <span class="pre">=</span> <span class="pre">frozenset(),</span> <span class="pre">lean:</span> <span class="pre">frozenset[str]</span> <span class="pre">=</span> <span class="pre">frozenset()</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mstar/engine/resources/step.html#StepContext"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mstar.engine.resources.step.StepContext" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.12/library/functions.html#object" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1381,6 +1386,7 @@ __init__ is the expensive way to do that.</p>
 <li><p><strong>_real_rids</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#frozenset" title="(in Python v3.12)"><em>frozenset</em></a><em> | </em><em>None</em>)</p></li>
 <li><p><strong>request_walks</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/collections.abc.html#collections.abc.Mapping" title="(in Python v3.12)"><em>Mapping</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.12/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a><em>]</em>)</p></li>
 <li><p><strong>force_prefill</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/functions.html#bool" title="(in Python v3.12)"><em>bool</em></a>)</p></li>
+<li><p><strong>repeats</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a>)</p></li>
 <li><p><strong>resident</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/typing.html#typing.Any" title="(in Python v3.12)"><em>Any</em></a>)</p></li>
 <li><p><strong>resident_plan</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/typing.html#typing.Any" title="(in Python v3.12)"><em>Any</em></a>)</p></li>
 <li><p><strong>chunk_tokens_after</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/collections.abc.html#collections.abc.Mapping" title="(in Python v3.12)"><em>Mapping</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.12/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.12/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a><em>]</em>)</p></li>
@@ -1485,6 +1491,11 @@ should reserve, address and commit nothing on its behalf.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="mstar.engine.resources.step.StepContext.rebuild_rids">
 <span class="sig-name descname"><span class="pre">rebuild_rids</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#frozenset" title="(in Python v3.12)"><span class="pre">frozenset</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.12/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">frozenset({})</span></span><a class="headerlink" href="#mstar.engine.resources.step.StepContext.rebuild_rids" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="mstar.engine.resources.step.StepContext.repeats">
+<span class="sig-name descname"><span class="pre">repeats</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.12/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></span><a class="headerlink" href="#mstar.engine.resources.step.StepContext.repeats" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py property">
@@ -1597,6 +1608,20 @@ should reserve, address and commit nothing on its behalf.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="mstar.engine.resources.step.StepHandle.commit_step">
+<span class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">commit_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mstar/engine/resources/step.html#StepHandle.commit_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mstar.engine.resources.step.StepHandle.commit_step" title="Link to this definition">#</a></dt>
+<dd><p>Apply what the handle itself holds of a step the resources just committed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>step</strong> (<a class="reference internal" href="#mstar.engine.resources.step.SubmoduleStep" title="mstar.engine.resources.step.SubmoduleStep"><em>SubmoduleStep</em></a>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="mstar.engine.resources.step.StepHandle.end_step">
 <span class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">end_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mstar/engine/resources/step.html#StepHandle.end_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mstar.engine.resources.step.StepHandle.end_step" title="Link to this definition">#</a></dt>
 <dd><p>Close the handle, on any path out of the step.</p>
@@ -1645,6 +1670,16 @@ should reserve, address and commit nothing on its behalf.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="mstar.engine.resources.step.SubmoduleStep.check_calls">
 <span class="sig-name descname"><span class="pre">check_calls</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mstar/engine/resources/step.html#SubmoduleStep.check_calls"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mstar.engine.resources.step.SubmoduleStep.check_calls" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mstar.engine.resources.step.SubmoduleStep.commit_calls">
+<span class="sig-name descname"><span class="pre">commit_calls</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mstar/engine/resources/step.html#SubmoduleStep.commit_calls"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mstar.engine.resources.step.SubmoduleStep.commit_calls" title="Link to this definition">#</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>None</p>
@@ -1886,6 +1921,7 @@ replay, in the order it tries them.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.engine.resources.step.StepContext.plan_results"><code class="docutils literal notranslate"><span class="pre">StepContext.plan_results</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.engine.resources.step.StepContext.real_rows"><code class="docutils literal notranslate"><span class="pre">StepContext.real_rows()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.engine.resources.step.StepContext.rebuild_rids"><code class="docutils literal notranslate"><span class="pre">StepContext.rebuild_rids</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.engine.resources.step.StepContext.repeats"><code class="docutils literal notranslate"><span class="pre">StepContext.repeats</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.engine.resources.step.StepContext.replays"><code class="docutils literal notranslate"><span class="pre">StepContext.replays</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.engine.resources.step.StepContext.request_ids"><code class="docutils literal notranslate"><span class="pre">StepContext.request_ids</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.engine.resources.step.StepContext.request_walks"><code class="docutils literal notranslate"><span class="pre">StepContext.request_walks</span></code></a></li>
@@ -1902,6 +1938,7 @@ replay, in the order it tries them.</p>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.engine.resources.step.StepHandle"><code class="docutils literal notranslate"><span class="pre">StepHandle</span></code></a><ul class="pst-show_toc_level nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.engine.resources.step.StepHandle.begin_step"><code class="docutils literal notranslate"><span class="pre">StepHandle.begin_step()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.engine.resources.step.StepHandle.check_step"><code class="docutils literal notranslate"><span class="pre">StepHandle.check_step()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.engine.resources.step.StepHandle.commit_step"><code class="docutils literal notranslate"><span class="pre">StepHandle.commit_step()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.engine.resources.step.StepHandle.end_step"><code class="docutils literal notranslate"><span class="pre">StepHandle.end_step()</span></code></a></li>
 </ul>
 </li>
@@ -1909,6 +1946,7 @@ replay, in the order it tries them.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.engine.resources.step.SubmoduleStep.begin_calls"><code class="docutils literal notranslate"><span class="pre">SubmoduleStep.begin_calls()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.engine.resources.step.SubmoduleStep.cg_key_info"><code class="docutils literal notranslate"><span class="pre">SubmoduleStep.cg_key_info</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.engine.resources.step.SubmoduleStep.check_calls"><code class="docutils literal notranslate"><span class="pre">SubmoduleStep.check_calls()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.engine.resources.step.SubmoduleStep.commit_calls"><code class="docutils literal notranslate"><span class="pre">SubmoduleStep.commit_calls()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.engine.resources.step.SubmoduleStep.ctx"><code class="docutils literal notranslate"><span class="pre">SubmoduleStep.ctx</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.engine.resources.step.SubmoduleStep.end_calls"><code class="docutils literal notranslate"><span class="pre">SubmoduleStep.end_calls()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mstar.engine.resources.step.SubmoduleStep.get"><code class="docutils literal notranslate"><span class="pre">SubmoduleStep.get()</span></code></a></li>
@@ -1955,7 +1993,7 @@ By M* Team
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Nov 11, 2026.
+  Last updated on Nov 12, 2026.
   <br/>
 </p>
   </div>
