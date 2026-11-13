@@ -55,7 +55,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="0.2.1" />
-    <meta name="docbuild:last-update" content="Nov 12, 2026"/>
+    <meta name="docbuild:last-update" content="Nov 13, 2026"/>
   
     
     <script src="_static/searchtools.js"></script>
@@ -797,7 +797,7 @@ second old; <code class="docutils literal notranslate"><span class="pre">mstar_c
 second, and the conductor adds them to its next status message, so worker families
 can be up to two seconds old. A lost or reordered message cannot corrupt a counter:
 every message carries totals, not increments, and the API server keeps the latest.</p></li>
-<li><p><strong>Rust frontend.</strong> With <code class="docutils literal notranslate"><span class="pre">--rust-frontend</span></code>, <code class="docutils literal notranslate"><span class="pre">mstar-server</span></code> serves <code class="docutils literal notranslate"><span class="pre">/metrics</span></code> by
+<li><p><strong>Rust frontend.</strong> <code class="docutils literal notranslate"><span class="pre">mstar-server</span></code>, the default frontend, serves <code class="docutils literal notranslate"><span class="pre">/metrics</span></code> by
 asking the API server for the rendered text over the bridge, so both frontends show
 the same families. It answers <code class="docutils literal notranslate"><span class="pre">503</span></code> if the bridge does not reply within two
 seconds. <code class="docutils literal notranslate"><span class="pre">mstar-server</span></code> counts its own HTTP refusals and sends the totals with each
@@ -963,8 +963,8 @@ to the API server: <code class="docutils literal notranslate"><span class="pre">
 field or request), <code class="docutils literal notranslate"><span class="pre">409</span></code> (a <code class="docutils literal notranslate"><span class="pre">request_id</span></code> in flight), <code class="docutils literal notranslate"><span class="pre">404</span></code> (unknown route, or
 a model without the endpoint), <code class="docutils literal notranslate"><span class="pre">405</span></code> (wrong method), and <code class="docutils literal notranslate"><span class="pre">503</span></code> when the Rust
 frontend’s <code class="docutils literal notranslate"><span class="pre">MSTAR_MAX_CONCURRENT_REQUESTS</span></code> cap turns a request away. WebSocket
-handshakes are not counted. With <code class="docutils literal notranslate"><span class="pre">--rust-frontend</span></code>, the values are the totals
-<code class="docutils literal notranslate"><span class="pre">mstar-server</span></code> sent with the latest <code class="docutils literal notranslate"><span class="pre">/metrics</span></code> request.</p>
+handshakes are not counted. Unless <code class="docutils literal notranslate"><span class="pre">--python-frontend</span></code> is set, the values are the
+totals <code class="docutils literal notranslate"><span class="pre">mstar-server</span></code> sent with the latest <code class="docutils literal notranslate"><span class="pre">/metrics</span></code> request.</p>
 </dd>
 </dl>
 </section>
@@ -1012,6 +1012,11 @@ under each node, so summing over <code class="docutils literal notranslate"><spa
 <dt><code class="docutils literal notranslate"><span class="pre">mstar_kv_pages_cached{model_name,</span> <span class="pre">component,</span> <span class="pre">resource}</span></code></dt><dd><p>Gauge. Pages the prefix cache names. Running requests may also hold some of them;
 the cache frees the others when a request needs the room.</p>
 </dd>
+<dt><code class="docutils literal notranslate"><span class="pre">mstar_kv_pages_lent{model_name,</span> <span class="pre">component,</span> <span class="pre">resource}</span></code></dt><dd><p>Gauge. Pages guaranteed requests lent that aren’t free: what preemptible requests
+borrowed, and a guaranteed request’s own cache hits until its walk takes them over.
+A guaranteed request takes a borrowed page back by moving a borrower when it needs
+the page and none is free.</p>
+</dd>
 <dt><code class="docutils literal notranslate"><span class="pre">mstar_rebuild_host_bytes_used{model_name,</span> <span class="pre">component}</span></code></dt><dd><p>Gauge. Bytes of the worker’s rebuild host pool that hold kept prompt ids and host
 copies, which a request dropped from the KV cache is rebuilt from. A prompt the pool has no room for
 keeps no ids, so its request is never dropped. One pool serves every node of a worker
@@ -1038,9 +1043,9 @@ Orpheus and Qwen3.5). Under tensor parallelism only rank 0 counts a lookup.</p>
 cache’s tokens before the recurrent pool cuts the hit to a snapshot, so a hit the pool
 cuts to 0 still counts.</p>
 </dd>
-<dt><code class="docutils literal notranslate"><span class="pre">mstar_kv_preemptions_total{model_name,</span> <span class="pre">component}</span></code></dt><dd><p>Counter. Requests chosen to move to the host or drop because a grant past a request’s reservation ran short
-of KV pages, on a single rank. Their pages go to the request that ran short, which counts too when it moves
-itself to the host to wait.</p>
+<dt><code class="docutils literal notranslate"><span class="pre">mstar_kv_preemptions_total{model_name,</span> <span class="pre">component}</span></code></dt><dd><p>Counter. Requests chosen to move to the host or drop because a request’s grant ran short of KV pages, on a
+single rank: past its reservation, or for a guaranteed request into pages it lent. Their pages go to the
+request that ran short, which counts too when it moves itself to the host to wait.</p>
 </dd>
 <dt><code class="docutils literal notranslate"><span class="pre">mstar_kv_drops_total{model_name,</span> <span class="pre">component}</span></code></dt><dd><p>Counter. Chosen requests whose KV was dropped. A request leaves before its drop when
 its client goes away.</p>
@@ -1053,7 +1058,14 @@ its client goes away.</p>
 for the load, and more pages or fewer concurrent requests stop it.</p>
 </dd>
 <dt><code class="docutils literal notranslate"><span class="pre">mstar_kv_returns_preempted_total{model_name,</span> <span class="pre">component}</span></code></dt><dd><p>Counter. Requests preempted again before they sampled a token since they were last preempted. Only
-requests that keep a rebuild log are counted.</p>
+requests that keep a rebuild log are counted. A request moved to the host again before its next step,
+or that gave back an allotment it never wrote into, counts too, though neither move cost it a token.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">mstar_kv_take_backs_total{model_name,</span> <span class="pre">component}</span></code></dt><dd><p>Counter. Preempted requests that moved so a guaranteed request could take back pages
+it lent. They count in <code class="docutils literal notranslate"><span class="pre">mstar_kv_preemptions_total</span></code> too.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">mstar_kv_take_back_waits_total{model_name,</span> <span class="pre">component}</span></code></dt><dd><p>Counter. Waits by guaranteed requests to take back pages they lent, since no request
+holding them could move yet. Each wait holds up a stream that can’t pause.</p>
 </dd>
 <dt><code class="docutils literal notranslate"><span class="pre">mstar_component_pending_steps{model_name,</span> <span class="pre">component}</span></code></dt><dd><p>Gauge. Requests whose next step on the node is ready (its inputs arrived) and not
 running: waiting for room in a step, or for the worker to pick the node.</p>
@@ -1159,8 +1171,8 @@ picks the <code class="docutils literal notranslate"><span class="pre">model_nam
 </pre></div>
 </div>
 <p>The conductor and workers report once a second, so a scrape interval under a second
-only repeats values. Keep the scrape timeout above two seconds with
-<code class="docutils literal notranslate"><span class="pre">--rust-frontend</span></code>, which waits that long for the bridge before answering <code class="docutils literal notranslate"><span class="pre">503</span></code>.</p>
+only repeats values. Keep the scrape timeout above two seconds: <code class="docutils literal notranslate"><span class="pre">mstar-server</span></code>
+waits that long for the bridge before answering <code class="docutils literal notranslate"><span class="pre">503</span></code>.</p>
 </section>
 </section>
 
@@ -1258,7 +1270,7 @@ By M* Team
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Nov 12, 2026.
+  Last updated on Nov 13, 2026.
   <br/>
 </p>
   </div>
