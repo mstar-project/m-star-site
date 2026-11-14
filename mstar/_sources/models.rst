@@ -1858,8 +1858,9 @@ Cosmos3 environment requirements
   prefill, the captured CUDA graphs, and multi-request batches.
 - The default denoise attention backend is ``dense_gen``
   (``Cosmos3Config.attention_backend``), which runs bs=1 eager generation
-  attention as one FlashAttention-3 varlen kernel from the ``fa3-fwd`` wheel
-  (AITER's varlen kernel on ROCm).
+  attention as one FlashAttention-3 kernel from the ``fa3-fwd`` wheel: varlen,
+  or the fixed-length kernel for a single non-causal segment such as a
+  guidance-off step (AITER's varlen kernel on ROCm).
   That wheel is ABI-tied to the installed torch/CUDA build (Hopper builds
   exist for at least torch 2.9 + cu12.8 and torch 2.11 + cu13.0); install the
   one matching your environment. It ships kernels for sm_80 and sm_90a only.
@@ -1883,7 +1884,10 @@ Cosmos3 environment requirements
 - Generated video containers are written with ``torchcodec``'s ``VideoEncoder``
   when available (torchcodec >= 0.9), otherwise directly with PyAV (``av``,
   ``video_encode.encode_mp4``), whose wheel bundles FFmpeg with libx264; that also
-  covers a torchcodec that cannot load FFmpeg.
+  covers a torchcodec that cannot load FFmpeg. With torchcodec a clip of 48 frames or
+  more encodes in parallel pieces (``video_encode.encode_mp4_chunked``, up to 4, without
+  B-frames), joined into one stream: a keyframe starts each piece, and the file is a few
+  percent larger. A 121-frame 832x480 clip encodes in about half the time of one encode.
 - Sound-enabled video responses mux the AAC track with the ``ffmpeg`` and
   ``ffprobe`` binaries, which must be on ``PATH`` (system packages, not
   pip-installable).
@@ -2011,7 +2015,8 @@ Super checkpoints force. A request in the other regime runs eager.
 ``gen_capture_image`` lists the (height, width) image tiers to capture
 (default 192x320, 480x832 and 720x1280, each still bounded by
 ``graph_max_latent_area``); the Super T2I config captures its 1024x1024
-default.
+default. ``compile_prefill`` (default off) compiles the captured text prefill
+in ``denoise_compile_mode``; the Super T2I config turns it on.
 
 The action policy (``cosmos3_edge_droid``, or ``cosmos3_edge`` with an action
 ``domain_name``) predicts a chunk of robot actions from the current observation:
