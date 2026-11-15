@@ -393,7 +393,6 @@
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/mstar.model.parakeet.html">mstar.model.parakeet</a></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="_autosummary/mstar.model.phi4mm.html">mstar.model.phi4mm</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.model.phi4mm.components.html">mstar.model.phi4mm.components</a></li>
-<li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.model.phi4mm.config.html">mstar.model.phi4mm.config</a></li>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/mstar.model.phi4mm.tests.html">mstar.model.phi4mm.tests</a></li>
 </ul>
 </details></li>
@@ -1518,7 +1517,10 @@ and <code class="docutils literal notranslate"><span class="pre">Positions()</sp
 <li><p><code class="docutils literal notranslate"><span class="pre">Positions(rope=)</span></code>: a position counter per request and label, on an append-only array
 that keeps entries. <code class="docutils literal notranslate"><span class="pre">rope=None</span></code> is a counter only. <code class="docutils literal notranslate"><span class="pre">Rope</span></code> carries <code class="docutils literal notranslate"><span class="pre">theta</span></code>,
 <code class="docutils literal notranslate"><span class="pre">rotary_dim</span></code>, <code class="docutils literal notranslate"><span class="pre">interleave</span></code>, <code class="docutils literal notranslate"><span class="pre">scale</span></code>, the Llama 3.1 factors (all three or none), the
-rotation’s <code class="docutils literal notranslate"><span class="pre">dtype</span></code> and a <code class="docutils literal notranslate"><span class="pre">table_dtype</span></code> for a cos/sin table built once. On the contract
+rotation’s <code class="docutils literal notranslate"><span class="pre">dtype</span></code> and a <code class="docutils literal notranslate"><span class="pre">table_dtype</span></code> for a cos/sin table built once. <code class="docutils literal notranslate"><span class="pre">longrope</span></code> takes
+a <code class="docutils literal notranslate"><span class="pre">LongRoPE</span></code>’s short and long factor sets, and a request rotates with the long set when the
+prompt length <code class="docutils literal notranslate"><span class="pre">process_prompt</span></code> sets under <code class="docutils literal notranslate"><span class="pre">MAX_POSITION_KWARG</span></code> passes the original context
+(Phi-4-multimodal). On the contract
 this picks the kernel, and a shared layer’s <code class="docutils literal notranslate"><span class="pre">rope_*</span></code> arguments have no effect, so a port
 declares what its layer passed before. The counter is
 separate from log positions: a kept step advances it by each row’s advance, a fork copies
@@ -1628,7 +1630,7 @@ a refused admit draws the same noise.</p>
 <p><code class="docutils literal notranslate"><span class="pre">kernel_settings(self)</span></code> is a temporary hook for what the engine doesn’t pick itself yet:
 <code class="docutils literal notranslate"><span class="pre">splits</span></code>, <code class="docutils literal notranslate"><span class="pre">decode_fmha</span></code> and <code class="docutils literal notranslate"><span class="pre">decode_tensor_cores</span></code> on a read of a paged array,
 <code class="docutils literal notranslate"><span class="pre">splits</span></code> on a <code class="docutils literal notranslate"><span class="pre">GatedDeltaNet</span></code>, and <code class="docutils literal notranslate"><span class="pre">max_segments_per_request</span></code>, <code class="docutils literal notranslate"><span class="pre">max_segments_per_step</span></code>,
-<code class="docutils literal notranslate"><span class="pre">compile_op</span></code> and <code class="docutils literal notranslate"><span class="pre">workspace_mb</span></code> on a <code class="docutils literal notranslate"><span class="pre">Block</span></code> read. Under an array’s name it sets the default size of the array’s pool, <code class="docutils literal notranslate"><span class="pre">max_num_pages</span></code>
+<code class="docutils literal notranslate"><span class="pre">compile_op</span></code>, <code class="docutils literal notranslate"><span class="pre">workspace_mb</span></code> and <code class="docutils literal notranslate"><span class="pre">backend</span></code> on a <code class="docutils literal notranslate"><span class="pre">Block</span></code> read. Under an array’s name it sets the default size of the array’s pool, <code class="docutils literal notranslate"><span class="pre">max_num_pages</span></code>
 on a paged array and <code class="docutils literal notranslate"><span class="pre">max_slots</span></code> on a <code class="docutils literal notranslate"><span class="pre">Value</span></code> with tensor fields or an unbounded array, which a deployment’s
 <code class="docutils literal notranslate"><span class="pre">resources:</span></code> block overrides. A cross read on an array that keeps entries takes
 <code class="docutils literal notranslate"><span class="pre">decode_tensor_cores</span></code> alone, and two reads that share a resource can’t set one field to two
@@ -1638,7 +1640,14 @@ values. It refuses anything else.</p>
 <p>The engine builds these specs from <code class="docutils literal notranslate"><span class="pre">declare_state</span></code>, and a deployment tunes them under the
 declared names. A model that hasn’t moved to declarations still writes them by hand in
 <code class="docutils literal notranslate"><span class="pre">get_node_resources</span></code>, which returns a flat list of <code class="docutils literal notranslate"><span class="pre">NodeResourceSpec</span></code> objects and is
-<code class="docutils literal notranslate"><span class="pre">[]</span></code> by default. Every spec has these common members:</p>
+<code class="docutils literal notranslate"><span class="pre">[]</span></code> by default. A new model package declares its state through the contract and is listed
+in <code class="docutils literal notranslate"><span class="pre">PORTED</span></code> in <code class="docutils literal notranslate"><span class="pre">test/modular/test_state_lint.py</span></code>, which fails a package that is on
+neither <code class="docutils literal notranslate"><span class="pre">PORTED</span></code> nor its frozen <code class="docutils literal notranslate"><span class="pre">UNPORTED</span></code> list. <code class="docutils literal notranslate"><span class="pre">get_node_resources</span></code> remains for the
+packages on <code class="docutils literal notranslate"><span class="pre">UNPORTED</span></code>. A ported file defines it only for a spec the contract can’t
+declare, such as the sequence shard on MiniMax-H3’s video decoder, a node with no arrays, and
+the lint lists that function with its reason. When the contract can’t declare a model’s state
+yet, the mask or op and its binding in <code class="docutils literal notranslate"><span class="pre">adapters.py</span></code> land first, in their own PR. Every spec
+has these common members:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">resource_key</span></code> is the name of this resource. Three places use this name, and all three
 must agree: the layers bind to it, <code class="docutils literal notranslate"><span class="pre">declare_step</span></code> uses it as the key of its
@@ -3218,8 +3227,9 @@ row whose last step did not keep its value on the device (its first decode step,
 the prefill) still brings it routed, and that read puts it over the slot’s.
 <code class="docutils literal notranslate"><span class="pre">SampledTokenDecoder</span></code> declares it for Qwen3.5, Muse Glimmer, Higgs Audio, Qwen3-ASR and the Cosmos3 reasoner,
 and a node on it that reads the routed token sets <code class="docutils literal notranslate"><span class="pre">device_loopback</span> <span class="pre">=</span> <span class="pre">None</span></code>; Whisper and
-Qwen3-Omni’s Thinker declare their own. Qwen3.5, Qwen3-ASR and Whisper read the tokens with
-<code class="docutils literal notranslate"><span class="pre">last_sampled</span></code>, and put a row’s routed token over its slot’s with <code class="docutils literal notranslate"><span class="pre">splice_loopback_ids</span></code>.
+Qwen3-Omni’s Thinker declare their own. A node on <code class="docutils literal notranslate"><span class="pre">DeclaredTokenDecoder</span></code> and Whisper’s decoder
+read the tokens with <code class="docutils literal notranslate"><span class="pre">last_sampled</span></code>, and put a row’s routed token over its slot’s with
+<code class="docutils literal notranslate"><span class="pre">splice_loopback_ids</span></code>.
 Its <code class="docutils literal notranslate"><span class="pre">walk</span></code> may be a <code class="docutils literal notranslate"><span class="pre">frozenset</span></code> of walks when several decode walks read the token back; a
 combined step’s rows each follow their own walk, and naming a combined walk is refused at
 startup.</p>
@@ -4500,8 +4510,8 @@ SNAC decoder instead declares how it must be run, using two class attributes on 
 <p><code class="docutils literal notranslate"><span class="pre">process_prompt</span></code> formats the string <code class="docutils literal notranslate"><span class="pre">&quot;{voice}:</span> <span class="pre">{text}&quot;</span></code>, tokenizes it, wraps the ids in
 the model’s start and end tokens, and returns <code class="docutils literal notranslate"><span class="pre">{&quot;text_inputs&quot;:</span> <span class="pre">[ids]}</span></code>, with its layout under
 <code class="docutils literal notranslate"><span class="pre">state_layout</span></code>.
-<code class="docutils literal notranslate"><span class="pre">get_submodule</span></code> builds either the Llama LLM submodule, a <code class="docutils literal notranslate"><span class="pre">SampledTokenDecoder</span></code> that
-declares little beyond its walk names, the state its steps list and capture buckets, or the SNAC
+<code class="docutils literal notranslate"><span class="pre">get_submodule</span></code> builds either the Llama LLM submodule, a <code class="docutils literal notranslate"><span class="pre">DeclaredTokenDecoder</span></code> that
+declares little beyond its walk names and capture buckets, or the SNAC
 decoder submodule, and caches the result. The SNAC submodule emits int16
 PCM, which the default <code class="docutils literal notranslate"><span class="pre">postprocess</span></code> passes through as raw bytes.</p>
 <p>Orpheus also demonstrates the async partition API, described in the next section. The LLM
@@ -4879,7 +4889,9 @@ submodule cache and where the files come from. A model sets <code class="docutil
 <code class="docutils literal notranslate"><span class="pre">METADATA_FILES</span></code> and writes <code class="docutils literal notranslate"><span class="pre">__init__</span></code> (setting
 <code class="docutils literal notranslate"><span class="pre">config</span></code>, <code class="docutils literal notranslate"><span class="pre">tokenizer</span></code> and <code class="docutils literal notranslate"><span class="pre">media</span></code>), its resources (the sampler from
 <code class="docutils literal notranslate"><span class="pre">_sampler_spec</span></code>; <code class="docutils literal notranslate"><span class="pre">MIXED_SPLIT</span></code> is the attention resources’ split of a mixed step),
-<code class="docutils literal notranslate"><span class="pre">_prompt_ids</span></code> and <code class="docutils literal notranslate"><span class="pre">_create_submodule</span></code>. The scaffold’s
+<code class="docutils literal notranslate"><span class="pre">_prompt_ids</span></code> and <code class="docutils literal notranslate"><span class="pre">_create_submodule</span></code>. A model on the state contract subclasses
+<code class="docutils literal notranslate"><span class="pre">DeclaredDecoderModel</span></code>, which returns the layout as <code class="docutils literal notranslate"><span class="pre">state_layout</span></code> and the request’s
+settings as <code class="docutils literal notranslate"><span class="pre">SampleSettings</span></code>. The scaffold’s
 <code class="docutils literal notranslate"><span class="pre">rebuild_policies</span></code> lets the KV cache drop a request and reprefill its ids on its prefill
 walk, a media prompt’s with host copies of its encoders’ outputs. A model whose LLM node
 holds a resource that can’t drop returns <code class="docutils literal notranslate"><span class="pre">{}</span></code>, or the engine refuses to start; Muse
@@ -4941,8 +4953,10 @@ writes:</p>
 <code class="docutils literal notranslate"><span class="pre">Qwen3_5ForCausalLM</span></code> and <code class="docutils literal notranslate"><span class="pre">Qwen3DenseLM</span></code> do. The sampler is declared under
 <code class="docutils literal notranslate"><span class="pre">mstar.model.keys</span></code>’ <code class="docutils literal notranslate"><span class="pre">SAMPLER</span></code>, and the positions under the node’s <code class="docutils literal notranslate"><span class="pre">POS_KEY</span></code>
 (<code class="docutils literal notranslate"><span class="pre">ROPE</span></code> unless the model’s layers name another <code class="docutils literal notranslate"><span class="pre">pos_key</span></code>). A model on the state contract
-overrides <code class="docutils literal notranslate"><span class="pre">node_step</span></code>, <code class="docutils literal notranslate"><span class="pre">next_position</span></code>, <code class="docutils literal notranslate"><span class="pre">loopback_tokens</span></code>, <code class="docutils literal notranslate"><span class="pre">last_token_hidden</span></code> and
-<code class="docutils literal notranslate"><span class="pre">sample_tokens</span></code> with its handle calls, as Qwen3.5 does. <code class="docutils literal notranslate"><span class="pre">MSTAR_DECODE_BUCKETS</span></code> sets the
+subclasses <code class="docutils literal notranslate"><span class="pre">DeclaredTokenDecoder</span></code> instead and sets none of <code class="docutils literal notranslate"><span class="pre">ATTN_KEY</span></code>, <code class="docutils literal notranslate"><span class="pre">POS_KEY</span></code> or
+<code class="docutils literal notranslate"><span class="pre">layer_steps</span></code>, since its positions are the array’s: its <code class="docutils literal notranslate"><span class="pre">node_step</span></code>, <code class="docutils literal notranslate"><span class="pre">next_position</span></code>,
+<code class="docutils literal notranslate"><span class="pre">loopback_tokens</span></code>, <code class="docutils literal notranslate"><span class="pre">last_token_hidden</span></code> and <code class="docutils literal notranslate"><span class="pre">sample_tokens</span></code> make the handle calls, and a model
+overrides <code class="docutils literal notranslate"><span class="pre">node_step</span></code> only when it steps a second array, as Qwen3.5 does. <code class="docutils literal notranslate"><span class="pre">MSTAR_DECODE_BUCKETS</span></code> sets the
 default decode ladder, <code class="docutils literal notranslate"><span class="pre">MIXED_MAX_PREFILL_ROWS</span></code> caps a mixed step’s prompt rows, <code class="docutils literal notranslate"><span class="pre">capture_compile_mode(walk)</span></code> names a capture’s <code class="docutils literal notranslate"><span class="pre">compile_mode</span></code> (<code class="docutils literal notranslate"><span class="pre">None</span></code>, the default,
 takes the deployment’s compile level), and <code class="docutils literal notranslate"><span class="pre">CAPTURE_PREFILL</span> <span class="pre">=</span> <span class="pre">False</span></code> captures decode
 only. A lone encoder’s <code class="docutils literal notranslate"><span class="pre">MediaEncoder.walk</span></code> names its media walk when the model’s graph
